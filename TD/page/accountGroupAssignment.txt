@@ -1,0 +1,17 @@
+*** Variables ***
+${accountGroupAssignment_button_top_createAssignment}    Xpath=//table[1]//input[@value='Create Assignment']
+${accountGroupAssignment_button_bottom_createAssignment}    Xpath=//table[3]//input[@value='Create Assignment']
+${accountGroupAssignment_button_top_deleteSelected}    Xpath=//table[1]//input[@name='delete']
+${accountGroupAssignment_button_bottom_deleteSelected}    Xpath=//table[3]//input[@name='delete']
+${accountGroupAssignment_button_top_copySelected}    Xpath=//table[1]//input[@name='copy']
+${accountGroupAssignment_button_bottom_copySelected}    Xpath=//table[3]//input[@name='copy']
+${accountGroupAssignment_button_top_setDefault}    Xpath=//table[1]//input[@name='setdefault']
+${accountGroupAssignment_button_bottom_setDefault}    Xpath=//table[3]//input[@name='setdefault']
+${accountGroupAssignment_button_top_clearDefault}    Xpath=//table[1]//input[@name='cleardefault']
+${accountGroupAssignment_button_bottom_clearDefault}    Xpath=//table[3]//input[@name='cleardefault']
+${accountGroupAssignment_link_clearAll}    Clear All
+${accountGroupAssignment_link_checkAll}    Check All
+${accountGroupAssignment_title_checkBox}    Xpath=//table[@id='table']/thead/tr[1]/th[1]/input
+${accountGroupAssignment_checkBox_rowPlaceHold}    Xpath=//table[@id='table']/tbody/tr[row]/td[1]/input
+${accountGroupAssignment_info_rowPlaceHold}    Xpath=//table[@id='table']/tbody/tr[row]/td[2]/a
+${accountGroupAssignment_info_count}    //table[@id='table']/tbody/tr

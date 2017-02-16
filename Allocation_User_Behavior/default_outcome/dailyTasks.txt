@@ -1,0 +1,3 @@
+*** Variables ***
+@{default_taskType}    Pre-Allocation    Mid-Allocation    Post-Allocation    Transfer
+@{default_screenType}    Detail    Detail by Color by Door    Detail by Size by Door    Summary

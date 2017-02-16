@@ -1,0 +1,66 @@
+.nonselectable .z-listitem .z-listcell {cursor:default;}
+.z-datebox { min-height: 14px; }
+.z-datebox-input[readonly]{ background: #fff; border-radius: 0;width:75px; }
+.z-datebox-button, .z-datebox-input { height:20px;line-height: 11px;border-radius: 0; }
+.z-calendar-title, .z-calendar-title:hover, .z-calendar-icon, .z-calendar-icon:hover {color:#fff !important;}
+.custom-disabled-date {height:100%;width:100%;cursor:default;}
+.custom-disabled-date::before {font-family: FontAwesome;content: "\f05e";color: red;font-size: 18px;position: relative;top: 2px;left: 0;bottom: 0;right: 0;margin-right: -14px;z-index: 2;}
+
+.z-button { margin:1px 0 0 0; }
+select.z-select { margin-top:1px !important; }
+
+.z-combobox, .z-bandbox, .z-datebox, .z-timebox, .z-spinner, .z-doublespinner, .z-select { border-radius: 0; }
+
+.colorselect .z-listitem.z-listitem-selected>.z-listcell>.z-listcell-content { color:#444;font-weight:bold;background:url('../images/ZK/selected.gif') no-repeat right top;}
+.colorselect .z-listitem.z-listitem-selected>.z-listcell {background:none;}
+.colorselect .z-listitem.z-listitem-selected {}
+
+.z-timebox-button:hover>i, .z-spinner-button:hover>i, .z-doublespinner-button:hover>i {top: 9px;}
+.z-spinner .z-icon-angle-down,.z-spinner .z-icon-angle-down:before, .z-spinner .z-icon-angle-up,.z-spinner .z-icon-angle-up:before {height:10px}
+.z-spinner .z-icon-angle-down:before {margin-top:1px;margin-bottom:-1px;height:9px;}
+.z-spinner-separator {margin:0;padding:0;}
+
+.z-listbox-header-border {border-bottom:none;}
+.z-decimalbox, .z-intbox, .z-select {height:20px}
+
+		
+
+.lockedcheck {display: inline;padding:4px 5px}
+	
+.p5 {padding:5px;}
+.right {text-align:right}		
+.tlp5 label {padding-right:5px;}
+	
+textarea {resize: none;background-color:#fff;}
+.right{float:right !important;}
+.pwrapper { background-color:#f6f6f6;border: 1px solid #808080; }
+	
+.z-panel-body, .z-panelchildren { background-color:#f6f6f6; }	
+.z-hlayout-inner {padding-right:0px !important;}	
+.z-vlayout-inner { padding-bottom: 0px !important; }
+	
+.gridwindow .z-window-content {padding:0px;}
+
+
+.hideside{display:none !important;}
+.countertable {counter-reset: Num;}
+.counter {counter-increment:Num;background-color:#fff;font-weight:bold;text-align:right;width:15px;}
+.counter:before {content: counter(Num) ".";}
+
+.zstophead { height: 0px;visibility:hidden;display:none; }
+.z-vbox-separator { height: 0px; }
+.zstbtn-addSheet {display:none !important;}
+
+
+.e-status *{ font-family: FontAwesome !important;font-size:16px !important;color:red;}
+	tr.z-listitem-selected .deny {color:#fff !important;}
+	tr.z-listitem-selected .edit,tr.z-listitem-selected .view {color:#000 !important;}
+	.lockb {width:60px;}
+
+.hidden { display:none !important; }
+
+.zscelltxt-real[style]{ text-decoration:none !important;} //Used to remove underline links in spreadsheet
+div.zssheet div.zscellcomment {
+	display:none;
+    border-color: #ccc #ccc transparent transparent;
+    }

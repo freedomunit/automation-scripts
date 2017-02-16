@@ -1,0 +1,543 @@
+*** Settings ***
+Force Tags        SC-G2-BP
+Resource          Setting/environment.txt
+Resource          Setting/performancekeyword.txt
+Resource          page/ZK.txt
+Resource          page/BrandProfile.txt
+Resource          page/standard7thpage.txt
+
+*** Test Cases ***
+enterBP
+    [Tags]
+    enterCertainModel    Brand Profile    ${mainPage}    BrandProfile
+
+download
+    [Tags]
+    return from keyword
+    @{downloadList}    get list items    ${BP_downloadDropdown}
+    : FOR    ${item}    IN    @{downloadList}
+    \    select from list by label    ${BP_downloadDropdown}    ${item}
+    \    list selection should be    ${BP_downloadDropdown}    ${item}
+    \    run keyword if    '${item}' !='Promotion Type Style Door' and '${item}' !='Promotion Type'    enter page by click    ${BP_downloadBtn}    ${mainPage}    DownloadFilterCriteria
+    \    run keyword if    '${item}' !='Promotion Type Style Door' and '${item}' !='Promotion Type'    dynamic Select Criteria    ${Criteria_Dropdown_filterHierarchy_last}    ${Criteria_filterHierarchy_options_last}    ${Criteria_filterHierarchy_optionsCount_last}
+    \    download excel    ${BP_downloadBtn}    ${item}
+    \    run keyword if    '${item}' !='Promotion Type Style Door' and '${item}' !='Promotion Type'    enter page by click    ${BP_cancelBtn}    ${mainPage}    BrandProfile
+
+setup
+    [Documentation]    exclude Allocation Prepack Setup-Create link case
+    [Tags]
+    @{setupList}    get list items    ${BP_setupDropdown}
+    : FOR    ${dropdownItem}    IN    @{setupList}
+    \    wait until page contains element    ${BP_setupDropdown}    30
+    \    run keyword    ${dropdownItem}    ${dropdownItem}
+
+*** Keywords ***
+Allocation Box Setup
+    [Arguments]    ${dropdownItem}
+    [Documentation]    ok
+    select from list by label    ${BP_setupDropdown}    ${dropdownItem}
+    list selection should be    ${BP_setupDropdown}    ${dropdownItem}
+    ${item}    replace string    ${dropdownItem}    Setup    ${EMPTY}
+    ${item}    replace string    ${item}    ${SPACE}    ${EMPTY}
+    enter page by click    ${BP_goBtn}    ${mainPage}    ${item}
+    @{criteriaItems}    get list items    ${BP_AllocationBox_dropdown_criteria}
+    ${criteriaCounts}    get length    ${criteriaItems}
+    ${criteriaIndex}    evaluate    random.randint(0,${criteriaCounts}-1)    random
+    ${criteriaIndex}    convert to string    ${criteriaIndex}
+    select from list by index    ${BP_AllocationBox_dropdown_criteria}    ${criteriaIndex}
+    sleep    3S
+    list selection should be    ${BP_AllocationBox_dropdown_criteria}    @{criteriaItems}[${criteriaIndex}]
+    @{citys}    get list items    ${BP_AllocationBox_dropdown_citys}
+    ${cityCounts}    get length    ${citys}
+    ${cityIndex}    evaluate    random.randint(0,${cityCounts}-1)    random
+    ${cityIndex}    convert to string    ${cityIndex}
+    select from list by index    ${BP_AllocationBox_dropdown_citys}    ${cityIndex}
+    sleep    3S
+    list selection should be    ${BP_AllocationBox_dropdown_citys}    @{citys}[${cityIndex}]
+    input text    ${BP_criteria_inputText_only}    test123,test1234
+    dynamic Select Criteria    ${Criteria_Dropdown_filterHierarchy_last}    ${Criteria_filterHierarchy_options_last}    ${Criteria_filterHierarchy_optionsCount_last}
+    enter page by click    ${BP_cancelBtn}    ${mainPage}    BrandProfile
+
+Allocation Prepack Setup
+    [Arguments]    ${dropdownItem}
+    [Documentation]    ok
+    select from list by label    ${BP_setupDropdown}    ${dropdownItem}
+    list selection should be    ${BP_setupDropdown}    ${dropdownItem}
+    ${item}    replace string    ${dropdownItem}    Setup    ${EMPTY}
+    ${item_1}    replace string    ${item}    ${SPACE}    ${EMPTY}
+    enter page by click    ${BP_goBtn}    ${mainPage}    ${item_1}
+    enter page by click    ${BP_createBtn}    ${mainPage}    Create${item}
+    input text    ${BP_criteria_inputText_name}    test123
+    dynamic Select Criteria    ${Criteria_Dropdown_filterHierarchy_last}    ${Criteria_filterHierarchy_options_last}    ${Criteria_filterHierarchy_optionsCount_last}
+    enter page by click    ${BP_cancelBtn}    ${mainPage}    ${item_1}
+    ${linksCount}    get matching xpath count    ${BP_reservePrepackSetting_linksCount_firstSection}
+    run keyword if    ${linksCount} < 2    enter page by click    ${BP_cancelBtn}    ${mainPage}    BrandProfile
+    continue for loop if    ${linksCount} < 2
+    ${linkNum}    evaluate    random.randint(2,${linksCount})    random
+    enter page by click    Xpath=${BP_reservePrepackSetting_linksCount_firstSection}[${linkNum}]/td[2]/a    ${mainPage}    Edit${item}
+    clear element text    ${BP_criteria_inputText_name}
+    input text    ${BP_criteria_inputText_name}    test123
+    dynamic Select Criteria    ${Criteria_Dropdown_filterHierarchy_last}    ${Criteria_filterHierarchy_options_last}    ${Criteria_filterHierarchy_optionsCount_last}
+    enter page by click    ${BP_cancelBtn}    ${mainPage}    ${item_1}
+    enter page by click    Xpath=${BP_reservePrepackSetting_linksCount_firstSection}[${linkNum}]//a[text()='Settings' ]    ${mainPage}    DefinePrepackSizes
+    @{inputTextRows}    execute javascript    var a = new Array();var n=0;$(".table4").find("input[name='createifqty']").each(function(){a[n]=$(this).parents("tr").index()+1;n++;});return a
+    ${rowNum}    run keyword if    @{inputTextRows} != @{EMPTY}    evaluate    random.randint(0,len(@{inputTextRows})-1)    random
+    run keyword if    @{inputTextRows} != @{EMPTY}    input text    Xpath=//table[@class='table4']//tr[@{inputTextRows}[${rowNum}]]//input[@name='createifqty']    5
+    run keyword if    @{inputTextRows} != @{EMPTY}    Textfield Value Should Be    Xpath=//table[@class='table4']//tr[@{inputTextRows}[${rowNum}]]//input[@name='createifqty']    5
+    run keyword if    @{inputTextRows} != @{EMPTY}    page should not contain    error
+    run keyword if    @{inputTextRows} != @{EMPTY}    input text    Xpath=//table[@class='table4']//tr[@{inputTextRows}[${rowNum}]]//input[@name='prepackpercent']    20
+    run keyword if    @{inputTextRows} != @{EMPTY}    Textfield Value Should Be    Xpath=//table[@class='table4']//tr[@{inputTextRows}[${rowNum}]]//input[@name='prepackpercent']    20
+    run keyword if    @{inputTextRows} != @{EMPTY}    page should not contain    error
+    enter page by click    ${BP_cancelBtn}    ${mainPage}    ${item_1}
+    enter page by click    Xpath=${BP_reservePrepackSetting_linksCount_firstSection}[${linkNum}]//a[text()='Edit' ]    ${mainPage}    Prepack%Style/Colors
+    @{inputTextRows}    execute javascript    var a = new Array();var n=0;$(".table4").find("input[name='createIfQty']").each(function(){a[n]=$(this).parents("tr").index()+1;n++;});return a
+    ${rowNum}    evaluate    random.randint(0,len(@{inputTextRows})-1)    random
+    input text    Xpath=//table[@class='table4']//tr[@{inputTextRows}[${rowNum}]]//input[@name='createIfQty']    5
+    Textfield Value Should Be    Xpath=//table[@class='table4']//tr[@{inputTextRows}[${rowNum}]]//input[@name='createIfQty']    5
+    page should not contain    error
+    input text    Xpath=//table[@class='table4']//tr[@{inputTextRows}[${rowNum}]]//input[@name='prepackpercent']    20
+    Textfield Value Should Be    Xpath=//table[@class='table4']//tr[@{inputTextRows}[${rowNum}]]//input[@name='prepackpercent']    20
+    page should not contain    error
+    @{style#}    execute javascript    var col=$(".table4 ").find("th:contains('Style#')").index();var a = new Array();var n = 0;$(".table4:last tr").find("td:eq("+col+")[rowspan='7']").each(function(){a[n]=$(this).text();n++;});return a
+    ${styleNum}    evaluate    random.randint(0,len(@{style#})-1)    random
+    input text    //input[@name='stylenumber']    @{style#}[${styleNum}]
+    click element    ${BP_searchBtn}
+    sleep    1S
+    wait until page does not contain    Processing...    60
+    Textfield Value Should Be    //input[@name='stylenumber']    @{style#}[${styleNum}]
+    @{style#_new}    execute javascript    var col=$(".table4 ").find("th:contains('Style#')").index();var a = new Array();var n = 0;$(".table4:last tr").find("td:eq("+col+")[rowspan='7']").each(function(){a[n]=$(this).text();n++;});return a
+    : FOR    ${item}    IN    @{style#_new}
+    \    Run Keyword And Continue On Failure    run keyword if    ${item} != @{style#}[${styleNum}]    fail    Search Result incorrect!
+    enter page by click    ${BP_cancelBtn}    ${mainPage}    ${item_1}
+    enter page by click    ${BP_cancelBtn}    ${mainPage}    BrandProfile
+
+Allocation Reserve Setup
+    [Arguments]    ${dropdownItem}
+    [Documentation]    OK
+    ...
+    ...
+    ...    Issue: don't twice search style!
+    #    return from keyword
+    select from list by label    ${BP_setupDropdown}    ${dropdownItem}
+    list selection should be    ${BP_setupDropdown}    ${dropdownItem}
+    ${item}    replace string    ${dropdownItem}    Setup    ${EMPTY}
+    ${item}    replace string    ${item}    Allocation    ${EMPTY}
+    ${item}    replace string    ${item}    ${SPACE}    ${EMPTY}
+    enter page by click    ${BP_goBtn}    ${mainPage}    ${item}
+    enter page by click    ${BP_createBtn}    ${mainPage}    Create${item}
+    input text    ${BP_criteria_inputText_name}    test123
+    textfield value should be    ${BP_criteria_inputText_name}    test123
+    random select option on dropdown    ${BP_Reserve%_dropdown_reserve%}    0    var a = new Array();var num=0;$("#selections").find("option:not(:selected):not(:disabled)").each(function(){a[num]=$(this).text();num++;});return a
+    input text    ${BP_Reserve%_inuptText_totalReserve}    10
+    textfield value should be    ${BP_Reserve%_inuptText_totalReserve}    10
+    random select option on dropdown    ${BP_Reserve%_dropdown_reserveDC}    1
+    random select option on dropdown    ${BP_Reserve%_dropdown_stockCategory}
+    input text    ${BP_Reserve%_inuptText_spread%}    10
+    input text    ${BP_Reserve%_inuptText_DCPushDate}    3
+    textfield value should be    ${BP_Reserve%_inuptText_spread%}    10
+    textfield value should be    ${BP_Reserve%_inuptText_DCPushDate}    3
+    dynamic Select Criteria    ${Criteria_Dropdown_filterHierarchy_last}    ${Criteria_filterHierarchy_options_last}    ${Criteria_filterHierarchy_optionsCount_last}
+    enter page by click    ${BP_cancelBtn}    ${mainPage}    ${item}
+    ${reserveSectionsCount}    get matching xpath count    //table[@class='table4']
+    ${sectionNum}    evaluate    random.randint(1,${reserveSectionsCount})    random
+    ${reserveRowsCount}    get matching xpath count    //table[@class='table4'][${sectionNum} ]//tr
+    run keyword if    ${reserveRowsCount} < 2    enter page by click    ${BP_cancelBtn}    ${mainPage}    BrandProfile
+    continue for loop if    ${reserveRowsCount} \ < 2
+    ${rowNum}    evaluate    random.randint(2,${reserveRowsCount})    random
+    enter page by click    Xpath=//table[@class='table4'][${sectionNum}]//tr[${rowNum}]/td[2]/a    ${mainPage}    Edit${item}
+    clear element text    ${BP_criteria_inputText_name}
+    input text    ${BP_criteria_inputText_name}    test123
+    textfield value should be    ${BP_criteria_inputText_name}    test123
+    random select option on dropdown    ${BP_Reserve%_dropdown_reserve%}    0    var a = new Array();var num=0;$("#selections").find("option:not(:selected):not(:disabled)").each(function(){a[num]=$(this).text();num++;});return a
+    clear element text    ${BP_Reserve%_inuptText_totalReserve}
+    input text    ${BP_Reserve%_inuptText_totalReserve}    10
+    textfield value should be    ${BP_Reserve%_inuptText_totalReserve}    10
+    random select option on dropdown    ${BP_Reserve%_dropdown_reserveDC}    1
+    random select option on dropdown    ${BP_Reserve%_dropdown_stockCategory}
+    clear element text    ${BP_Reserve%_inuptText_spread%}
+    clear element text    ${BP_Reserve%_inuptText_DCPushDate}
+    input text    ${BP_Reserve%_inuptText_spread%}    10
+    input text    ${BP_Reserve%_inuptText_DCPushDate}    3
+    textfield value should be    ${BP_Reserve%_inuptText_spread%}    10
+    textfield value should be    ${BP_Reserve%_inuptText_DCPushDate}    3
+    dynamic Select Criteria    ${Criteria_Dropdown_filterHierarchy_last}    ${Criteria_filterHierarchy_options_last}    ${Criteria_filterHierarchy_optionsCount_last}
+    enter page by click    ${BP_cancelBtn}    ${mainPage}    ${item}
+    clear element text    Xpath=//table[@class='table4'][${sectionNum}]//tr[${rowNum}]/td[3]/input
+    input text    Xpath=//table[@class='table4'][${sectionNum}]//tr[${rowNum}]/td[3]/input    10
+    page should not contain    error
+    textfield value should be    Xpath=//table[@class='table4'][${sectionNum}]//tr[${rowNum}]/td[3]/input    10
+    clear element text    Xpath=//table[@class='table4'][${sectionNum}]//tr[${rowNum}]/td[4]/input[@name='dcpushdate']
+    input text    Xpath=//table[@class='table4'][${sectionNum}]//tr[${rowNum}]/td[4]/input[@name='dcpushdate']    3
+    page should not contain    error
+    textfield value should be    Xpath=//table[@class='table4'][${sectionNum}]//tr[${rowNum}]/td[4]/input[@name='dcpushdate']    3
+    enter page by click    Xpath=//table[@class='table4'][${sectionNum}]//tr[${rowNum}]/td[6]/a    ${mainPage}    ReserveStyle/Colors
+    wait until element is visible    ${BP_searchBtn}    60
+    enter page by click    ${BP_searchBtn}    Xpath=//div[@id='notabcontent']/table    AddStyle/Colors
+    ${styleCount}    get matching Xpath count    //table[@class='table1']//tr[2]
+    ${style#}    run keyword if    ${styleCount}>0    get text    Xpath=//table[@class='table1']//tr[2]/td[2]
+    enter page by click    ${BP_cancelBtn}    ${mainPage}    ReserveStyle/Colors
+    go back
+    wait until page contains element     Xpath=//big[@class='title2']    60
+    wait until element contains    Xpath=//big[@class='title2']    ${item}    60
+    enter page by click    Xpath=//table[@class='table4'][${sectionNum}]//tr[${rowNum}]/td[6]/a    ${mainPage}    ReserveStyle/Colors
+    run keyword if    ${styleCount}>0    input text    Xpath=//input[@name='stylenumber']    ${style#}
+    enter page by click    ${BP_searchBtn}    Xpath=//div[@id='notabcontent']/table    AddStyle/Colors
+    @{researchedStyle}    execute javascript    var col = $("th:contains('Style#')").index();var a = new Array();var n = 0;$(".table1 tbody tr:gt(0)").find("td:eq("+col+")").each(function(){a[n]=$(this).text();n++;}); return a
+    : FOR    ${style}    IN    @{researchedStyle}
+    \    Run Keyword And Continue On Failure    run keyword if    ${style} != ${style#}    fail    Fail Researched Style !
+    enter page by click    ${BP_cancelBtn}    ${mainPage}    ReserveStyle/Colors
+    go back
+    wait until element contains    Xpath=//big[@class='title2']    ${item}    60
+    wait until element is visible    ${BP_cancelBtn}
+    enter page by click    ${BP_cancelBtn}    ${mainPage}    BrandProfile
+
+Allocation Setup
+    [Arguments]    ${dropdownItem}
+    [Documentation]    ok
+    select from list by label    ${BP_setupDropdown}    ${dropdownItem}
+    list selection should be    ${BP_setupDropdown}    ${dropdownItem}
+    ${item}    strip string    ${dropdownItem}
+    enter page by click    ${BP_goBtn}    ${mainPage}    Setup
+    enter page by click    ${BP_createBtn}    ${mainPage}    Create${item}
+    input text    ${BP_criteria_inputText_only}    test123
+    dynamic Select Criteria    ${Criteria_Dropdown_filterHierarchy_last}    ${Criteria_filterHierarchy_options_last}    ${Criteria_filterHierarchy_optionsCount_last}
+    enter page by click    ${BP_cancelBtn}    ${mainPage}    Setup
+    ${linkRows_count}    get matching xpath count    ${BP_setup_linksCount}
+    run keyword if    ${linkRows_count} < 2    enter page by click    ${BP_cancelBtn}    ${mainPage}    BrandProfile
+    continue for loop if    ${linkRows_count} < 2
+    ${rowNum}    evaluate    random.randint(2,${linkRows_count})    random
+    ${setupCriteria_path}    set variable    Xpath=${BP_setup_linksCount}[${rowNum}]/td[2]/a
+    ${edit_path}    set variable    Xpath=${BP_setup_linksCount}[${rowNum}]//a[text()='Edit']
+    enter page by click    ${setupCriteria_path}    ${mainPage}    Edit${item}
+    clear element text    ${BP_criteria_inputText_only}
+    input text    ${BP_criteria_inputText_only}    test123
+    dynamic Select Criteria    ${Criteria_Dropdown_filterHierarchy_last}    ${Criteria_filterHierarchy_options_last}    ${Criteria_filterHierarchy_optionsCount_last}
+    enter page by click    ${BP_cancelBtn}    ${mainPage}    Setup
+    enter page by click    ${edit_path}    ${mainPage}    Define ${item}
+    ${removeRowPath}    replace string    ${Criteria_filterHierarchy_options_last}    [last()]    ${EMPTY}
+    ${removeRowPath}    replace string    ${removeRowPath}    Xpath=    ${EMPTY}
+    ${removeRowCount}    get matching xpath count    ${removeRowPath}
+    : FOR    ${num}    IN RANGE    1    ${removeRowCount}+1
+    \    run keyword if    ${removeRowCount} > ${num}    click button    ${Criteria_Button_removeFilter_last}
+    \    run keyword if    ${removeRowCount} == ${num}    select from list by index    ${Criteria_Dropdown_filterHierarchy_last}    0
+    \    run keyword if    ${removeRowCount} == ${num}    list selection should be    ${Criteria_Dropdown_filterHierarchy_last}    ${EMPTY}
+    \    sleep    1S
+    random select option on dropdown    Xpath=//select[@name='fromTimeOption']
+    random select option on dropdown    Xpath=//select[@name='toTimeOption']
+    random select option on dropdown    Xpath=//select[@name='partialShipmentRule']
+    random select option on dropdown    Xpath=//select[@name='hierarchyattr1']    1
+    random select option on dropdown    Xpath=//select[@name='mdOperator']
+    click element    Xpath=//td[@class='multiselectholder']/div/div[@class='multiCtext']    #    Xpath=//span[@class='ui-dropdownchecklist-text']
+    ${checkedRow}    execute javascript    var rows='';$("td.multiselectholder div div.multiC").find("input:checked").each(function(){ if(rows){ rows+=","+($(this).parents("tr").index()+1);} else { rows+=$(this).parents("tr").index()+1;} }); return rows    #    var rows='';$("div.ui-dropdownchecklist-item").children("input:checked").each(function(){ if(rows){ rows+=","+($(this).parent().index()+1);} else { rows+=$(this).parent().index()+1;} }); return rows
+    @{checkedRow}    split string    ${checkedRow}    ,
+    : FOR    ${num}    IN    @{checkedRow}
+    \    unselect checkbox    Xpath=//td[@class='multiselectholder']//tr[${num}]//input[@checked]
+    \    checkbox should not be selected    Xpath=//td[@class='multiselectholder']//tr[${num}]//input[@checked]    #    Xpath=//div[${num}]/input[@checked='checked']
+    click element    Xpath=//td[@class='multiselectholder']/div/div[@class='multiCtext']    #    Xpath=//span[@class='ui-dropdownchecklist-text']
+    ${uncheck_count}    get matching xpath count    //td[@class='multiselectholder']//tr//input[@type='checkbox']    #    //div/input[@type='checkbox']
+    ${row}    evaluate    random.randint(1,${uncheck_count})    random
+    click element    Xpath=//td[@class='multiselectholder']/div/div[@class='multiCtext']    #    Xpath=//span[@class='ui-dropdownchecklist-text']
+    select checkbox    Xpath=//td[@class='multiselectholder']//tr[${row}]//input[@type='checkbox']    #    Xpath=//div[${row}]/input[@type='checkbox']
+    checkbox should be selected    Xpath=//td[@class='multiselectholder']//tr[${row}]//input[@type='checkbox']
+    ${row}    evaluate    ${row}+1
+    #    click element    Xpath=//span[@class='ui-dropdownchecklist-text']
+    select checkbox    Xpath=//td[@class='multiselectholder']//tr[${row}]//input[@type='checkbox']
+    checkbox should be selected    Xpath=//td[@class='multiselectholder']//tr[${row}]//input[@type='checkbox']
+    click element    Xpath=//td[@class='multiselectholder']/div/div[@class='multiCtext']
+    ${hierarchyattrDropdownCounts}    get matching xpath count    //tr[@class="filtertablerow"]    #    //td[not(@class)]/div/div[@class='multiCtext']
+    ${selectedHierarchyattrDropdown}    evaluate    random.randint(1,${hierarchyattrDropdownCounts})    random
+    click element    Xpath=//tr[@class='filtertablerow'][${selectedHierarchyattrDropdown}]//div[@class='multiCtext']
+    #    ${checked_count}    get matching xpath count    //tr[@class='checkedrowcolor']
+    #    :FOR    ${num}    IN RANGE    1    ${checked_count}+1
+    #    unselect checkbox    Xpath=//tr[${num}]//input
+    #    checkbox should not be selected    Xpath=//tr[${num}]//input
+    click element    Xpath=//tr[@class='filtertablerow'][${selectedHierarchyattrDropdown}]//div[@class='multiCtext']
+    ${uncheck_count}    get matching xpath count    //tr[@class='filtertablerow'][${selectedHierarchyattrDropdown}]//div[contains(@class,'multiC')]//tr//label/input[@type='checkbox']
+    ${row}    evaluate    random.randint(1,${uncheck_count})    random
+    click element    Xpath=//tr[@class='filtertablerow'][${selectedHierarchyattrDropdown}]//div[@class='multiCtext']
+    select checkbox    Xpath=//tr[@class='filtertablerow'][${selectedHierarchyattrDropdown}]//div[contains(@class,'multiC')]//tr[${row}]//label/input[@type='checkbox']
+    checkbox should be selected    Xpath=//tr[@class='filtertablerow'][${selectedHierarchyattrDropdown}]//div[contains(@class,'multiC')]//tr[${row}]//label/input[@type='checkbox']
+    ${row}    evaluate    ${row}+1
+    select checkbox    Xpath=//tr[@class='filtertablerow'][${selectedHierarchyattrDropdown}]//div[contains(@class,'multiC')]//tr[${row}]//label/input[@type='checkbox']
+    checkbox should be selected    Xpath=//tr[@class='filtertablerow'][${selectedHierarchyattrDropdown}]//div[contains(@class,'multiC')]//tr[${row}]//label/input[@type='checkbox']
+    unselect checkbox    Xpath=//tr[@class='filtertablerow'][${selectedHierarchyattrDropdown}]//div[contains(@class,'multiC')]//tr[${row}]//label/input[@type='checkbox']
+    checkbox should not be selected    Xpath=//tr[@class='filtertablerow'][${selectedHierarchyattrDropdown}]//div[contains(@class,'multiC')]//tr[${row}]//label/input[@type='checkbox']
+    ${disabledDropdown_count}    get matching xpath count    //select[contains(@id,'tstoreindex') and @disabled]
+    ${enabledDropdown_firstRowNum}    evaluate    ${disabledDropdown_count}+2
+    ${enabledDropdown_firstRowIndex}    evaluate    ${disabledDropdown_count}+1
+    random select option on dropdown    Xpath=//tr[${enabledDropdown_firstRowNum}]//select[contains(@id,'tstoreindex') and not(@disabled)]    0    var a = new Array();var num=0;$("#tstoreindex${enabledDropdown_firstRowIndex} optgroup").find("option:not(:selected):not(:disabled)").each(function(){a[num]=$(this).text();num++;});return a
+    ${disabledDropdown_count}    get matching xpath count    //select[contains(@id,'qallocation') and @disabled]
+    ${enabledDropdown_firstRowNum}    evaluate    ${disabledDropdown_count}+2
+    ${enabledDropdown_firstRowIndex}    evaluate    ${disabledDropdown_count}+1
+    random select option on dropdown    Xpath=//tr[${enabledDropdown_firstRowNum}]//select[contains(@id,'qallocation') and not(@disabled)]    0    var a = new Array();var num=0;$("#qallocation${enabledDropdown_firstRowIndex} optgroup").find("option:not(:selected):not(:disabled)").each(function(){a[num]=$(this).text();num++;});return a
+    ${disabledDropdown_count}    get matching xpath count    //select[contains(@id,'sprofile') and @disabled]
+    ${enabledDropdown_firstRowNum}    evaluate    ${disabledDropdown_count}+2
+    ${enabledDropdown_firstRowIndex}    evaluate    ${disabledDropdown_count}+1
+    random select option on dropdown    Xpath=//tr[${enabledDropdown_firstRowNum}]//select[contains(@id,'sprofile') and not(@disabled)]    0    var a = new Array();var num=0;$("#sprofile${enabledDropdown_firstRowIndex} optgroup").find("option:not(:selected):not(:disabled)").each(function(){a[num]=$(this).text();num++;});return a
+    ${disabledDropdown_count}    get matching xpath count    //select[contains(@id,'obreakdown') and @disabled]
+    ${enabledDropdown_firstRowNum}    evaluate    ${disabledDropdown_count}+2
+    ${enabledDropdown_firstRowIndex}    evaluate    ${disabledDropdown_count}+1
+    random select option on dropdown    Xpath=//tr[${enabledDropdown_firstRowNum}]//select[contains(@id,'obreakdown') and not(@disabled)]    0    var a = new Array();var num=0;$("#obreakdown${enabledDropdown_firstRowIndex} optgroup").find("option:not(:selected):not(:disabled)").each(function(){a[num]=$(this).text();num++;});return a
+    clear element text    Xpath=//input[@name='mdPercent']
+    input text    Xpath=//input[@name='mdPercent']    1.0
+    clear element text    Xpath=//input[@name='targetAlpha']
+    input text    Xpath=//input[@name='targetAlpha']    1.0
+    clear element text    Xpath=//input[@name='allocateAlpha']
+    input text    Xpath=//input[@name='allocateAlpha']    1.0
+    clear element text    Xpath=//input[@name='sizeProfileAttrAlpha']
+    input text    Xpath=//input[@name='sizeProfileAttrAlpha']    1.0
+    #    clear element text    Xpath=//input[@name='cityAlhpa']
+    #    input text    Xpath=//input[@name='cityAlhpa']    1.0
+    enter page by click    ${BP_cancelBtn}    ${mainPage}    Setup
+    enter page by click    ${BP_cancelBtn}    ${mainPage}    BrandProfile
+
+Allocation Stage Setup
+    [Arguments]    ${dropdownItem}
+    [Documentation]    ok
+    select from list by label    ${BP_setupDropdown}    ${dropdownItem}
+    list selection should be    ${BP_setupDropdown}    ${dropdownItem}
+    ${item}    replace string    ${dropdownItem}    Setup    ${EMPTY}
+    ${item}    strip string    ${item}
+    ${item_1}    replace string    ${item}    Allocation${SPACE}    ${EMPTY}
+    enter page by click    ${BP_goBtn}    ${mainPage}    ${item_1}
+    enter page by click    ${BP_createBtn}    ${mainPage}    Create${item}
+    input text    ${BP_criteria_inputText_name}    test123
+    dynamic Select Criteria    ${Criteria_Dropdown_filterHierarchy_last}    ${Criteria_filterHierarchy_options_last}    ${Criteria_filterHierarchy_optionsCount_last}
+    enter page by click    ${BP_cancelBtn}    ${mainPage}    ${item_1}
+    ${linkRows_count}    get matching xpath count    ${BP_setup_linksCount}
+    run keyword if    ${linkRows_count} < 2    enter page by click    ${BP_cancelBtn}    ${mainPage}    BrandProfile
+    continue for loop if    ${linkRows_count} < 2
+    ${rowNum}    evaluate    random.randint(2,${linkRows_count})    random
+    ${setupCriteria_path}    set variable    Xpath=${BP_setup_linksCount}[${rowNum}]/td[2]/a
+    ${edit_path}    set variable    Xpath=${BP_setup_linksCount}[${rowNum}]//a[text()='Edit']
+    enter page by click    ${setupCriteria_path}    ${mainPage}    Edit${item}
+    clear element text    ${BP_criteria_inputText_only}
+    input text    ${BP_criteria_inputText_only}    test123
+    dynamic Select Criteria    ${Criteria_Dropdown_filterHierarchy_last}    ${Criteria_filterHierarchy_options_last}    ${Criteria_filterHierarchy_optionsCount_last}
+    enter page by click    ${BP_cancelBtn}    ${mainPage}    ${item_1}
+    enter page by click    ${edit_path}    ${mainPage}    DefineAllocationStage
+    ${definedStageCount}    get matching xpath count    ${BP_AllocationStage_definedStageCount}
+    ${stageRow}    evaluate    random.randint(2,${definedStageCount}+1)    random
+    random select option on dropdown    Xpath=//tr[${stageRow}]/td[5]/select    0    var row = ${stageRow}-1;var a = new Array();var n=0;$("#mytableid tr:eq("+row+") td:eq(4) select").children("option:not(:selected)").each(function(){a[n]=$(this).text();n++;});return a
+    random select option on dropdown    Xpath=//tr[${stageRow}]/td[6]/select    0    var row = ${stageRow}-1;var a = new Array();var n=0;$("#mytableid tr:eq("+row+") td:eq(5) select").children("option:not(:selected)").each(function(){a[n]=$(this).text();n++;});return a
+    random select option on dropdown    Xpath=//tr[${stageRow}]/td[7]/select    0    var row = ${stageRow}-1;var a = new Array();var n=0;$("#mytableid tr:eq("+row+") td:eq(6) select").children("option:not(:selected)").each(function(){a[n]=$(this).text();n++;});return a
+    random select option on dropdown    Xpath=//tr[${stageRow}]/td[8]/select    0    var row = ${stageRow}-1;var a = new Array();var n=0;$("#mytableid tr:eq("+row+") td:eq(7) select").children("option:not(:selected)").each(function(){a[n]=$(this).text();n++;});return a
+    random select option on dropdown    Xpath=//tr[${stageRow}]/td[9]/select    0    var row = ${stageRow}-1;var a = new Array();var n=0;$("#mytableid tr:eq("+row+") td:eq(8) select").children("option:not(:selected)").each(function(){a[n]=$(this).text();n++;});return a
+    enter page by click    ${BP_cancelBtn}    ${mainPage}    ${item_1}
+    enter page by click    ${BP_cancelBtn}    ${mainPage}    BrandProfile
+
+Base Units Setup
+    [Arguments]    ${dropdownItem}
+    [Documentation]    ok
+    #    return from keyword
+    select from list by label    ${BP_setupDropdown}    ${dropdownItem}
+    list selection should be    ${BP_setupDropdown}    ${dropdownItem}
+    ${item}    replace string    ${dropdownItem}    Setup    ${EMPTY}
+    ${item_1}    replace string    ${item}    ${SPACE}    ${EMPTY}
+    enter page by click    ${BP_goBtn}    ${mainPage}    ${item}
+    enter page by click    ${BP_createBtn}    ${mainPage}    Create${item}
+    input text    ${BP_criteria_inputText_name}    test123
+    dynamic Select Criteria    ${Criteria_Dropdown_filterHierarchy_last}    ${Criteria_filterHierarchy_options_last}    ${Criteria_filterHierarchy_optionsCount_last}
+    enter page by click    ${BP_cancelBtn}    ${mainPage}    ${item}
+    ${linkRows_count}    get matching xpath count    ${BP_setup_linksCount}
+    run keyword if    ${linkRows_count} < 2    enter page by click    ${BP_cancelBtn}    ${mainPage}    BrandProfile
+    continue for loop if    ${linkRows_count} < 2
+    ${rowNum}    evaluate    random.randint(2,${linkRows_count})    random
+    ${setupCriteria_path}    set variable    Xpath=${BP_setup_linksCount}[${rowNum}]/td[2]/a
+    ${edit_path}    set variable    Xpath=${BP_setup_linksCount}[${rowNum}]//a[text()='Edit']
+    enter page by click    ${setupCriteria_path}    ${mainPage}    Edit${item}
+    clear element text    ${BP_criteria_inputText_only}
+    input text    ${BP_criteria_inputText_only}    test123
+    dynamic Select Criteria    ${Criteria_Dropdown_filterHierarchy_last}    ${Criteria_filterHierarchy_options_last}    ${Criteria_filterHierarchy_optionsCount_last}
+    enter page by click    ${BP_cancelBtn}    ${mainPage}    ${item}
+    enter page by click    ${edit_path}    ${mainPage}    Define${item_1}
+    ${definedStageCount}    get matching xpath count    //tr/td/select
+    : FOR    ${row}    IN RANGE    2    ${definedStageCount}+2
+    \    random select option on dropdown    Xpath=//tr[${row}]/td/select    0    var row = ${row}-1 ;var a = new Array();var n=0;$(".table4 tr:eq("+row+") td select optgroup").children("option:not(:selected):not(:disabled)").each(function(){a[n]=$(this).text().trim();n++;});return a
+    enter page by click    ${BP_cancelBtn}    ${mainPage}    ${item}
+    enter page by click    ${BP_cancelBtn}    ${mainPage}    BrandProfile
+
+Set Clustering
+    [Arguments]    ${dropdownItem}
+    [Documentation]    ok
+    select from list by label    ${BP_setupDropdown}    ${dropdownItem}
+    list selection should be    ${BP_setupDropdown}    ${dropdownItem}
+    ${item}    replace string    ${dropdownItem}    ${SPACE}    ${EMPTY}
+    enter page by click    ${BP_goBtn}    ${mainPage}    ${item}
+    go back
+
+Upload Format Setup
+    [Arguments]    ${dropdownItem}
+    [Documentation]    ok
+    #    return from keyword
+    select from list by label    ${BP_setupDropdown}    ${dropdownItem}
+    list selection should be    ${BP_setupDropdown}    ${dropdownItem}
+    ${item}    replace string    ${dropdownItem}    Setup    ${EMPTY}
+    ${item_1}    replace string    ${item}    ${SPACE}    ${EMPTY}
+    enter page by click    ${BP_goBtn}    ${mainPage}    ${item}
+    enter page by click    ${BP_createBtn}    ${mainPage}    Create${item}
+    input text    ${BP_criteria_inputText_name}    test123
+    textfield value should be    ${BP_criteria_inputText_name}    test123
+    dynamic Select Criteria    ${Criteria_Dropdown_filterHierarchy_last}    ${Criteria_filterHierarchy_options_last}    ${Criteria_filterHierarchy_optionsCount_last}
+    enter page by click    ${BP_cancelBtn}    ${mainPage}    ${item}
+    ${linkRows_count}    get matching xpath count    ${BP_setup_linksCount}
+    run keyword if    ${linkRows_count} < 2    enter page by click    ${BP_cancelBtn}    ${mainPage}    BrandProfile
+    continue for loop if    ${linkRows_count} < 2
+    ${rowNum}    evaluate    random.randint(2,${linkRows_count})    random
+    ${setupCriteria_path}    set variable    Xpath=${BP_setup_linksCount}[${rowNum}]/td[2]/a
+    ${edit_path}    set variable    Xpath=${BP_setup_linksCount}[${rowNum}]//a[text()='Edit']
+    enter page by click    ${setupCriteria_path}    ${mainPage}    Edit${item}
+    clear element text    ${BP_criteria_inputText_name}
+    input text    ${BP_criteria_inputText_name}    test123
+    textfield value should be    ${BP_criteria_inputText_name}    test123
+    dynamic Select Criteria    ${Criteria_Dropdown_filterHierarchy_last}    ${Criteria_filterHierarchy_options_last}    ${Criteria_filterHierarchy_optionsCount_last}
+    enter page by click    ${BP_cancelBtn}    ${mainPage}    ${item}
+    enter page by click    ${edit_path}    ${mainPage}    Define${item_1}
+    ${dropdownGroupsCount}    get matching xpath count    ${BP_uploadFormat_dropdownGroups_count}
+    ${dropdownGroup_itemsCount}    get matching xpath count    ${BP_uploadFormat_dropdownGroup1_itemsCount}
+    : FOR    ${itemNum}    IN RANGE    1    ${dropdownGroup_itemsCount}+1
+    \    RandomSelectOptionOnDropdown    Xpath=//select[@id='alevel${itemNum}']    1    var a = new Array();var n=0;$("#alevel"+${itemNum}+" option:not(:selected):not(:disabled)").each(function(){a[n]=$(this).text();n++;});return a
+    ${dropdownGroup_itemsCount}    run keyword if    ${dropdownGroupsCount} == 2    get matching xpath count    ${BP_uploadFormat_dropdownGroup2_itemsCount}
+    ...    ELSE    set variable    0
+    : FOR    ${itemNum}    IN RANGE    1    ${dropdownGroup_itemsCount}+1
+    \    RandomSelectOptionOnDropdown    Xpath=//select[@id='blevel${itemNum}']    1    var a = new Array();var n=0;$("#blevel"+${itemNum}+" option:not(:selected):not(:disabled)").each(function(){a[n]=$(this).text();n++;});return a
+    @{unselectUploadType}    execute javascript    var a = new Array();var n=0;$("#uploadformattype option:not(:selected)").each(function(){a[n]=$(this).text();n++;});return a
+    ${typeNum}    evaluate    random.randint(0,len(@{unselectUploadType})-1)    random
+    select from list by label    ${BP_defineUploadFormat_uploadTypeDropdown}    @{unselectUploadType}[${typeNum}]
+    click element    ${BP_goBtn}
+    sleep    1S
+    list selection should be    ${BP_defineUploadFormat_uploadTypeDropdown}    @{unselectUploadType}[${typeNum}]
+    ${dropdownGroupsCount}    get matching xpath count    ${BP_uploadFormat_dropdownGroups_count}
+    ${dropdownGroup_itemsCount}    get matching xpath count    ${BP_uploadFormat_dropdownGroup1_itemsCount}
+    : FOR    ${itemNum}    IN RANGE    1    ${dropdownGroup_itemsCount}+1
+    \    RandomSelectOptionOnDropdown    Xpath=//select[@id='alevel${itemNum}']    1    var a = new Array();var n=0;$("#alevel"+${itemNum}+" option:not(:selected):not(:disabled)").each(function(){a[n]=$(this).text();n++;});return a
+    ${dropdownGroup_itemsCount}    run keyword if    ${dropdownGroupsCount} == 2    get matching xpath count    ${BP_uploadFormat_dropdownGroup2_itemsCount}
+    ...    ELSE    set variable    0
+    : FOR    ${itemNum}    IN RANGE    1    ${dropdownGroup_itemsCount}+1
+    \    RandomSelectOptionOnDropdown    Xpath=//select[@id='blevel${itemNum}']    1    var a = new Array();var n=0;$("#blevel"+${itemNum}+" option:not(:selected):not(:disabled)").each(function(){a[n]=$(this).text();n++;});return a
+    enter page by click    ${BP_cancelBtn}    ${mainPage}    ${item}
+
+Transfer Rules Setup
+    [Arguments]    ${dropdownItem}
+    [Documentation]    OK
+    ...
+    ...    exculding SubRule !
+    #    return from keyword
+    select from list by label    ${BP_setupDropdown}    ${dropdownItem}
+    list selection should be    ${BP_setupDropdown}    ${dropdownItem}
+    ${item}    strip string    ${dropdownItem}
+    ${item}    replace string    ${item}    s Setup    ${EMPTY}
+    ${item_1}    replace string    ${item}    ${SPACE}    ${EMPTY}
+    enter page by click    ${BP_goBtn}    ${mainPage}    ${item} Setup
+    enter page by click    ${BP_createBtn}    Xpath=//div[@id='notabcontent']    Create${item_1}
+    random select option on dropdown    ${BP_TransferRule_dopdownCriteria}
+    input text    ${BP_criteria_inputText_name}    test123
+    textfield value should be    ${BP_criteria_inputText_name}    test123
+    dynamic Select Criteria    ${Criteria_Dropdown_filterHierarchy_last}    ${Criteria_filterHierarchy_options_last}    ${Criteria_filterHierarchy_optionsCount_last}
+    click element    ${Criteria_Button_removeFilter_last}
+    click element    ${Criteria_Button_removeFilter_last}
+    click element    ${Criteria_Button_removeFilter_last}
+    click element    ${Criteria_Button_removeFilter_last}
+    click element    ${BP_TransferRule_disabledOutDoor}
+    sleep    5S
+    ${disabledOutDoorsCount}    get matching xpath count    ${BP_TransferRule_disabledOutDoorsCount}
+    ${disabledOutNum}    evaluate    random.randint(1,${disabledOutDoorsCount})    random
+    ${disabledOutNum_new}    run keyword if    ${disabledOutNum} ==1    set variable    ${disabledOutNum}
+    ...    ELSE    evaluate    ${disabledOutNum}-1
+    ${disabledOutDoorsXpath}    run keyword if    ${disabledOutNum} ==1    set variable    Xpath=${BP_TransferRule_disabledOutDoorsCount}//input[@name='']
+    ...    ELSE    set variable    Xpath=${BP_TransferRule_disabledOutDoorsCount}[${disabledOutNum_new}]//input[@name='attrdropdownout']
+    wait until element is visible    ${disabledOutDoorsXpath}    30
+    select checkbox    ${disabledOutDoorsXpath}
+    checkbox should be selected    ${disabledOutDoorsXpath}
+    ${disabledOutName}    get text    ${disabledOutDoorsXpath}/parent::label
+    click element    Xpath=//div[@id='notabcontent']    #    ${BP_TransferRule_disabledOutDoor}
+    sleep    1S
+    Wait Until Page Does Not Contain    Processing...    60
+    run keyword if    ${disabledOutDoorsCount}==2    element text should be    ${BP_TransferRule_disabledOutDoor}    All Selected
+    ...    ELSE    element text should be    ${BP_TransferRule_disabledOutDoor}    ${disabledOutName}
+    click element    ${BP_TransferRule_disabledInDoor}
+    sleep    5S
+    ${disabledInDoorsCount}    get matching xpath count    ${BP_TransferRule_disabledInDoorsCount}
+    ${disabledInNum}    evaluate    random.randint(1,${disabledInDoorsCount})    random
+    ${disabledInNum_new}    run keyword if    ${disabledInNum} ==1    set variable    ${disabledInNum}
+    ...    ELSE    evaluate    ${disabledInNum}-1
+    ${disabledInDoorsXpath}    run keyword if    ${disabledInNum} ==1    set variable    Xpath=${BP_TransferRule_disabledInDoorsCount}//input[@name='']
+    ...    ELSE    set variable    Xpath=${BP_TransferRule_disabledInDoorsCount}[${disabledInNum_new}]//input[@name='attrdropdownin']
+    wait until element is visible    ${disabledInDoorsXpath}    30
+    select checkbox    ${disabledInDoorsXpath}
+    checkbox should be selected    ${disabledInDoorsXpath}
+    ${disabledInName}    get text    ${disabledInDoorsXpath}/parent::label
+    click element    Xpath=//div[@id='notabcontent']    #    ${BP_TransferRule_disabledInDoor}
+    sleep    1S
+    Wait Until Page Does Not Contain    Processing...    60
+    run keyword if    ${disabledInDoorsCount}==2    element text should be    ${BP_TransferRule_disabledInDoor}    All Selected
+    ...    ELSE    element text should be    ${BP_TransferRule_disabledInDoor}    ${disabledInName}
+    enter page by click    ${BP_cancelBtn}    ${mainPage}    ${item} Setup
+    ${linkRows_count}    get matching xpath count    ${BP_setup_linksCount}
+    run keyword if    ${linkRows_count} < 2    enter page by click    ${BP_cancelBtn}    ${mainPage}    BrandProfile
+    continue for loop if    ${linkRows_count} < 2
+    ${rowNum}    evaluate    random.randint(2,${linkRows_count})    random
+    ${rule_path}    set variable    Xpath=${BP_setup_linksCount}[${rowNum}]//a[text()='Edit Rule']    #    Xpath=${BP_setup_linksCount}[${rowNum}]/td[2]/a
+    ${subRule_path}    set variable    Xpath=${BP_setup_linksCount}[${rowNum}]//a[text()='Create New Sub Rule']
+    enter page by click    ${rule_path}    ${mainPage}    Edit${item_1}
+    clear element text    ${BP_criteria_inputText_name}
+    input text    ${BP_criteria_inputText_name}    test123
+    textfield value should be    ${BP_criteria_inputText_name}    test123
+    dynamic Select Criteria    ${Criteria_Dropdown_filterHierarchy_last}    ${Criteria_filterHierarchy_options_last}    ${Criteria_filterHierarchy_optionsCount_last}
+    click element    ${Criteria_Button_removeFilter_last}
+    click element    ${Criteria_Button_removeFilter_last}
+    click element    ${Criteria_Button_removeFilter_last}
+    click element    ${Criteria_Button_removeFilter_last}
+    click element    ${BP_TransferRule_disabledOutDoor}
+    sleep    5S
+    ${disabledOutDoorsCount}    get matching xpath count    ${BP_TransferRule_disabledOutDoorsCount}
+    ${disabledOutNum}    evaluate    random.randint(1,${disabledOutDoorsCount})    random
+    @{selectedDisabledOutDoorsList}    execute javascript    var a = new Array();var n =0;$("#transferouttr .multiC tbody input:checked").each(function(){a[n]=$(this).parents("tr").index()+1;n++;});return a    #    var a = new Array();var n =0;$("#transferouttr .ui-dropdownchecklist-item input:checked").each(function(){a[n]=$(this).parent().index()+1;n++;});return a
+    #    run keyword if    '@{selectedDisabledOutDoorsList}'    click element    ${BP_TransferRule_disabledOutDoor}
+    : FOR    ${door}    IN    @{selectedDisabledOutDoorsList}
+    \    exit for loop if    '${door}' == '${EMPTY}'
+    \    unselect checkbox    Xpath=${BP_TransferRule_disabledOutDoorsCount}[${door}]/input[@name='attrdropdownout']
+    run keyword if    @{selectedDisabledOutDoorsList} != @{EMPTY}    click element    Xpath=//div[@id='notabcontent']
+    element text should be    ${BP_TransferRule_disabledOutDoor}    ${EMPTY}
+    run keyword if    @{selectedDisabledOutDoorsList} != @{EMPTY}    click element    ${BP_TransferRule_disabledOutDoor}
+    run keyword if    @{selectedDisabledOutDoorsList} != @{EMPTY}    sleep    5S
+    ${disabledOutNum_new}    run keyword if    ${disabledOutNum} ==1    set variable    ${disabledOutNum}
+    ...    ELSE    evaluate    ${disabledOutNum}-1
+    ${disabledOutDoorsXpath}    run keyword if    ${disabledOutNum} ==1    set variable    Xpath=${BP_TransferRule_disabledOutDoorsCount}//input[@name='']
+    ...    ELSE    set variable    Xpath=${BP_TransferRule_disabledOutDoorsCount}[${disabledOutNum_new}]//input[@name='attrdropdownout']
+    wait until element is visible    ${disabledOutDoorsXpath}    30
+    select checkbox    ${disabledOutDoorsXpath}
+    checkbox should be selected    ${disabledOutDoorsXpath}
+    ${disabledOutName}    get text    ${disabledOutDoorsXpath}/parent::label
+    click element    Xpath=//div[@id='notabcontent']    #    ${BP_TransferRule_disabledOutDoor}
+    sleep    1S
+    Wait Until Page Does Not Contain    Processing...    60
+    run keyword if    ${disabledOutDoorsCount}==2    element text should be    ${BP_TransferRule_disabledOutDoor}    All Selected
+    ...    ELSE    element text should be    ${BP_TransferRule_disabledOutDoor}    ${disabledOutName}
+    click element    ${BP_TransferRule_disabledInDoor}
+    sleep    5S
+    @{selectedDisabledInDoorsList}    execute javascript    var a = new Array();var n =0;$("#transferintr .multiC tbody input:checked").each(function(){a[n]=$(this).parents("tr").index()+1;n++;});return a    #    var a = new Array();var n =0;$("#transferintr").next("tr").find(".ui-dropdownchecklist-item input:checked").each(function(){a[n]=$(this).parent().index()+1;n++;});console.log(a)
+    : FOR    ${door}    IN    @{selectedDisabledInDoorsList}
+    \    exit for loop if    '${door}' == '${EMPTY}'
+    \    unselect checkbox    Xpath=${BP_TransferRule_disabledInDoorsCount}[${door}]/input[@name='attrdropdownin']
+    run keyword if    @{selectedDisabledInDoorsList} != @{EMPTY}    click element    Xpath=//div[@id='notabcontent']
+    element text should be    ${BP_TransferRule_disabledInDoor}    ${EMPTY}
+    run keyword if    @{selectedDisabledInDoorsList} != @{EMPTY}    click element    ${BP_TransferRule_disabledInDoor}
+    run keyword if    @{selectedDisabledInDoorsList} != @{EMPTY}    sleep    5S
+    ${disabledInDoorsCount}    get matching xpath count    ${BP_TransferRule_disabledInDoorsCount}
+    ${disabledInNum}    evaluate    random.randint(1,${disabledInDoorsCount})    random
+    ${disabledInNum_new}    run keyword if    ${disabledInNum} ==1    set variable    ${disabledInNum}
+    ...    ELSE    evaluate    ${disabledInNum}-1
+    ${disabledInDoorsXpath}    run keyword if    ${disabledInNum} ==1    set variable    Xpath=${BP_TransferRule_disabledInDoorsCount}//input[@name='']
+    ...    ELSE    set variable    Xpath=${BP_TransferRule_disabledInDoorsCount}[${disabledInNum_new}]//input[@name='attrdropdownin']
+    wait until element is visible    ${disabledInDoorsXpath}    30
+    select checkbox    ${disabledInDoorsXpath}
+    checkbox should be selected    ${disabledInDoorsXpath}
+    ${disabledInName}    get text    ${disabledInDoorsXpath}/parent::label
+    click element    Xpath=//div[@id='notabcontent']    #    ${BP_TransferRule_disabledInDoor}
+    sleep    1S
+    Wait Until Page Does Not Contain    Processing...    60
+    run keyword if    ${disabledInDoorsCount}==2    element text should be    ${BP_TransferRule_disabledInDoor}    All Selected
+    ...    ELSE    element text should be    ${BP_TransferRule_disabledInDoor}    ${disabledInName}
+    enter page by click    ${BP_cancelBtn}    ${mainPage}    ${item} Setup
+    enter page by click    ${BP_cancelBtn}    ${mainPage}    BrandProfile

@@ -1,0 +1,8 @@
+*** Variables ***
+${clusterSequence_button_top_newSequence}    Xpath=//form/table[1]//input[@name='new']
+${clusterSequence_button_bottom_newSequence}    Xpath=//form/table[3]//input[@name='new']
+${clusterSequence_button_top_deleteSelected}    Xpath=//form/table[1]//input[@name='delete']
+${clusterSequence_button_bottom_deleteSelected}    Xpath=//form/table[3]//input[@name='delete']
+${clusterSequence_checkBox_rowPlaceHold}    Xpath=//table[@id='collaborative']/tbody[2*row-1]/tr[@style='background-color:#eeeeee']/td[1]/input
+${clusterSequence_info_rowPlaceHold}    Xpath=//table[@id='collaborative']/tbody[2*row-1]/tr[@style='background-color:#eeeeee']/td[2]/a
+${clusterSequence_info_count}    //tr[@style='background-color:#eeeeee']

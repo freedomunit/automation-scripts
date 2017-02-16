@@ -1,0 +1,16 @@
+*** Keywords ***
+ZKPageWithoutRandom
+    [Arguments]    ${originalPage_query}
+    ${originalPage}    execute javascript    ${originalPage_query}
+    ${staticlPage}    replace string using regexp    ${originalPage}    id="(.*?)"    \    -1
+    ${staticlPage}    remove string using regexp    ${staticlPage}    for="(.*?)"    \    -1
+    ${staticlPage}    replace string using regexp    ${staticlPage}    href="(.*?)"    \    -1
+    ${staticlPage}    replace string using regexp    ${staticlPage}    src="(.*?)"    \    -1
+    [Return]    ${staticlPage}
+
+htmlPageWithoutRandom
+    [Arguments]    ${originalPage_query}
+    ${originalPage}    execute javascript    ${originalPage_query}
+    ${staticlPage}    replace string using regexp    ${originalPage}    href="(.*?)"    \    -1
+    ${staticlPage}    replace string using regexp    ${staticlPage}    src="(.*?)"    \    -1
+    [Return]    ${staticlPage}

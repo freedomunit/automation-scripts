@@ -1,0 +1,69 @@
+*** Settings ***
+Library           String
+Resource          ../page/login.txt
+Library           Selenium2Library
+
+*** Variables ***
+${prod_URL}       https://10.125.2.170
+${user}           dly
+${password}       wuhan02
+${stage_URL}      https://10.125.2.172
+${prod_download_dir}    d:\\Robot\\TD\\prod_download
+${stage_download_dir}    d:\\Robot\\TD\\stage_download
+${browser_type}    firefox
+${browser_profile_1}    C:\\Users\\pc\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\8hl9l980.default
+@{stylebank_criteria}    Year/2015,2016    Bus Verti/ACTIVE LIFESTYLE,CYCLING,GOLF
+${users_setting}    d:\\Robot\\TD\\Setting\\comparison setting.xlsx
+${ws_setting_tab}    WS setting
+${ws_criteria_colNumber}    8
+${ws_monthlyFlag_colNumber}    5
+${stylebank_setting_tab}    StyleBank setting
+${stylebank_criteria_colNumber}    5
+${sizescales_setting_tab}    SizeScales setting
+${sizescales_criteria_colNumber}    5
+${companyprofile_setting_tab}    CompanyProfile setting
+${diff_dir}       d:\\Robot\\TD\\diff
+${selenium_speed}    0.1
+${browser_profile_2}    C:\\Users\\pc\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\8hl9l980.default
+
+*** Keywords ***
+EnvironmentInit
+    [Arguments]    ${URL}
+    Open Browser    ${URL}    ${browser}    ff_profile_dir=${browser_profile}
+    Maximize Browser Window
+
+Logout Close Browser
+    [Arguments]    ${browser}
+    Switch Browser    ${browser}
+    #    Click Element    Xpath=//a[@class='logout']
+    Close Browser
+
+EnvironmentInit and Login
+    [Arguments]    ${URL}    ${userName}    ${browser_profile}
+    ${browser}    Open Browser    ${URL}    ${browser_type}    \    \    ${EMPTY}
+    ...    ${browser_profile}
+    log    ${browser_profile}
+    Maximize Browser Window
+    wait until page contains element    id=login1    100
+    Input Text    id=login1    ${userName}
+    Input Password    id=password    ${password}
+    ${map_status}    get element attribute    ${login_editable_form}@action
+    log    ${login_map_uncheck_action}
+    run keyword if    '${map_status}' == '${login_map_uncheck_action}'    Click Element    ${login_map}
+    Click Element    Xpath=//input[@class='sb']
+    Sleep    3S
+    ${message}    Get Text    Xpath=//body
+    ${line}    Get Lines Containing String    ${message}    Warning
+    ${count}    Get Line Count    ${line}
+    Run Keyword If    ${count}>0    Click Element    Xpath=//input[@name='answeryes']
+    Page Should Contain    Welcome
+    Capture Page Screenshot
+    [Return]    ${browser}
+
+Wait Until Page End
+    [Arguments]    @{main_windowhandle}
+    : FOR    ${count}    IN RANGE    10000
+    \    @{windowhandles}    Get Window Handles
+    \    Run Keyword If    @{windowhandles} == @{main_windowhandle}    Exit For Loop
+    \    Sleep    5s
+    \    Run Keyword If    ${count} ==10000    Log    exceed time!

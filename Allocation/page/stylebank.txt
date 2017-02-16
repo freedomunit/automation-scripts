@@ -1,0 +1,20 @@
+*** Variables ***
+${stylebank_button_advancedSearch}    Xpath=//input[@type='button' and @value='Advanced Search']
+${stylebank_advanced_topButton_search}    Xpath=//form[@name='message']/table[1]//input[@name='search']
+${stylebank_advanced_bottomButton_search}    Xpath=//form[@name='message']/table[4]//input[@name='search']
+${stylebank_advanced_topDropdown}    Xpath=//form[@name='message']/table[1]//select[@id='downloadtype']
+${stylebank_advanced_bottomDropdown}    Xpath=//form[@name='message']/table[4]//select[@id='downloadtype']
+${stylebank_searched_dropdown_option}    name=downloadtype
+${stylebank_advanced_topButton_generateReport}    Xpath=//form[@name='message']/table[1]//input[@value='Generate Report']
+${stylebank_advanced_bottomButton_generateReport}    Xpath=//form[@name='message']/table[4]//input[@value='Generate Report'']
+${stylebank_advanced_topButton_reset}    Xpath=//form[@name='message']/table[1]//input[@value='Reset']
+${stylebank_advanced_bottomButton_reset}    Xpath=//form[@name='message']/table[4]//input[@value='Reset']
+${stylebank_advanced_criteriaAttr_value}    Xpath=//label[contains(text(),'attr')]/ancestor::tbody[1]/tr/td[contains(text(),'value')]/parent::tr/td[1]/input
+${stylebank_searched_button_wait}    Xpath=//input[@name='view' and @value='Wait']
+${stylebank_button_back}    Xpath=//input[@class='sb' and @value='Back']
+${stylebank_styleinfo_section_count}    //table[@class='table1']
+${stylebank_searched_error_count}    //big[text()='Error']
+${stylebank_searched_error_closewindow}    Xpath=//input[@value ='Close Window']
+${stylebank_advanced_criteriaAttr}    Xpath=//label[contains(text(),'attr')]/ancestor::tr[1]/th[1]/input
+${stylebank_styleInfo_image}    Xpath=//table[@class='table1']/tbody/tr[Number]/td[1]/a    # number start from 2
+${stylebank_styleInfo_UPC}    Xpath=//table[@class='table1']/tbody/tr[Number]/td[2]/a    # number start from 2

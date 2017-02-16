@@ -1,0 +1,58 @@
+*** Variables ***
+${AssortmentMix_criteria_top_submit}    Xpath=//form[@name='message']/table[1]//input[@name='submit']
+${AssortmentMix_Sheet}    Xpath=//div[@class='zssheet']
+${AssortmentMix_Button_Save}    Xpath=//li[@title='Save']
+${AssortmentMix_Button_SaveClose}    Xpath=//li[@title='Save & Close']
+${AssortmentMix_Button_TargetDoors}    Xpath= //li[@title='Target Doors']
+${AssortmentMix_Button_Excel}    Xpath=//li[@title='Excel']
+${AssortmentMix_Button_Options}    Xpath=//li[@title='Options']
+${AssortmentMix_Button_Close}    Xpath=//li[@title='Close']
+${AssortmentMix_criteria_removeFilter_count}    //input[@title='Remove Filter']
+${AssortmentMix_criteria_Button_addFilter_rowPlaceHold}    Xpath=//tr[@id='rrow']//input[@title='Add Filter']
+${AssortmentMix_criteria_Button_removeFilter_rowPlaceHold}    Xpath=//tr[@id='rrow']//input[@title='Remove Filter']
+${AssortmentMix_criteria_Dropdown_filterHierarchy1}    Xpath=//select[@name='hierarchyattr1']
+${AssortmentMix_criteria_Options_filterHierarachy1}    Xpath=//tr[@id='r1']/td[3]/div
+${AssortmentMix_criteria_Option_filterHierarachy1}    Xpath=//tr[@id='r1']/td[3]//tr
+${AssortmentMix_criteria_filterHierarachy1_optionCount}    //tr[@id='r1']/td[3]//tr
+${AssortmentMix_criteria_filterHierarachy1_rowCount}    //tr[@id='r1']
+${AssortmentMix_tab_AssortmentMix}    Xpath=//div[text()='Assortment Mix']
+${AssortmentMix_tab_TargetDoors}    Xpath=//div[text()='Target Doors']
+${AssormentMix_popPanel_button_yes}    Xpath=//button[text()='Yes']
+${AssormentMix_popPanel_button_no}    Xpath=//button[text()='No']
+${AssortmentMix_scrollPanel}    Xpath=//div[@class='zsscroll']
+${Assortment_cellButtonToDropDown}    Xpath=//div[@class='zsbtn zsdropdown']
+${AssortmentMix_cellDropDown}    Xpath=//div[@class='zscellpopup']
+${AssortmentMix_cellHeight_px}    20    # page=700px
+${AssortmentMix_cellButton}    Xpath=//a[@class='btn']
+${AssortmentMix_tab_selected}    Xpath=//li[@class='zssheettab z-tab z-tab-selected']
+${AssortmentMix_criteria_text_style#}    Xpath=//input[@name='stylenumber' and @type='text']
+${AssortmentMix_criteria_text_colorCode}    Xpath=//input[@name='colorcodes' and @type='text']
+${AssortmentMix_criteria_topButton_addStyle/Colors}    Xpath=//form[@name='message']/table[1]//input[@name='addcolors']
+${AssortmentMix_addStyles_topButton_addStyleColors}    Xpath=//input[@type='submit' and @name='button_add']
+${AssortmentMix_addStyles_checkBox_top}    Xpath=//thead//input[@type='checkbox']
+${AssortmentMix_addStyles_checkBox_rowPH}    Xpath=//tbody/tr[row]//input[@type='checkbox']
+${AssortmentMix_addStyles_checkBox_rowCount}    //input[@type='checkbox' and @name='colorids']
+${AssortmentMix_Button_firstCustomize}    Xpath=//div[@class='zsblock']/div[4]//a[text()='Customize']
+${AssortmentMix_Customize_text_topDoors}    Xpath=//tr[@class='filtertablerow'][1]/preceding-sibling::tr//input[@type='text']
+${AssortmentMix_Customize_doorClusterCount}    //div[@class='z-window-content' and contains(@style,'height')]//div[@class='z-hlayout-inner' and contains(@style,'height')]    # //div[@class='z-window-content' and contains(@style,'height')]//span[@class='z-listitem-checkable z-listitem-checkbox']
+${AssortmentMix_checkedBox_count}    //tr[contains(@class,'z-listitem-selected')]
+${AssortmentMix_Customize_dropdown}    Xpath=//select
+${AssortmentMix_Button_submit}    Xpath=//button[@type='button' and text()='Submit']
+${AssortmentMix_Customize_button_reset}    Xpath=//button[@type='button' and text()='Reset']
+${AssortmentMix_Options_uncheckBoxCount}    //div[@class='z-listbox']//tr[contains(@class,'z-listitem') and not( contains( @class,'z-listitem-selected'))]    # //tr[not (contains(@class,'z-listitem-selected'))] \ #//tr[@class='z-listitem' or @class='z-listitem none' ]
+${AssortmentMix_TargetDoor_doorLinkCount}    //div[@class='zstopblock']//div[contains(@style,'box-shadow:0px -1px')]
+${AssortmentMix_DoorInfo_dropDown_door}    Xpath=//div/b[text()='Location Attribute: ']/parent::div/following-sibling::div[3]/select    # Xpath=//select[@style='width:100px;']
+${AssortmentMix_DoorInfo_text_door}    Xpath=//input[@type='text' \ and @class='z-textbox']
+${AssortmentMix_DoorInfo_doorCell}    Xpath=//div[contains(@style,'width:')]/table/tbody/tr/td[@class='z-listcell'][1]
+${AssortmentMix_addStyles_checkBox_checkedStyleColorsCount}    return $("input:checked[name='colorids']").length
+${AssortmentMix_addStyles_button_top_cancel}    Xpath=//form/table[1]//input[@value='Cancel']
+${AssortmentMix_addStyles_link_searchCriteria}    Xpath=//a[text()='Search Criteria']
+${AssortmentMix_Button_Customize_rowPH}    Xpath=//div[@class='zsblock']/div[row]//a[text()='Customize']
+${AssortmentMix_Customize_LocationAttr_jquery}    var a = new Array();var tmp;a.push($(".filtertablerow:first").prev().children("td:contains('# of Top Doors:')").next().children("input").val());tmp=$(".filtertablerow:first").prev().children("td:contains('Grade:')").find("select option[selected]").text().trim();if(tmp == 'ALL'){a.push('')}else{a.push(tmp)};if($(".filtertablerow td:contains('Affiliated City:')").next().children(":visible").children().length > 1){a.push('CUSTOM')}else{tmp = $(".filtertablerow td:contains('Affiliated City:')").next().children(":visible").children().text().trim();if(tmp == 'All Selected'){a.push('')}else{a.push(tmp)}};if($(".filtertablerow td:contains('Sub-City:')").next().children(":visible").children().length > 1){a.push('CUSTOM')}else{tmp = $(".filtertablerow td:contains('Sub-City:')").next().children(":visible").children().text().trim();if(tmp == 'All Selected'){a.push('')}else{a.push(tmp)}};if($(".filtertablerow td:contains('Business Circle:')").next().children(":visible").children().length > 1){a.push('CUSTOM')}else{tmp = $(".filtertablerow td:contains('Business Circle:')").next().children(":visible").children().text().trim();if(tmp == 'All Selected'){a.push('')}else{a.push(tmp)}};tmp= $(".z-listitem-selected:visible").length;if(tmp>0 && tmp<$(".z-window-content:visible").find(".z-listbox-body").find(".z-listitem-checkbox").length){a.push(tmp.toString());}else{a.push('ALL');};return a    # var a = new Array();var tmp;a.push($(".filtertablerow:first").prev().children("td:contains('# of Top Doors:')").next().children("input").val());tmp=$(".filtertablerow:first").prev().children("td:contains('Grade:')").find("select option[selected]").text().trim();if(tmp == 'ALL'){a.push('')}else{a.push(tmp)};if($(".filtertablerow td:contains('Affiliated City:')").next().children(":visible").children().length > 1){a.push('CUSTOM')}else{tmp = $(".filtertablerow td:contains('Affiliated City:')").next().children(":visible").children().text().trim();if(tmp == 'All Selected'){a.push('')}else{a.push(tmp)}};if($(".filtertablerow td:contains('Sub-City:')").next().children(":visible").children().length > 1){a.push('CUSTOM')}else{tmp = $(".filtertablerow td:contains('Sub-City:')").next().children(":visible").children().text().trim();if(tmp == 'All Selected'){a.push('')}else{a.push(tmp)}};if($(".filtertablerow td:contains('Business Circle:')").next().children(":visible").children().length > 1){a.push('CUSTOM')}else{tmp = $(".filtertablerow td:contains('Business Circle:')").next().children(":visible").children().text().trim();if(tmp == 'All Selected'){a.push('')}else{a.push(tmp)}};return a
+${AssortmentMix_Customize_button_submit}    Xpath=//button[@type='button' and text()='Submit']
+${AssortmentMix_TargetDoor_doorLink_colPH}    Xpath=//div[@class='zstopblock']/div[2]/div[col]
+${AssortmentMix_DoorInfo_validSelectStyle_jquery}    var a = new Array();var n =0;$(".zsblock").children("div").children("div:visible:not([style *='background-image'])[style *= '#ffffff']").each(function(){a[n] = new Array();a[n].push($(this).parent().index()+1);a[n].push($(this).index()+1);n++;});return(a)
+${AssortmentMix_DoorInfo_dropDown_stockCategory}    Xpath=//div/b[text()='Location Attribute: ']/parent::div/following-sibling::div[1]/select
+${AssortmentMix_DoorInfo_styleCell_rowcolPH}    Xpath=//div[@class='zsblock']/div[row]/div[col]
+${AssortmentMix_TargetDoor_validSelectStyle_jquery}    var a = new Array();var n =0;var row;$(".zsblock").children("div").each(function(){row = $(this).index()+1;$(this).children("div:visible:not([style *='background-color:'])").each(function(){a[n] = new Array();a[n].push(row);a[n].push($(this).index()+1);n++;});});return(a)
+${AssortmentMix_Button_cancel}    Xpath=//button[@type='button' and text()='Cancel']

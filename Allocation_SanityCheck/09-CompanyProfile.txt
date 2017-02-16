@@ -1,0 +1,33 @@
+*** Settings ***
+Force Tags        SC-G1-CP
+Resource          Setting/environment.txt
+Resource          Setting/performancekeyword.txt
+Resource          page/ZK.txt
+Resource          page/companyProfile.txt
+
+*** Test Cases ***
+editCP
+    [Tags]
+    enterCertainModel    Company Profile    ${mainPage}    CompanyProfile
+    click Link    ${CP_link_openAll}
+    wait until page does not contain element    Xpath=${CP_spreadButton_count}    30
+    sleep    1S
+    click Link    ${CP_link_closeAll}
+    wait until page does not contain element    Xpath=${CP_collapseButton_count}    30
+    ${blank}    set variable    '
+    @{CP_setting}    get list items    ${CP_dropdown}
+    : FOR    ${item}    IN    @{CP_setting}
+    \    select from list by label    ${CP_dropdown}    ${item}
+    \    list selection should be    ${CP_dropdown}    ${item}
+    \    ${item}    replace string    ${item}    Set    ${EMPTY}
+    \    ${item}    replace string    ${item}    Generate    ${EMPTY}
+    \    ${item}    run keyword if    '${item}' == ' Planning Seasons'    replace string    ${item}    ${SPACE}
+    \    ...    ${EMPTY}
+    \    ...    ELSE    set variable    ${item}
+    \    enter page by click    ${CP_button_go}    ${mainPage}    ${item}
+    \    go back
+    \    sleep    3S
+    \    Wait Until Page Does Not Contain    Processing...    600
+    \    Wait Until Page Contains element    ${mainPage}    30
+    \    Wait Until element Contains    ${mainPage}    CompanyProfile    10
+    \    wait until element is visible    ${CP_dropdown}

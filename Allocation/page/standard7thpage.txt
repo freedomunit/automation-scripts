@@ -1,0 +1,6 @@
+*** Variables ***
+${mainPage}       Xpath=//div[@id='maincontent']
+${link_openAll}    Open All
+${link_closeAll}    Close All
+${pageName_first}    Xpath=//big[@class='title1']
+${pageName_second}    Xpath=//big[@class='title2']

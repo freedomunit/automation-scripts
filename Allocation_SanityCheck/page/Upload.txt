@@ -1,0 +1,10 @@
+*** Variables ***
+${Upload_select_uploadType}    Xpath=//select[@id='theSelect']
+${Upload_input_fileName}    Xpath=//div[@id='holder']//div[contains(@style,'display: block')]//div[@class='fakefile']/input[@class='finput']
+${Upload_radio_uncompressedFile}    Xpath=//div[@id='holder']//div[contains(@style,'display: block')]//input[@type='radio' and @value='xls']
+${Upload_radio_compressedFile}    Xpath=//div[@id='holder']//div[contains(@style,'display: block')]//input[@type='radio' and @value='gzip']
+${Upload_button_processDoc}    Xpath=//div[@id='holder']//div[contains(@style,'display: block')]//input[@type='submit' and @value='Process Document']
+${Upload_button_closeWindow}    Xpath=//input[@type='button' and @value='Close Window']
+${Upload_button_browse}    Xpath=//div[@id='holder']//div[contains(@style,'display: block')]//div[@class='fakefile']/input[@type='button' and @value='Browse...']    # Browse...
+${Upload_fileName}    Xpath=//div[@id='holder']//div[contains(@style,'display: block')]//input[@type='file']
+${Upload_textTilte}    Xpath=//div[@id='textholder']/div[not (contains(@style,'display: none'))]    # Xpath=//div[@id='textholder']/div[contains(@style,'display: block')]

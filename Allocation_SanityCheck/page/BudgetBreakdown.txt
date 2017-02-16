@@ -1,0 +1,51 @@
+*** Variables ***
+${BBD_criteria_Text_PlanName}    Xpath=//input[@name='settingname']
+${BBD_criteria_removeFilter_count}    //input[@title='Remove Filter']
+${BBD_criteria_Button_addFilter_rowPlaceHold}    Xpath=//tr[@id='rrow']//input[@title='Add Filter']
+${BBD_criteria_Button_removeFilter_rowPlaceHold}    Xpath=//tr[@id='rrow']//input[@title='Remove Filter']
+${BBD_criteria_Dropdown_filterHierarchy1}    Xpath=//select[@name='hierarchyattr1']
+${BBD_criteria_Options_filterHierarachy1}    Xpath=//tr[@id='r1']/td[3]/div
+${BBD_criteria_Option_filterHierarachy1}    Xpath=//tr[@id='r1']/td[3]//tr
+${BBD_criteria_filterHierarachy1_optionCount}    //tr[@id='r1']/td[3]//tr
+${BBD_criteria_filterHierarachy1_rowCount}    //tr[@id='r1']
+${BBD_popPanel_button_yes}    Xpath=//button[text()='Yes']
+${BBD_popPanel_button_no}    Xpath=//button[text()='No']
+${BBD_scrollPanel}    Xpath=//div[@class='zsscroll']
+${BBD_cellButtonToDropDown}    Xpath=//div[@class='zsbtn zsdropdown']
+${BBD_cellDropDown}    Xpath=//div[@class='zscellpopup']
+${BBD_cellHeight_px}    20    # page=700px
+${BBD_cellButton}    Xpath=//a[@class='btn']
+${BBD_Freeze_position}    Xpath=//div[@class='zsblock']/div[3]/div[contains(@class,'zsmerge')][last()]/following-sibling::div[1]
+${BBD_Button_ViewCriteria}    Xpath=//li[@title='Viewing Criteria']
+${BBD_tabsCount}    //ul[@class="z-tabs-content"]/li
+${BBD_Button_Edit_rowPH}    Xpath=//div[@class='zsblock']/div[row]//a[text()='Edit']
+${BBD_Button_Populate}    Xpath=//li[@title='Populate']
+${BBD_Panel_Populate}    Xpath=//div[contains(text(),'Populate from:')]
+${BBD_popPanel_Select}    Xpath=//select[@class='z-select']
+${BBD_popPanel_BtnSubmit}    Xpath=//button[text()='Submit']
+${BBD_Title_QtyAllocated_count}    //div[@class="zstopblock"]/div[14]//div[contains(text(),'Allocated')]
+${BBD_jquery_QtyAllocated_col}    return $(".zstopblock").children("div:eq(13)").find("div:contains('Allocated'):eq(0)").index();
+${BBD_page_rowCount}    //div[@class="zsblock"]/div
+${BBD_options_attributeCols}    Xpath=//div[contains(text(),'Select Attribute Columns')]
+${BBD_StyleColorSize_openStockSizeColRow_jquery}    var openStockSizeList = '';$(".zsblock").children("div:eq(0)").children("div:visible").each(function(){if($(this).text() && !$(this).text().match('Total')){var titleCol = $(this).index(); var openStock = $(".zsblock").children("div:eq(9)").children("div")[titleCol]; var openStockNum = $(openStock).text(); openStockNum = parseInt(openStockNum);var title = $(this).text(); if(openStockNum > 0 ) {var titleSizeCol=$(".zsblock").children("div:eq(13)").children("div:visible:contains("+title+")").index()-1; var openStockSizeCol=$(".zsblock").children("div:eq(14)").children("div:gt("+titleSizeCol+"):visible:contains('AdjOpen Stock'):first").index(); for (var openStockSizeRow = 16; openStockSizeRow<39; openStockSizeRow++) {var openStockSize=$(".zsblock").children("div:eq("+openStockSizeRow+")").children("div:eq("+openStockSizeCol+")"); var openStockSizeNum= parseInt($(openStockSize).text());if(openStockSizeNum>0) { var openStockSizeX=$(openStockSize).offset().left; var openStockSizeY=$(openStockSize).offset().top; openStockSizeCol++;openStockSizeRow++;if(!openStockSizeList) {openStockSizeList = title+"/"+openStockSizeCol+"/"+openStockSizeRow+"/"+openStockSizeNum.toString()+"/"+openStockSizeX+"/"+openStockSizeY;} else{ openStockSizeList += ";"+title+"/"+openStockSizeCol+"/"+openStockSizeRow+"/"+openStockSizeNum.toString()+"/"+openStockSizeX+"/"+openStockSizeY;} openStockSizeCol--;openStockSizeRow--;} } } } }); return openStockSizeList;
+${BBD_StyleColorSize_prepackTotalColRow_jquery}    var prepackTotalList = '';var titleTotalSizeCol=$(".zsblock").children("div:eq(13)").children("div:visible:contains('Total')").index()-1;var prepackTotalCol=$(".zsblock").children("div:eq(14)").children("div:gt("+titleTotalSizeCol+"):visible:contains('Adj Prepack'):first").index(); var prepackTotalTotal=$(".zsblock").children("div:eq(15)").children("div:eq("+prepackTotalCol+")");var prepackTotalTotalNum=parseInt($(prepackTotalTotal).text());if (prepackTotalTotalNum > 0){ for (var prepackTotalRow = 16; prepackTotalRow<39; prepackTotalRow++){ var prepackTotal=$(".zsblock").children("div:eq("+prepackTotalRow+")").children("div:eq("+prepackTotalCol+")"); var prepackTotalNum=parseInt($(prepackTotal).text());if (prepackTotalNum>0){ var prepackTotalX=$(prepackTotal).offset().left; var prepackTotalY=$(prepackTotal).offset().top;prepackTotalCol++;prepackTotalRow++;if(!prepackTotalList) {prepackTotalList = "Total/"+prepackTotalCol+"/"+prepackTotalRow+"/"+prepackTotalNum.toString()+"/"+prepackTotalX+"/"+prepackTotalY;} else{prepackTotalList += ";Total/"+prepackTotalCol+"/"+prepackTotalRow+"/"+prepackTotalNum.toString()+"/"+prepackTotalX+"/"+prepackTotalY;}prepackTotalCol--;prepackTotalRow--;}}}return prepackTotalList;
+${BBD_ListPage_Button_topCreatePlan}    Xpath=//form[@name='message']/table[2]//input[@name='createsetting']
+${BBD_CreatePlan_Button_topCancel}    Xpath=//form[@name='message']/table[1]//input[@name='cancel']
+${BBD_ListPage_editPlanCount}    //td/a[text()='Edit Plan']
+${BBD_ListPage_Dropdown_month}    Xpath=//select[@id='startmonth']
+${BBD_ListPage_Dropdown_year}    Xpath=//select[@id='year']
+${BBD_ListPage_expandCount}    //tr/td[2]/img
+${BBD_ListPage_planCount}    //td/a[text()='Budget Breakdown Plan']
+${BBD_ListPage_collapseCount}    //tr[@class='dhl' and @style='']
+${BBD_InfoNotesSection}    Xpath=//table[@class='z-vbox']/tbody/tr[1]/td[1]/table/tbody/tr[1]/td[1]/div/div[not(contains(@style,'none')) and @style]
+${BBD_selectedButton_retail$Sales%}    Xpath=//li[contains(@class,'tog')]/a[@disabled='disabled']
+${BBD_popDropdown_MonthsCount}    //div[contains(@class,'z-combobox-popup fakeSelect')]/ul/li[contains(@class,'disabled')][last()]/following-sibling::li
+${BBD_popDropdown_YearsCount}    //div[contains(@class,'z-combobox-popup fakeSelect')]/ul/li[not(contains(@class,'disabled'))]/span[@class='z-comboitem-text' and not (contains(text(),'-'))]
+${BBD_popDropdown_QuartersCount}    //div[contains(@class,'z-combobox-popup fakeSelect')]/ul/li[not(contains(@class,'disabled'))]/span[@class='z-comboitem-text' and contains(text(),'-Q')]
+${BBD_popDropdown_Year_addNum}    Xpath=//div[contains(@class,'z-combobox-popup fakeSelect')]/ul/li[contains(@class,'disabled')]/span[@class='z-comboitem-text' and contains(text(),'Year')]/parent::li/following-sibling::li
+${BBD_popDropdown_Quarter_addNum}    Xpath=//div[contains(@class,'z-combobox-popup fakeSelect')]/ul/li[contains(@class,'disabled')]/span[@class='z-comboitem-text' and contains(text(),'Quarters')]/parent::li/following-sibling::li
+${BBD_popDropdown}    Xpath=//table[@class='z-vbox']//tr[contains(@style,'width')]//input[@class='z-combobox-input']
+${BBD_Button_View}    Xpath=//button[text()='View']
+${BBD_Sheet}      Xpath=//table[@class='z-vbox']/tbody/tr[1]/td[1]/table/tbody/tr[last()]
+${BBD_totalCell_first}    Xpath=//div[@class='zsblock']/div[3]/div[1]
+${BBD_Options_verifyPoint}    Xpath=//div[@class='z-vlayout-inner'][1]/div[@class='z-hlayout']/div[1]//div[@class='z-window-header']

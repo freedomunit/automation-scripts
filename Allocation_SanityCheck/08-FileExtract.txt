@@ -1,0 +1,36 @@
+*** Settings ***
+Force Tags        SC-G1-FE
+Test Template
+Resource          Setting/environment.txt
+Resource          Setting/performancekeyword.txt
+Resource          page/ZK.txt
+Resource          page/FileExtract.txt
+Resource          page/standard7thpage.txt
+
+*** Test Cases ***
+editFileExtract
+    [Tags]
+    enterCertainModel    File Extract    ${mainPage}    FileExtract
+    ${fileLinksCount}    get matching xpath count    ${FileExtract_fileLink_Count}
+    ${linkNum}    evaluate    random.randint(1,${fileLinksCount})    random
+    ${fileLink}    replace string    ${FileExtract_fileLink_numPH}    [num]    [${linkNum}]
+    ${scheduleLink}    replace string    ${FileExtract_scheduleLink_numPH}    [num]    [${linkNum}]
+    enter page by click    ${fileLink}    ${mainPage}    File ExtractCriteriaSelection
+    input text    ${RB_Criteria_Text_FromDate}    ${FileExtract_fromDate}
+    input text    ${RB_Criteria_Text_ToDate}    ${FileExtract_toDate}
+    ${removeFilter_count}    get matching xpath count    ${RB_Criteria_removeFilter_count}
+    run keyword if    ${removeFilter_count}>1    removeFilters    ${RB_Criteria_Button_removeFilter_rowPlaceHold}    ${removeFilter_count}    ${RB_Criteria_Dropdown_filterHierarchy1}
+    run keyword if    ${removeFilter_count}==1    Select From List by index    ${RB_Criteria_Dropdown_filterHierarchy1}    0
+    run keyword if    '@{FileExtract_Criteria}[0]' != '${EMPTY}'    selectCustomCriteria    ${RB_Criteria_Dropdown_filterHierarchy1}    ${RB_Criteria_Option_filterHierarachy1}    ${RB_Criteria_Options_filterHierarachy1}    ${RB_Criteria_filterHierarachy1_optionCount}
+    ...    Xpath=${RB_Criteria_filterHierarachy1_rowCount}//input[@title='Add Filter']    ${RB_Criteria_filterHierarachy1_rowCount}    @{FileExtract_Criteria}
+    go back
+    wait until page contains element    ${scheduleLink}    30
+    enter page by click    ${scheduleLink}    ${mainPage}    RecurringSchedule
+    enter page by click    ${FileExtract_Button_NewSchedule}    ${mainPage}    CreateRecurringSchedule
+    input text    ${RB_Criteria_Text_FromDate}    ${FileExtract_fromDate}
+    input text    ${RB_Criteria_Text_ToDate}    ${FileExtract_toDate}
+    ${removeFilter_count}    get matching xpath count    ${RB_Criteria_removeFilter_count}
+    run keyword if    ${removeFilter_count}>1    removeFilters    ${RB_Criteria_Button_removeFilter_rowPlaceHold}    ${removeFilter_count}    ${RB_Criteria_Dropdown_filterHierarchy1}
+    run keyword if    ${removeFilter_count}==1    Select From List by index    ${RB_Criteria_Dropdown_filterHierarchy1}    0
+    run keyword if    '@{FileExtract_Criteria}[0]' != '${EMPTY}'    selectCustomCriteria    ${RB_Criteria_Dropdown_filterHierarchy1}    ${RB_Criteria_Option_filterHierarachy1}    ${RB_Criteria_Options_filterHierarachy1}    ${RB_Criteria_filterHierarachy1_optionCount}
+    ...    Xpath=${RB_Criteria_filterHierarachy1_rowCount}//input[@title='Add Filter']    ${RB_Criteria_filterHierarachy1_rowCount}    @{FileExtract_Criteria}

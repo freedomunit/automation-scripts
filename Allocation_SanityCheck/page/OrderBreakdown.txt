@@ -1,0 +1,46 @@
+*** Variables ***
+${OBD_criteria_top_submit}    Xpath=//form[@name='message']/input[@type='submit'][1]
+${OBD_Sheet}      Xpath=//div[@class='zssheet']
+${OBD_Button_Save}    Xpath=//li[@title='Save']
+${OBD_Button_SaveClose}    Xpath=//li[@title='Save & Close']
+${OBD_Button_TargetDoors}    Xpath= //li[@title='Target Doors']
+${OBD_Button_Excel}    Xpath=//li[@title='Excel']
+${OBD_Button_Options}    Xpath=//li[@title='Options']
+${OBD_Button_Close}    Xpath=//li[@title='Close']
+${OBD_criteria_Dropdown_TaskType}    Xpath=//select[@id='databreakdownviewtype']
+${OBD_criteria_Text_FromDate}    Xpath=//input[@name='fromorderdate']
+${OBD_criteria_Text_ToDate}    Xpath=//input[@name='toorderdate']
+${OBD_criteria_Radio_ShopDate}    Xpath=//input[@name='timerangeselection' and @value='0']
+${OBD_criteria_Radio_InDCDate}    Xpath=//input[@name='timerangeselection' and @value='1']
+${OBD_criteria_removeFilter_count}    //input[@title='Remove Filter']
+${OBD_criteria_Button_addFilter_rowPlaceHold}    Xpath=//tr[@id='rrow']//input[@title='Add Filter']
+${OBD_criteria_Button_removeFilter_rowPlaceHold}    Xpath=//tr[@id='rrow']//input[@title='Remove Filter']
+${OBD_criteria_Dropdown_filterHierarchy1}    Xpath=//select[@name='hierarchyattr1']
+${OBD_criteria_Options_filterHierarachy1}    Xpath=//tr[@id='r1']/td[3]/div
+${OBD_criteria_Option_filterHierarachy1}    Xpath=//tr[@id='r1']/td[3]//tr
+${OBD_criteria_filterHierarachy1_optionCount}    //tr[@id='r1']/td[3]//tr
+${OBD_criteria_filterHierarachy1_rowCount}    //tr[@id='r1']
+${OBD_popPanel_button_yes}    Xpath=//button[text()='Yes']
+${OBD_popPanel_button_no}    Xpath=//button[text()='No']
+${OBD_scrollPanel}    Xpath=//div[@class='zsscroll']
+${OBD_cellButtonToDropDown}    Xpath=//div[@class='zsbtn zsdropdown']
+${OBD_cellDropDown}    Xpath=//div[@class='zscellpopup']
+${OBD_cellHeight_px}    20    # page=700px
+${OBD_cellButton}    Xpath=//a[@class='btn']
+${OBD_Button_FreezePanel}    Xpath=//li[@title='Freeze Pane']
+${OBD_freezePanel_position}    Xpath=//div[@class='zsblock']/div[18]/div[7]
+${OBD_tab_selected}    Xpath=//ul[@class="z-tabs-content"]/li[@class='zssheettab z-tab z-tab-selected']
+${OBD_Button_ViewCriteria}    Xpath=//li[@title='Viewing Criteria']
+${OBD_tabsCount}    //ul[@class="z-tabs-content"]/li
+${OBD_Button_Edit_rowPH}    Xpath=//div[@class='zsblock']/div[row]//a[text()='Edit']
+${OBD_Button_Populate}    Xpath=//li[@title='Populate']
+${OBD_Panel_Populate}    Xpath=//div[contains(text(),'Populate from:')]
+${OBD_popPanel_Select}    Xpath=//select[@class='z-select']
+${OBD_popPanel_BtnSubmit}    Xpath=//button[text()='Submit']
+${OBD_Title_QtyAllocated_count}    //div[@class="zstopblock"]/div[14]//div[contains(text(),'Allocated')]
+${OBD_jquery_QtyAllocated_col}    return $(".zstopblock").children("div:eq(13)").find("div:contains('Allocated'):eq(0)").index();
+${OBD_page_rowCount}    //div[@class="zsblock"]/div
+${OBD_options_attributeCols}    Xpath=//div[contains(text(),'Select Attribute Columns')]
+${OBD_Button_Job}    Xpath=//li[@title='Create Job']
+${OBD_StyleColorSize_openStockSizeColRow_jquery}    var openStockSizeList = '';$(".zsblock").children("div:eq(0)").children("div:visible").each(function(){if($(this).text() && !$(this).text().match('Total')){var titleCol = $(this).index(); var openStock = $(".zsblock").children("div:eq(9)").children("div")[titleCol]; var openStockNum = $(openStock).text(); openStockNum = parseInt(openStockNum);var title = $(this).text(); if(openStockNum > 0 ) {var titleSizeCol=$(".zsblock").children("div:eq(13)").children("div:visible:contains("+title+")").index()-1; var openStockSizeCol=$(".zsblock").children("div:eq(14)").children("div:gt("+titleSizeCol+"):visible:contains('AdjOpen Stock'):first").index(); for (var openStockSizeRow = 16; openStockSizeRow<39; openStockSizeRow++) {var openStockSize=$(".zsblock").children("div:eq("+openStockSizeRow+")").children("div:eq("+openStockSizeCol+")"); var openStockSizeNum= parseInt($(openStockSize).text());if(openStockSizeNum>0) { var openStockSizeX=$(openStockSize).offset().left; var openStockSizeY=$(openStockSize).offset().top; openStockSizeCol++;openStockSizeRow++;if(!openStockSizeList) {openStockSizeList = title+"/"+openStockSizeCol+"/"+openStockSizeRow+"/"+openStockSizeNum.toString()+"/"+openStockSizeX+"/"+openStockSizeY;} else{ openStockSizeList += ";"+title+"/"+openStockSizeCol+"/"+openStockSizeRow+"/"+openStockSizeNum.toString()+"/"+openStockSizeX+"/"+openStockSizeY;} openStockSizeCol--;openStockSizeRow--;} } } } }); return openStockSizeList;
+${OBD_StyleColorSize_prepackTotalColRow_jquery}    var prepackTotalList = '';var titleTotalSizeCol=$(".zsblock").children("div:eq(13)").children("div:visible:contains('Total')").index()-1;var prepackTotalCol=$(".zsblock").children("div:eq(14)").children("div:gt("+titleTotalSizeCol+"):visible:contains('Adj Prepack'):first").index(); var prepackTotalTotal=$(".zsblock").children("div:eq(15)").children("div:eq("+prepackTotalCol+")");var prepackTotalTotalNum=parseInt($(prepackTotalTotal).text());if (prepackTotalTotalNum > 0){ for (var prepackTotalRow = 16; prepackTotalRow<39; prepackTotalRow++){ var prepackTotal=$(".zsblock").children("div:eq("+prepackTotalRow+")").children("div:eq("+prepackTotalCol+")"); var prepackTotalNum=parseInt($(prepackTotal).text());if (prepackTotalNum>0){ var prepackTotalX=$(prepackTotal).offset().left; var prepackTotalY=$(prepackTotal).offset().top;prepackTotalCol++;prepackTotalRow++;if(!prepackTotalList) {prepackTotalList = "Total/"+prepackTotalCol+"/"+prepackTotalRow+"/"+prepackTotalNum.toString()+"/"+prepackTotalX+"/"+prepackTotalY;} else{prepackTotalList += ";Total/"+prepackTotalCol+"/"+prepackTotalRow+"/"+prepackTotalNum.toString()+"/"+prepackTotalX+"/"+prepackTotalY;}prepackTotalCol--;prepackTotalRow--;}}}return prepackTotalList;

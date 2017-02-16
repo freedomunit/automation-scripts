@@ -1,0 +1,51 @@
+*** Variables ***
+${BP_downloadDropdown}    Xpath=//select[@id='dd0']
+${BP_setupDropdown}    Xpath=//select[@name='setActions']
+${BP_downloadBtn}    Xpath=//input[@value='Download'][1]
+${BP_goBtn}       Xpath=//input[@type='button' and @value='GO' or @value='Go' ]
+${BP_downloadCriteria_filterHierarchy1}    Xpath=//select[@name='hierarchyattr1']
+${BP_downloadCriteria_filterHierarchy1_options}    Xpath=//tr[@id='r1']/td[3]/div
+${BP_downloadCriteria_filterHierarchy1_option}    Xpath=//tr[@id='r1']/td[3]//tr
+${BP_downloadCriteria_filterHierarchy1_optionCount}    //tr[@id='r1']/td[3]//tr
+${BP_downloadCriteria_filterHierarchy1_rowCount}    //tr[@id='r1']
+${BP_cancelBtn}    Xpath=//input[@value='Cancel'][1]
+${BP_setupDetail_rowCount}    //div[@id='maincontent']//table[2]/tbody[last()]/tr
+${BP_pageName_second}    Xpath=//big[@class='title2']
+${BP_pageName_first}    Xpath=//big[@class='title1']
+${BP_setClustering_checkboxCount}    //div[@class='ui-dropdownchecklist-item ui-state-default']
+${BP_setClustering_checkedbox}    Xpath=//span[@class='ui-dropdownchecklist-text']
+${BP_defineUploadFormat_uploadTypeDropdown}    Xpath=//select[@id='uploadformattype']
+${BP_defineUploadFormat_goBtn}    Xpath=//input[@type='button' and @value='Go']
+${BP_downloadCriteria_filterItems_jquery}    var items='';$("#key tbody").children("tr:gt(0)").each(function(){if(!items){items+=$(this).text();} else{items+=','+$(this).text();}});return(items);
+${BP_createBtn}    Xpath=//input[@type='button' and contains(@name,'create')]
+${BP_criteria_inputText_only}    Xpath=//input[@type='text']
+${BP_setup_linksCount}    //table[@class='table1']/tbody[2]/tr    # //table[@class='table1']/tbody[2]/tr//a[text()='Edit']
+${BP_setup_criteriaDropdown_first}    Xpath=//tr[2]//select
+${BP_reservePrepackSetting_linksCount_firstSection}    //table[@class='table4'][1]//tr
+${BP_reservePrepackSetting_linksCount_secondSection}    //table[@class='table4'][2]//tr
+${BP_searchBtn}    Xpath=//input[@value='Search']
+${BP_criteria_inputText_name}    Xpath=//input[@type='text' and @name='settingname']
+${BP_Reserve%_inuptText_Style#}    Xpath=//input[@name='stylenumber']
+${BP_Reserve%_inuptText_colorCode}    Xpath=//input[@name='colorcodes']
+${BP_AllocationStage_selectedDropdown}    Xpath=//tr[2]/td[5]/select
+${BP_UploadFormat_selectedDropdown}    Xpath=//select[@id='alevel1']
+${BP_AllocationSetup_selectedDropdown}    Xpath=//select[@id='tstoreindex3']
+${BP_Prepack_selectedInputText_QTY}    Xpath=//table[@class='table4']//tr[2]//input[@name='createIfQty']
+${BP_Prepack_selectedInputText_%}    Xpath=//table[@class='table4']//tr[2]//input[@name='prepackpercent']
+${BP_AllocationBox_dropdown_criteria}    Xpath=//select[@id='selectCriteria']
+${BP_AllocationBox_dropdown_citys}    Xpath=//select[@id='selectedcriteria1']
+${BP_AllocationStage_definedStageCount}    //tr/td/input[@name='stagename' and not (@value='')]
+${BP_uploadFormat_dropdownGroups_count}    //td[@class='container']//table[@class='table4']
+${BP_uploadFormat_dropdownGroup1_itemsCount}    //select[contains(@id,'alevel')]
+${BP_uploadFormat_dropdownGroup2_itemsCount}    //select[contains(@id,'blevel')]
+${BP_Reserve%_inuptText_totalReserve}    Xpath=//input[@name='totalreservepercent']
+${BP_Reserve%_dropdown_reserve%}    Xpath=//select[@id='selections']
+${BP_Reserve%_dropdown_reserveDC}    Xpath=//select[@name='dcselecteitem']
+${BP_Reserve%_dropdown_stockCategory}    Xpath=//select[@name='stockcategoryselecteditem']
+${BP_Reserve%_inuptText_spread%}    Xpath=//input[@type='text' and @name='spreadpercent']
+${BP_Reserve%_inuptText_DCPushDate}    Xpath=//input[@name='dcpushdate' and @type='text']
+${BP_TransferRule_disabledOutDoorsCount}    //tr[@id='transferouttr']//tr    # //tr[@id='transferouttr']//div[contains(@class,'ui-dropdownchecklist-item')]
+${BP_TransferRule_disabledInDoorsCount}    //tr[@id='transferintr']//tr    # //tr[@id='transferintr']/following-sibling::tr//div[contains(@class,'ui-dropdownchecklist-item')]
+${BP_TransferRule_disabledOutDoor}    Xpath=//tr[@id="transferouttr"]//div[contains(@class,"multiCtext")]    # Xpath=//tr[@id='transferouttr']/td/span
+${BP_TransferRule_disabledInDoor}    Xpath=//tr[@id="transferintr"]//div[contains(@class,"multiCtext")]    # Xpath=//tr[@id='transferintr']/following-sibling::tr/td/span
+${BP_TransferRule_dopdownCriteria}    Xpath=//select[@id='selectCriteria']

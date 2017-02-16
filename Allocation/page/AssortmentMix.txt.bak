@@ -1,0 +1,9 @@
+*** Variables ***
+${AssortmentMix_criteria_top_submit}    Xpath=//form[@name='message']/table[1]//input[@name='submit']
+${AssortmentMix_Sheet}    id=zkcontainer
+${AssortmentMix_Button_Save}    //li[@title='Save']
+${AssortmentMix_Button_SaveClose}    //li[@title='Save & Close']
+${AssortmentMix_Button_TargetDoors}    //li[@title='Target Doors']
+${AssortmentMix_Button_Excel}    //li[@title='Excel']
+${AssortmentMix_Button_Options}    //li[@title='Options']
+${AssortmentMix_Button_Close}    //li[@title='Close']

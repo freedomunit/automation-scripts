@@ -1,0 +1,15 @@
+*** Variables ***
+${AP_link_setAssortmentPermissions}    Xpath=//a[text()='Set Assortment Permissions']
+${AP_link_setClusterSequence}    Xpath=//a[text()='Set Cluster Sequence']
+${AP_link_accountGroupAssignments}    Xpath=//a[text()='Account Group Assignments']
+${AP_link_storeGroups}    Xpath=//a[text()='Store Groups']
+${AP_link_quantityBreakList}    Xpath=//a[text()='Quantity Break List']
+${AP_link_openAll}    Open All
+${AP_link_closeAll}    Close All
+${AP_link_styleProdTypeMatch}    Xpath=//a[text()='Style Prod Type Match']
+${AP_link_customerDirectory1}    Xpath=//a[text()='Customer Directory'][1]
+${AP_link_customerDirectory2}    Xpath=//a[text()='Customer Directory'][2]
+${AP_link_setBusVertiSummaryStyleViewOptions}    Xpath=//a[text()='Set Bus Verti Summary Style View Options']
+${AP_link_setSortOrder}    Xpath=//a[text()='Set Sort Order']
+${AP_button_top_setCriteria}    Xpath=//form/div//input[@name='setcriteria']
+${AP_button_bottom_setCriteria}    Xpath=//form/input[@name='setcriteria']

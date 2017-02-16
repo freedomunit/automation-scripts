@@ -1,0 +1,1 @@
+pybot -d ..\..\..\robot\Allocation\output --timestampoutputs --log AllocationCPCompareLog.html --report AllocationCPCompareReport.html --include CP-test   ..\..\..\robot\Allocation\interfacetest.txt 

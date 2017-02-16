@@ -1,0 +1,19 @@
+*** Variables ***
+${RB_run_runReport_PHID}    Xpath=//td/a[contains(@href,'reportid=ID') and text()='Run']
+${RB_criteria_title}    Xpath=//table[@class='publicnone']
+${RB_criteria_topSubmit}    Xpath=//form[@name='message']/table[1]//input[@value='Submit']
+${RB_criteria_fromDate}    Xpath=//form[@name='message']//input[@name='fromdate']
+${RB_criteria_toDate}    Xpath=//form[@name='message']//input[@name='todate']
+${RB_criteria_removeFilter_count}    //table[@id='filtertable']//input[@title='Remove Filter']
+${RB_criteria_Button_addFilter_rowPlaceHold}    Xpath=//tr[@id='rrow']//input[@title='Add Filter']
+${RB_criteria_Button_removeFilter_rowPlaceHold}    Xpath=//tr[@id='rrow']//input[@title='Remove Filter']
+${RB_criteria_Dropdown_filterHierarchy1}    Xpath=//select[@name='hierarchyattr1']
+${RB_criteria_Options_filterHierarachy1}    Xpath=//tr[@id='r1']/td[3]/div
+${RB_criteria_Option_filterHierarachy1}    Xpath=//tr[@id='r1']/td[3]//tr
+${RB_criteria_filterHierarachy1_optionCount}    //tr[@id='r1']/td[3]//tr
+${RB_criteria_filterHierarachy1_rowCount}    //tr[@id='r1']
+${RB_criteria_topNewReport}    Xpath=//form[@name='message']/table[1]//input[@value='New Report']
+${RB_run_title}    Xpath=//div[@id='notabcontent']/table[1]/tbody/tr[1]/td[1]
+${RB_criteria_dropdown_reportType}    Xpath=//select[@id='reporttype']
+${RB_criteria_input_style#}    Xpath=//input[@name='stylenumbers']
+${RB_criteria_filterHierarchy_options_last_checkbox_optionPH}    Xpath=//tr[contains(@class,'filtertablerow')][last()]//div[contains(@class,'multiC')]//tr//label[text()='option']/input[@type='checkbox']

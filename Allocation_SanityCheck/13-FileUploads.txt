@@ -1,0 +1,30 @@
+*** Settings ***
+Force Tags        SC-G1-FU
+Test Template
+Resource          Setting/environment.txt
+Resource          Setting/performancekeyword.txt
+Resource          page/ZK.txt
+Resource          page/Upload.txt
+
+*** Test Cases ***
+editFileUploads
+    enterCertainModel    File Uploads    ${mainPage}    FileUploads
+    @{uploadType}    get list items    ${Upload_select_uploadType}
+    : FOR    ${item}    IN RANGE    0    3
+    \    ${targetTypeIndex}    evaluate    random.randint(1,len(@{uploadType})-1)    random
+    \    select from list by label    ${Upload_select_uploadType}    @{uploadType}[${targetTypeIndex}]
+    \    list selection should be    ${Upload_select_uploadType}    @{uploadType}[${targetTypeIndex}]
+    \    run keyword if    '@{uploadType}[${targetTypeIndex}]' == 'Vendor Name'    wait until element contains    ${Upload_textTilte}    Vendor info    30
+    \    ...    ELSE IF    '@{uploadType}[${targetTypeIndex}]' == 'Buyer Brand'    wait until element contains    ${Upload_textTilte}    buyer Brand
+    \    ...    30
+    \    ...    ELSE IF    '@{uploadType}[${targetTypeIndex}]' == 'Category'    wait until element contains    ${Upload_textTilte}    category
+    \    ...    30
+    \    ...    ELSE IF    '@{uploadType}[${targetTypeIndex}]' == 'Receiver'    wait until element contains    ${Upload_textTilte}    RECEIVER
+    \    ...    30
+    \    ...    ELSE IF    '@{uploadType}[${targetTypeIndex}]' == 'Style/Color/Size Flat File'    wait until element contains    ${Upload_textTilte}    style/color/size
+    \    ...    30
+    \    ...    ELSE IF    '@{uploadType}[${targetTypeIndex}]' == 'Upload Images'    wait until element contains    Xpath=//td[1]/fieldset/legend/b    Upload Style Images
+    \    ...    30
+    \    ...    ELSE    wait until element contains    ${Upload_textTilte}    @{uploadType}[${targetTypeIndex}]    30
+    \    page should not contain    error
+    \    sleep    1S

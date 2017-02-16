@@ -1,0 +1,22 @@
+var preBtnRow =$(".zsblock").find("div:contains('<preBtn}')").index()
+var btnRow =$(".zsblock").find("div:contains('<btn}')").index();
+var fromCol =$(".zstopblock div").find("div:contains('Transfer From DC / Store ')").index();
+var titleRow =$(".zstopblock").children("div").size()-1;
+var modifyRow='';
+$(".zsblock").children("div:gt("+titleRow+")").each(function(){
+   var from=$(this).children("div:eq("+fromCol+")").text();
+  
+  if(from !='' && preBtnRow < btnRow && preBtnRow < $(this).index() && $(this).index()< btnRow){
+    
+      if(modifyRow==''){
+      modifyRow+=from+"/"+($(this).index());
+    }else{
+      modifyRow+=","+from+"/"+($(this).index());}
+} else if (from !='' && preBtnRow == btnRow && $(this).index()< btnRow){
+
+      if(modifyRow==''){
+      modifyRow+=from+"/"+($(this).index());
+    }else{
+      modifyRow+=","+from+"/"+($(this).index());
+}}});
+return(modifyRow);

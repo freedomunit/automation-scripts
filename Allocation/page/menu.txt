@@ -1,0 +1,4 @@
+*** Variables ***
+${styleBank}      Style Bank
+${collaborativeAssortments}    Collaborative Assortments
+${menu_section}    Xpath=//div[@id='menuContent']

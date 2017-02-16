@@ -1,0 +1,18 @@
+*** Variables ***
+${BP_downloadDropdown}    Xpath=//select[@id='dd0']
+${BP_setupDropdown}    Xpath=//select[@name='setActions']
+${BP_downloadBtn}    Xpath=//input[@value='Download'][1]
+${BP_goBtn}       Xpath=//input[@type='button' and @value='GO']
+${BP_downloadCriteria_filterHierarchy1}    Xpath=//select[@name='hierarchyattr1']
+${BP_downloadCriteria_filterHierarchy1_options}    Xpath=//tr[@id='r1']/td[3]/div
+${BP_downloadCriteria_filterHierarchy1_option}    Xpath=//tr[@id='r1']/td[3]//tr
+${BP_downloadCriteria_filterHierarchy1_optionCount}    //tr[@id='r1']/td[3]//tr
+${BP_downloadCriteria_filterHierarchy1_rowCount}    //tr[@id='r1']
+${BP_cancelBtn}    Xpath=//input[@value='Cancel'][1]
+${BP_setupDetail_rowCount}    //div[@id='maincontent']//table[2]/tbody[last()]/tr
+${BP_pageName_second}    Xpath=//big[@class='title2']
+${BP_pageName_first}    Xpath=//big[@class='title1']
+${BP_setClustering_checkboxCount}    //div[@class='ui-dropdownchecklist-item ui-state-default']
+${BP_setClustering_checkedbox}    Xpath=//span[@class='ui-dropdownchecklist-text']
+${BP_defineUploadFormat_uploadTypeDropdown}    Xpath=//select[@id='uploadformattype']
+${BP_defineUploadFormat_goBtn}    Xpath=//input[@type='button' and @value='Go']

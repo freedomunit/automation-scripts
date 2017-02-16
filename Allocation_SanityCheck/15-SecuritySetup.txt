@@ -1,0 +1,64 @@
+*** Settings ***
+Force Tags        SC-G1-SS
+Resource          Setting/environment.txt
+Resource          Setting/performancekeyword.txt
+Resource          page/ZK.txt
+Resource          page/SecuritySetup.txt
+
+*** Test Cases ***
+editSS
+    [Tags]
+    enterCertainModel    Security Setup    ${ZK_selectedTab}    Security Groups
+    Download Excel    ${Security_Button_donloadTemplate}    Security_template
+    Download Excel    ${Security_Button_donloadAccess}    Security_access
+    ${editBtn_count}    get matching xpath count    ${Security_Button_editCount}
+    ${invalidUsers_count}    get matching xpath count    ${Security_invalidUsers_count}
+    ${validUsers_count}    evaluate    ${editBtn_count}- ${invalidUsers_count}
+    ${editBtn_row}    evaluate    random.randint(1,${validUsers_count})    random
+    click element    ${Security_Sort_status}
+    sleep    3S
+    ${sortBy}    execute javascript    ${Security_Sort_status_up@class_jquery}
+    should be equal as strings    ${sortBy}    z-icon-caret-up
+    ${editBtn_path}    replace string    ${Security_Button_Edit_rowPH}    [row]    [${editBtn_row}]
+    enter page by click    ${editBtn_path}    ${ZK_selectedTab}    Security for
+    ${dropdownCount}    get matching xpath count    ${Security_SecurityForTab_Dropdown_count}
+    ${selectedCriteriaStr}    set variable    ${EMPTY}
+    : FOR    ${col}    IN RANGE    2    ${dropdownCount}*2+2    2
+    \    ${dropdownPath}    replace string    ${Security_SecurityForTab_Dropdown_colPH}    [col]    [${col}]
+    \    select from list by index    ${dropdownPath}    1
+    \    ${item}    get selected list label    ${dropdownPath}
+    \    ${selectedCriteriaStr}    run keyword if    '${selectedCriteriaStr}'    set variable    ${selectedCriteriaStr}-${item}
+    \    ...    ELSE    set variable    ${item}
+    click element    ${Security_SecurityForTab_Button_Filter}
+    sleep    3S
+    Wait Until Page Does Not Contain    Processing...    120
+    Wait Until element Contains    ${Security_SecurityForTab_Sheet_content}    ${selectedCriteriaStr}    120
+    enter page by click    Xpath=${ZK_tabsCount}//span[text() ='Security Rule Exceptions']    ${ZK_selectedTab}    Security Rule Exceptions
+    enter page by click    ${Security_Button_createSecurity}    ${ZK_selectedTab}    Create/Edit Rule Exception
+    input text    ${Security_create/editRuleException_input}    test123
+    #    element should contain    ${Security_create/editRuleException_input}    test123
+    dynamic ZK Select Criteria    ${Security_create/editRuleException_dropdown_filterHierarachy_last}    ${Security_create/editRuleException_filterHierarachy_options_last}    ${Security_create/editRuleException_filterHierarachy_optionsCount_last}    ${Security_create/editRuleException_filterItems_jquery}    ${Security_create/editRuleException_filterHierarachy_popOptions_header}    ${Security_create/editRuleException_filterHierarachy_popOptions_rowPH}
+    ...    ${Security_create/editRuleException_filterHierarachy_popOptions_header_checked}    ${Security_create/editRuleException_Button_addFilter_last}    ${Security_create/editRuleException_Button_removeFilter_last}
+    click element    ${ZK_Button_Close}
+    wait until element is visible    ${ZK_popPanel_button_NO}    30
+    enter page by click    ${ZK_popPanel_button_NO}    ${ZK_selectedTab}    Security Rule Exceptions
+    element should not be visible    Xpath=${ZK_tabsCount}/a/span[text()='Create/Edit Rule Exception']
+    ${ruleCounts}    get matching xpath count    ${Security_ruleException_ruleCount}
+    ${checkboxCol_header}    get matching xpath count    ${Security_ruleException_checkboxCol_count}
+    ${targetRule}    evaluate    random.randint(1,${ruleCounts})    random
+    ${targetBox_header}    evaluate    random.randint(1,${checkboxCol_header})    random
+    ${targetBox_rule}    evaluate    random.randint(1,${checkboxCol_header}+1)    random
+    ${targetCol}    run keyword if    ${targetBox_header}>1    evaluate    ${targetBox_header}+1
+    ...    ELSE    set variable    ${targetBox_header}
+    enter page by click    Xpath=${Security_ruleException_ruleCount}[${targetRule}]//a    ${ZK_selectedTab}    Create/Edit Rule Exception
+    dynamic ZK Select Criteria    ${Security_create/editRuleException_dropdown_filterHierarachy_last}    ${Security_create/editRuleException_filterHierarachy_options_last}    ${Security_create/editRuleException_filterHierarachy_optionsCount_last}    ${Security_create/editRuleException_filterItems_jquery}    ${Security_create/editRuleException_filterHierarachy_popOptions_header}    ${Security_create/editRuleException_filterHierarachy_popOptions_rowPH}
+    ...    ${Security_create/editRuleException_filterHierarachy_popOptions_header_checked}    ${Security_create/editRuleException_Button_addFilter_last}    ${Security_create/editRuleException_Button_removeFilter_last}
+    click element    ${ZK_Button_Close}
+    wait until element is visible    ${ZK_popPanel_button_NO}    30
+    enter page by click    ${ZK_popPanel_button_NO}    ${ZK_selectedTab}    Security Rule Exceptions
+    element should not be visible    Xpath=${ZK_tabsCount}/a/span[text()='Create/Edit Rule Exception']
+    ${checkBox_header_path}    replace string    ${Security_ruleException_checkbox_header_colPH}    [col]    [${targetCol}]
+    click element    ${checkBox_header_path}
+    ${checkBox_rule_path}    replace string    ${Security_ruleException_checkbox_rule_rowPHcolPH}    [col]    [${targetBox_rule}]
+    ${checkBox_rule_path}    replace string    ${checkBox_rule_path}    [row]    [${targetRule}]
+    click element    ${checkBox_rule_path}

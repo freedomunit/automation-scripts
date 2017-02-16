@@ -1,0 +1,3 @@
+*** Variables ***
+${WSAddRemoveStyle_bottom_cancel}    Xpath=//form[@name='message']/table[last()]//input[@value='Cancel']
+${WSAddRemoveStyle_top_cancel}    Xpath=//form[@name='message']/table[1]//input[@value='Cancel']

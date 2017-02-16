@@ -1,0 +1,182 @@
+
+function compareNodes(ss,pp){
+	var s1 =$(ss).children(); 
+	var p1 = $(pp).children(); 
+	if(! s1 && ! p1) {
+	 return 
+	} 
+	if(!s1 && p1 ) {
+	 $(pp).css("background-color","red");
+	} 
+	if(s1  && ! p1 ) {
+	 $(ss).css("background-color","red");
+	} 
+	if (s1 && p1 ){
+		var step = $(s1).size() >= $(p1).size() ? $(s1).size() : $(p1).size();
+		for(var i = 0 ; i < step; i++){
+			var cs = s1[i];
+			var cp = p1[i];
+			if(cs && cp) {
+				if (cs.isEqualNode(cp))  continue;
+				if (! cs.isEqualNode(cp) && $(cs).children() && $(cp).children()) compareNodes(cs, cp);
+				if (! cs.isEqualNode(cp) && ! $(cs).children() && ! $(cp).children()) {
+					cp.style.background="red";
+					cs.style.background="red";
+				}
+				if (! cs.isEqualNode(cp) && ! $(cs).children() && $(cp).children()) {
+					cp.style.background="red";				
+				}
+				if (! cs.isEqualNode(cp) && $(cs).children() && ! $(cp).children()) {
+					cs.style.background="red";				
+				}
+			}	
+			if( ! cs) {
+				cp.style.background="red";
+			}
+			if( ! cp) {
+				cs.style.background="red";
+			}			
+		}
+ 	}  
+}
+
+
+
+
+
+
+function(var st,var pt,var next)
+for(var i = 0; i < next; i++){
+   if(st[i].nodeValue != pt[i].nodeValue) {
+    st[i].style.backgroundColor="red";
+    pt[i].style.backgroundColor="red";
+  }
+  sn[i] = sn[i].childNodes;
+  pn[i] = pn[i].childNodes;
+}
+
+
+
+
+
+while(sn.hasChildNodes() && pn.hasChildNodes()){  
+  if(sn.nodeValue != pn.nodeValue) {
+    sn.style.backgroundColor="red";
+    pn.style.backgroundColor="red";
+  }
+  sn = sn.childNodes;
+  pn = pn.childNodes;   
+  
+  
+}
+
+function compareNodes(ss,pp){
+	var s1 = ss.cjildNodes; 
+	var p1 = pp.childNodes; 
+	if(! s1 && ! p1) {
+	 return 
+	} 
+	if(!s1 && p1 ) {
+	 p1.style.background="red";
+	} 
+	if(s1  && ! p1 ) {
+	 s1.style.background="red";
+	} 
+	if (s1 && p1 ){
+		var step = (s1.length >= p1.length)? s1.length : p1.length;
+		for(var i = 0 ; i < step; i ++){
+			var cs = s1[i];
+			var cp = p1[i];
+			if(cs && cp) {
+				if (cs.isEqualNode(cp))  continue;
+				if (! cs.isEqualNode(cp) && cs.childNodes && cp.childNodes) compareNodes(cs, cp);
+				if (! cs.isEqualNode(cp) && ! cs.childNodes && ! cp.childNodes) {
+					cp.style.background="red";
+					cs.style.background="red";
+				}
+				if (! cs.isEqualNode(cp) && ! cs.childNodes && cp.childNodes) {
+					cp.style.background="red";				
+				}
+				if (! cs.isEqualNode(cp) && cs.childNodes && ! cp.childNodes) {
+					cs.style.background="red";				
+				}
+			}	
+			if( ! cs) {
+				cp.style.background="red";
+			}
+			if( ! cp) {
+				cs.style.background="red";
+			}			
+		}
+ 	}  
+}
+
+
+
+*************
+var se = $("#stage");
+var pe = $("#prod");
+compareNodes(se,pe);
+function compareNodes(ss,pp){
+  var sameFlag = true;
+  if($(ss).size()>0 && $(pp).size()>0){
+    var s1 = $(ss).children(); 
+    var p1 = $(pp).children();
+    console.log($(s1).size() +"---"+ $(p1).size())    
+    var step = $(s1).size() >= $(p1).size() ? $(s1).size() : $(p1).size();
+    for(var i = 0 ; i < step; i++){
+      var cs = s1[i];
+      var cp = p1[i];
+      if(cs && cp) {
+        if (cs.isEqualNode(cp)) {   
+          console.log("same:"+step+"/"+i+"--"+cs.tagName+"/"+cp.tagName);
+          if(cs.tagName == "BR" || cp.tagName== "BR") console.log("BR:"+cs.nextSibling.nodeValue+"/"+cp.nextSibling.nodeValue);
+          continue;
+        }
+        if (! cs.isEqualNode(cp) && $(cs).children().size()>0 && $(cp).children().size()>0){
+          sameFlag = false;       
+
+          if (compareNodes(cs, cp) && !sameFlag) {
+            cp.style.background="red";
+            cs.style.background="red";
+            console.log("diff:"+step+"/"+i+"--"+$(cs).html()+"/"+$(cp).html());
+          };
+
+        }
+        if (! cs.isEqualNode(cp) && $(cs).children().size()==0 && $(cp).children().size()==0) {
+          sameFlag = false;
+          cp.style.background="red";
+          cs.style.background="red";
+          console.log("text diff:"+step+"/"+i+"--"+$(cs).html()+"/"+$(cp).html());
+        }
+        if (! cs.isEqualNode(cp) && $(cs).children().size()==0 && $(cp).children().size()>0) {
+          sameFlag = false;
+          cp.style.background="red";	
+          console.log("d_prod diff:"+step+"/"+i+"/" +cp.innerHTML);
+        }
+        if (! cs.isEqualNode(cp) && $(cs).children().size()>0 && $(cp).children().size()==0) {
+          sameFlag = false;
+          cs.style.background="red";		
+          console.log("d_stage diff:"+step+"/"+i+"/" +cs.innerHTML);
+        }
+      }	
+      if( ! cs) {
+        sameFlag = false;
+        cp.style.background="red";
+        console.log("prod diff:"+step+"/"+i+"/" +cp.innerHTML);
+      }
+      if( ! cp) {
+        sameFlag = false;
+        cs.style.background="red";
+        console.log("stage diff:"+step+"/"+i+"/" +cs.innerHTML);
+      }			
+      
+    } 
+     return sameFlag
+  }else{
+    console.log("target element don't exist!")
+    return false
+  }
+    
+ 
+};

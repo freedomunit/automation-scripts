@@ -1,0 +1,5 @@
+*** Variables ***
+${FileExtract_fileLink_Count}    //div[@id='notabcontent']//tbody/tr/td[1]/a
+${FileExtract_fileLink_numPH}    Xpath=//div[@id='notabcontent']//tbody/tr[num]/td[1]/a
+${FileExtract_scheduleLink_numPH}    Xpath=//div[@id='notabcontent']//tbody/tr[num]/td[2]/a
+${FileExtract_Button_NewSchedule}    Xpath=//input[@name='new']

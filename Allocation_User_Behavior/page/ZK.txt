@@ -1,0 +1,71 @@
+*** Variables ***
+${ZK_Cell_Selected}    Xpath=//div[@class='zsdata']//div[@class='zsselecti']
+${ZK_Cell_Edit}    Xpath=//div[@class='zsedit']/div[2]
+${ZK_checkBox_count}    //span[contains(@class,'checkable')]
+${ZK_checkBox_rowCount}    //tr[contains(@class,'z-listitem')]
+${ZK_selectedTab}    Xpath=//ul[@class="z-tabs-content"]/li[contains(@class,'z-tab z-tab-selected')]    # Xpath=//ul[@class="z-tabs-content"]/li[@class='zssheettab z-tab z-tab-selected']
+${ZK_checkedBox_rowCount}    //tr[contains(@class,'z-listitem-selected')]
+${ZK_uncheckBox_rowCount}    //tr[contains(@class,'z-listitem') and not( contains( @class,'z-listitem-selected'))]    # //tr[@class='z-listitem' or @class='z-listitem none' ]
+${ZK_popPanel_message}    Xpath=//div[contains(@class,'z-messagebox-window')]
+${ZK_popPanel_message_button_NO}    Xpath=//button[@class='z-messagebox-button z-button' and text()='No']
+${ZK_Title_Style#}    Xpath=//div[@class='zstop zsfztop']//div[@class='zstopblock']//div[text()='Style #']
+${ZK_selectedFreezeButton}    Xpath=//div[@class='zsleft zsfzleft']//div[@class='zslefti']/div[@class='zsleftblock']
+${ZK_Options_checkedBox_rowCount_sectionPH}    //div[text()='section']//following::div[@class='z-listbox-body'][1]//tr[contains(@class,'z-listitem-selected')]
+${ZK_Options_uncheckBox_rowCount_sectionPH}    //div[text()='section']//following::div[@class='z-listbox-body'][1]//tr[contains(@class,'z-listitem') and not( contains( @class,'z-listitem-selected'))]    # //div[text()='section']//following-sibling::div[1]//tr[@class='z-listitem' or @class='z-listitem none' ]
+${ZK_Button_Save}    Xpath=//li[@title='Save']
+${ZK_Button_SaveClose}    Xpath=//li[@title='Save & Close']
+${ZK_Button_TargetDoors}    Xpath= //li[@title='Target Doors']
+${ZK_Button_Excel}    Xpath=//li[@title='Excel']
+${ZK_Button_Options}    Xpath=//li[@title='Options']
+${ZK_Button_Close}    Xpath=//li[@title='Close']
+${ZK_Button_FreezePanel}    Xpath=//li[@title='Freeze Pane']
+${ZK_Button_Populate}    Xpath=//li[@title='Populate']
+${ZK_Button_Job}    Xpath=//li[@title='Create Job']
+${ZK_Button_ViewCriteria}    Xpath=//li[@title='Viewing Criteria']
+${ZK_Button_Info}    Xpath=//li[@title='Info']
+${ZK_Button_Notes}    Xpath=//li[@title='Notes']
+${ZK_Button_Retail$}    Xpath=//li[contains(@class,'togR')]/a
+${ZK_Button_Sales%}    Xpath=//li[contains(@class,'togL')]/a
+${ZK_popDropdown_open}    Xpath=//div[contains(@class,'z-combobox-popup fakeSelect z-combobox-open')]/ul/li
+${ZK_popDropdown_selectedItem}    Xpath=//div[contains(@class,'z-combobox-popup fakeSelect')]/ul/li[contains(@class,'selected')]
+${ZK_InfoNotesSection}    Xpath=//table[@class='z-vbox']/tbody/tr[1]/td[1]/table/tbody/tr[1]/td/div/div[not(contains(@style,'none')) and @style]    # exclude BudgetBreakdown
+${ZK_Title_selectedCount}    //div[@class='zstop zsfztop']//div[@class='zstopblock']/following-sibling::div[@class='zsselect' and not (contains(@style,'-'))]
+${ZK_tabsCount}    //ul[@class="z-tabs-content"]/li
+${ZK_Button_Sales%_selected}    Xpath=//li[contains(@class,'togL') and \ contains(@class,'disabled')]/a
+${ZK_Button_Retail$_selected}    Xpath=//li[contains(@class,'togR') and \ contains(@class,'disabled')]/a
+${ZK_Options_title}    Xpath=//th[@class='z-auxheader']
+${ZK_Criteria_filterItems_jquery}    var items='';$(".z-listbox-body table:visible tbody:eq(0)").children("tr").each(function(){if(!items){items+=$(this).text();} else{items+=','+$(this).text();}});return(items)
+${ZK_Criteria_filterHierarachy_popupOptions_header}    Xpath=//div[@class='pop z-popup z-popup-open']/div[@class='z-popup-content']/div/div[1]//div[not(contains(@style,'none'))]/span[contains(@class,'checkable')]
+${ZK_Criteria_filterHierarachy_popupOptions_rowPH}    Xpath=//div[@class='pop z-popup z-popup-open']/div[@class='z-popup-content']/div/div[3]//tr[row]//span[contains(@class,'checkable')]
+${ZK_Criteria_filterHierarachy_popupOptions_header_checked}    Xpath=//div[@class='pop z-popup z-popup-open']/div[@class='z-popup-content']/div/div[1]//div[not(contains(@style,'none'))]/span[contains(@class,'checked')]
+${ZK_Criteria_filterHierarachy_popupOptionsCount_last}    //div[@class='pop z-popup z-popup-open']//span[contains(@class,'checkable')]
+${ZK_Button_AddStyles}    Xpath=//li[@title='add Style(s)']
+${ZK_Button_Filter}    Xpath=//li[@title='Filter']
+${ZK_checkedBox_title_jquery}    var a= new Array();var n=0;$('.z-listheader-checked').each(function(){a[n]=$(this).parents('th').next().text();n++;});return a
+${ZK_checkBox_title_jquery}    var a= new Array();var n=0;$('.z-listheader-checkable').each(function(){a[n]=$(this).parents('th').next().text();n++;});return a
+${ZK_Button_disabledViewCriteria}    Xpath=//li[@title='Viewing Criteria' and contains(@class,'disabled')]
+${ZK_Button_disabledInfo}    Xpath=//li[@title='Info' and contains(@class,'disabled')]
+${ZK_Button_disabledNotes}    Xpath=//li[@title='Notes' and contains(@class,'disabled')]
+${ZK_Button_disabledOptions}    Xpath=//li[@title='Options' and contains(@class,'disabled')]
+${ZK_Button_disabledJob}    Xpath=//li[@title='Create Job' and contains(@class,'disabled')]
+${ZK_Button_disabledPopulate}    Xpath=//li[@title='Populate' and contains(@class,'disabled')]
+${ZK_Button_CancelJob}    Xpath=//li[@title='Cancel Job']
+${ZK_Button_disabledCancelJob}    Xpath=//li[@title='Cancel Job' and contains(@class,'disabled')]
+${ZK_Button_disabledAddStyles}    Xpath=//li[@title='add Style(s)' and contains(@class,'disabled')]
+${ZK_sheetDataByRowsList_jquery}    var a = new Array();var n=0;$(".zsblock").children("div").each(function(){var row = $(".zsleftcell:eq("+$(this).index()+")").text();a[n]= row+"Row:"+ $(this).text();n++;});return a;
+${ZK_sheet_rowNumStartEndVisible_jquery}    var a = new Array();a[0]=$(".zslefthead .zsleftcell:first").text()+"/"+ $(".zslefthead .zsleftcell:first").offset().top;a[1]=$(".zslefthead .zsleftcell:visible:last").text()+"/"+ $(".zslefthead .zsleftcell:visible:last").offset().top;return a;
+${ZK_sheet_colNumStartEndVisible_jquery}    var a = new Array();a[0]=$(".zstophead .zstopcell:first").text()+"/"+ $(".zstophead .zstopcell:first").offset().left;a[1]=$(".zstophead .zstopcell:visible:last").text()+"/"+ $(".zstophead .zstopcell:visible:last").offset().left;return a;
+${ZK_rowNum_last}    Xpath=//div[@class='zslefthead']/div[contains(@class,'zsleftcell')][last()]
+${ZK_colNum_last}    Xpath=//div[@class='zstophead']/div[contains(@class,'zstopcell')][last()]
+${ZK_sheetDataByRowColList_jquery}    var a = new Array();var n= 0;$(".zsblock").children("div").each(function(){a[n] = new Array();var j = 0;a[n][j] = $(".zslefthead .zsleftcell:eq("+$(this).index()+")").text(); j++;$(this).children("div").each(function(){var tmp = $(this).text().trim();if(tmp.indexOf('(')==0 && tmp.indexOf(')') == tmp.length-1 && parseInt(tmp.substring(1,tmp.length-1))){a[n][j]='-'+tmp.substring(1,tmp.length-1);}else{a[n][j]=tmp;}j++;});n++;});return a;
+${ZK_sheet_topHeadList_jquery}    var a = new Array();var n = 0;$(".zstophead .zstopcell").each(function(){a[n]= $(this).text();n++;}); return a
+${ZK_colLeftPosition_last_jquery}    return $(".zstophead").width()    # return $(".zstophead .zstopcell:visible:last").offset().left
+${ZK_rowTopPosition_last_jquery}    return $(".zslefthead").height()    # return $(".zslefthead .zsleftcell:visible:last").offset().top
+${ZK_sheet_rowNum_last_jquery}    return $(".zslefthead .zsleftcell:visible:last").text()
+${ZK_mainLoad_Processing}    Xpath=//div[@class='z-apply-loading-indicator']    #Xpath=//div[@id='zkcontainer']/div[@class='processing']
+${ZK_footLoad_Processing}    Xpath=//div[@class='z-loading-indicator']
+${ZK_popPanel_message_button_OK}    Xpath=//button[@class='z-messagebox-button z-button' and text()='OK']
+${ZK_popPanel_message_button_Yes}    Xpath=//button[@class='z-messagebox-button z-button' and text()='Yes']
+${ZK_message_non-editableCell}    Xpath=//span[@class='zsinfo']    # Can not edit on a protected cell.
+${ZK_sheet_cell_rowcolPH}    Xpath=//div[@class='zsblock']/div[row]/div[col]
+${ZK_Title_Selected}    Xpath=//div[@class='zstopi']//div[@class='zsselecti']

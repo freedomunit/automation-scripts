@@ -1,0 +1,154 @@
+*** Variables ***
+${DailyTasks_criteria_top_submit}    Xpath=//form[@name='message']/input[@type='submit'][1]
+${DailyTasks_Sheet}    Xpath=//div[@class='zssheet']
+${DailyTasks_Button_Save}    Xpath=//li[@title='Save']
+${DailyTasks_Button_SaveClose}    Xpath=//li[@title='Save & Close']
+${DailyTasks_Button_DoorFilter}    Xpath= //li[@title='Door Filter']
+${DailyTasks_Button_Excel}    Xpath=//li[@title='Excel']
+${DailyTasks_Button_Options}    Xpath=//li[@title='Options']
+${DailyTasks_Button_Close}    Xpath=//li[@title='Close']
+${DailyTasks_criteria_Dropdown_TaskType}    Xpath=//select[@id='dailytasktype']
+${DailyTasks_criteria_Dropdown_ScreenType}    Xpath=//select[@id='screentype']
+${DailyTasks_criteria_Dropdown_Status}    Xpath=//select[@id='status']
+${DailyTasks_criteria_Dropdown_OrderCity}    Xpath=//select[@id='stockcategory']
+${DailyTasks_criteria_Dropdown_DataSourceType}    Xpath=//select[@name='datasourcetype']
+${DailyTasks_criteria_Text_FromDate}    Xpath=//input[@name='fromorderdate']
+${DailyTasks_criteria_Text_ToDate}    Xpath=//input[@name='toorderdate']
+${DailyTasks_criteria_Radio_ShopDate}    Xpath=//input[@name='timerangeselection' and @value='0']
+${DailyTasks_criteria_Radio_InDCDate}    Xpath=//input[@name='timerangeselection' and @value='1']
+${DailyTasks_criteria_removeFilter_count}    //input[@title='Remove Filter']
+${DailyTasks_criteria_Button_addFilter_rowPlaceHold}    Xpath=//tr[@id='rrow']//input[@title='Add Filter']
+${DailyTasks_criteria_Button_removeFilter_rowPlaceHold}    Xpath=//tr[@id='rrow']//input[@title='Remove Filter']
+${DailyTasks_criteria_Dropdown_filterHierarchy1}    Xpath=//select[@name='hierarchyattr1']
+${DailyTasks_criteria_Options_filterHierarachy1}    Xpath=//tr[@id='r1']/td[3]/div
+${DailyTasks_criteria_Option_filterHierarachy1}    Xpath=//tr[@id='r1']/td[3]//tr
+${DailyTasks_criteria_filterHierarachy1_optionCount}    //tr[@id='r1']/td[3]//tr
+${DailyTasks_criteria_filterHierarachy1_rowCount}    //tr[@id='r1']
+${DailyTasks_popPanel_button_yes}    Xpath=//button[text()='Yes']
+${DailyTasks_popPanel_button_no}    Xpath=//button[text()='No']
+${DailyTasks_scrollPanel}    Xpath=//div[@class='zsscroll']
+${DailyTasks_cellButtonToDropDown}    Xpath=//div[@class='zsbtn zsdropdown']
+${DailyTasks_cellDropDown}    Xpath=//div[@class='zscellpopup']
+${DailyTasks_cellHeight_px}    20    # page=700px
+${DailyTasks_cellButton}    Xpath=//a[@class='btn']
+${DailyTasks_Button_FreezePanel}    Xpath=//li[@title='Freeze Pane']
+${DailyTasks_freezePanel_position}    Xpath=//div[@class='zsblock']/div[18]/div[7]
+${DailyTasks_tab_selected}    Xpath=//ul[@class="z-tabs-content"]/li[@class='zssheettab z-tab z-tab-selected']
+${DailyTasks_Button_ViewCriteria}    Xpath=//li[@title='Viewing Criteria']
+${DailyTasks_tabsCount}    //ul[@class="z-tabs-content"]/li
+${DailyTasks_Button_Edit_rowPH}    Xpath=//div[@class='zsblock']/div[row]//a[text()='Edit']
+${DailyTasks_Button_Populate}    Xpath=//li[@title='Populate']
+${DailyTasks_Panel_Populate}    Xpath=//div/b[contains(text(),'Populate from:')]
+${DailyTasks_popPanel_dropdown}    Xpath=//select[@class='z-select']/preceding-sibling::b/following-sibling::select
+${DailyTasks_popPanel_BtnSubmit}    Xpath=//div[@style='display: block;']//button[text()='Submit']    # //button[text()='Submit']
+${DailyTasks_Title_QtyAllocated_count}    //div[@class="zstopblock"]/div[14]//div[contains(text(),'Allocated')]
+${DailyTasks_jquery_QtyAllocated_col}    return $(".zstopblock").children("div:eq(13)").find("div:contains('Allocated'):eq(0)").index();
+${DailyTasks_page_rowCount}    //div[@class="zsblock"]/div
+${DailyTasks_Button_OptionsSelected}    Xpath=//li[@title='Options' and @class= 'MenuImage IconOptions-OC opened z-menuitem']    # MenuImage IconOptions-OC opened z-menuitem
+${DailyTasks_options_attributeCols}    Xpath=//div[contains(text(),'Select Attribute Columns')]
+${DailyTasks_Button_Job}    Xpath=//li[@title='Create Job']
+${DailyTasks_StyleColorSize_openStockSizeColRow_jquery}    var openStockSizeList = '';$(".zsblock").children("div:eq(0)").children("div:visible").each(function(){if($(this).text() && !$(this).text().match('Total')){var titleCol = $(this).index(); var openStock = $(".zsblock").children("div:eq(9)").children("div")[titleCol]; var openStockNum = $(openStock).text(); openStockNum = parseInt(openStockNum);var title = $(this).text(); if(openStockNum > 0 ) {var titleSizeCol=$(".zsblock").children("div:eq(13)").children("div:visible:contains("+title+")").index()-1; var openStockSizeCol=$(".zsblock").children("div:eq(14)").children("div:gt("+titleSizeCol+"):visible:contains('AdjOpen Stock'):first").index(); for (var openStockSizeRow = 16; openStockSizeRow<39; openStockSizeRow++) {var openStockSize=$(".zsblock").children("div:eq("+openStockSizeRow+")").children("div:eq("+openStockSizeCol+")"); var openStockSizeNum= parseInt($(openStockSize).text());if(openStockSizeNum>0) { var openStockSizeX=$(openStockSize).offset().left; var openStockSizeY=$(openStockSize).offset().top; openStockSizeCol++;openStockSizeRow++;if(!openStockSizeList) {openStockSizeList = title+"/"+openStockSizeCol+"/"+openStockSizeRow+"/"+openStockSizeNum.toString()+"/"+openStockSizeX+"/"+openStockSizeY;} else{ openStockSizeList += ";"+title+"/"+openStockSizeCol+"/"+openStockSizeRow+"/"+openStockSizeNum.toString()+"/"+openStockSizeX+"/"+openStockSizeY;} openStockSizeCol--;openStockSizeRow--;} } } } }); return openStockSizeList;
+${DailyTasks_StyleColorSize_prepackTotalColRow_jquery}    var prepackTotalList = '';var titleTotalSizeCol=$(".zsblock").children("div:eq(13)").children("div:visible:contains('Total')").index()-1;var prepackTotalCol=$(".zsblock").children("div:eq(14)").children("div:gt("+titleTotalSizeCol+"):visible:contains('Adj Prepack'):first").index(); var prepackTotalTotal=$(".zsblock").children("div:eq(15)").children("div:eq("+prepackTotalCol+")");var prepackTotalTotalNum=parseInt($(prepackTotalTotal).text());if (prepackTotalTotalNum > 0){ for (var prepackTotalRow = 16; prepackTotalRow<39; prepackTotalRow++){ var prepackTotal=$(".zsblock").children("div:eq("+prepackTotalRow+")").children("div:eq("+prepackTotalCol+")"); var prepackTotalNum=parseInt($(prepackTotal).text());if (prepackTotalNum>0){ var prepackTotalX=$(prepackTotal).offset().left; var prepackTotalY=$(prepackTotal).offset().top;prepackTotalCol++;prepackTotalRow++;if(!prepackTotalList) {prepackTotalList = "Total/"+prepackTotalCol+"/"+prepackTotalRow+"/"+prepackTotalNum.toString()+"/"+prepackTotalX+"/"+prepackTotalY;} else{prepackTotalList += ";Total/"+prepackTotalCol+"/"+prepackTotalRow+"/"+prepackTotalNum.toString()+"/"+prepackTotalX+"/"+prepackTotalY;}prepackTotalCol--;prepackTotalRow--;}}}return prepackTotalList;
+${DailyTasks_viewCriteria_Dropdown_Status}    Xpath=//td/b[text()='Status:']/parent::*/following-sibling::td[1]/select
+${DailyTasks_viewCriteria_Dropdown_OrderCity}    Xpath=//td/b[text()='Order City:']/parent::*/following-sibling::td[1]/select
+${DailyTasks_viewCriteria_Dropdown_DataSourceType}    Xpath=//td/b[text()='#(s):']/preceding-sibling::select
+${DailyTasks_viewCriteria_Text_FromDate}    Xpath=//div/b[text()='From:']/parent::*/parent::*/following-sibling::div[2]//input[@class='z-datebox-input']
+${DailyTasks_viewCriteria_Text_ToDate}    Xpath=//div/b[text()='To:']/parent::*/parent::*/following-sibling::div[2]//input[@class='z-datebox-input']
+${DailyTasks_viewCriteria_Radio_ShopDate}    Xpath=//label[text()='Shop Date']/preceding-sibling::input
+${DailyTasks_viewCriteria_Radio_InDCDate}    Xpath=//label[text()='In DC Date']/preceding-sibling::input
+${DailyTasks_viewCriteria_removeFilter_count}    //button[text()='-']
+${DailyTasks_viewCriteria_Button_addFilter_last}    Xpath=//tbody[@class='z-rows']/tr[last()]//button[text()='+']
+${DailyTasks_viewCriteria_Button_removeFilter_last}    Xpath=//tbody[@class='z-rows']/tr[last()]//button[text()='-']
+${DailyTasks_viewCriteria_Dropdown_filterHierarchy_last}    Xpath=//tbody[@class='z-rows']/tr[last()]//select
+${DailyTasks_viewCriteria_Options_filterHierarachy_last}    Xpath=//tbody[@class='z-rows']/tr[last()]//div[not (contains(@style,'display: none;'))]/span[@class='ZKmultispans z-span']
+${DailyTasks_viewCriteria_popPanel_options}    Xpath=//div[@class='pop z-popup z-popup-open']
+${DailyTasks_viewCriteria_filterHierarachy_lastOptions_itemPH}    Xpath=//div[@class='pop z-popup z-popup-open']//div[contains(text(),'item')]/span[contains(@class,'checkable')]
+${DailyTasks_viewCriteria_removeFirstOptionsCount}    //tbody[@class='z-rows']/tr[last()]//span[@class='ZKmultispansclose z-label']
+${DailyTasks_viewCriteria_lastRow_addRowNum}    Xpath=//tbody[@class='z-rows']/tr
+${DailyTasks_Button_freezedEdit_rowPH}    Xpath=//div[@class='zsleftblock']/div[row]//a[text()='Edit']
+${DailyTasks_Button_Edit_rowList_jquery}    var editBtnRowList='';$(".zsblock").children("div:contains('Edit')").each(function(){var row=$(this).index();var rowTop = $(this).offset().top; if(row>-1 && editBtnRowList ==''){row++; editBtnRowList=row+'/'+rowTop;} else if(row>-1 && editBtnRowList){row++; editBtnRowList+=','+row+'/'+rowTop;}});return editBtnRowList;    # var editBtnRowList='';$(".zsblock").children("div:contains('Edit')").each(function(){var row=$(this).index();var rowTop = $(this).offset().top-$(".zstopblock").children("div:last").offset().top; if(row>-1 && editBtnRowList ==''){row++; editBtnRowList=row+'/'+rowTop;} else if(row>-1 && editBtnRowList){row++; editBtnRowList+=','+row+'/'+rowTop;}});return editBtnRowList;
+${DailyTasks_Door_colList_jquery}    var doorColList='';$(".zstopblock").children("div:eq(1)").children("div div div:contains('+')").each(function(){ var col= $(this).index();var colLeft=$(this).offset().left; if(col>-1 && doorColList =='' ){ col++; doorColList=col+'/'+colLeft;} else if(col>-1 && doorColList){col++; doorColList+=','+col+'/'+colLeft;}});return (doorColList)
+${DailyTasks_Door+_colPH}    Xpath=//div[@class='zstopblock']/div[2]/div[col]/div/div[contains(text(),'+')]
+${DailyTasks_viewCriteria_Options}    Xpath=//tbody[@class='z-rows']/tr[last()]//span[num]/span[@class='ZKmultispansclose z-label']
+${DailyTasks_Door+_count}    //div[@class='zstopblock']/div[2]//div[contains(text(),'+')]
+${DailyTasks_Title_selected}    Xpath=//div[@class='zstop zsfztop']//div[@class='zstopblock']/following-sibling::div[@class='zsselect']/div[@class='zsselecti']
+${DailyTasks_DoorCols_count}    //div[@class='zstopblock']//div[contains(text(),'◄►')]
+${DailyTasks_DoorCols_colPH}    Xpath=//div[@class='zstopblock']//div[col]/div/div[contains(text(),'◄►')]
+${DailyTasks_Panel_createJob}    Xpath=//div/b[contains(text(),'create a job')]
+${DailyTasks_popPanel_cancelBtn}    Xpath=//div[@class='z-div' and not(contains(@style,"none")) ]/div[contains(@class,'z-panel')]//button[text()='Cancel']
+${DailyTasks_Button_EditCount}    //div[@class='zsblock']//a[text()='Edit']
+${DailyTasks_DoorFilter_text_topDoors}    Xpath=//input[@type='text']
+${DailyTasks_DoorFilter_button_reset}    Xpath=//button[@type='button' and text()='Reset']
+${DailyTasks_viewCriteria_verifyPoint}    Xpath=//div[@class='z-vlayout-inner']/div[@class='z-div']/b
+${DailyTasks_filterDoor_verifyPoint}    Xpath=//div[@class='z-vlayout-inner']/div/div[1]/b
+${DailyTasks_viewCriteria_filterAttributes_count}    //div[@class='tblWithoutHover nonselectable z-listbox']/div[@class='z-listbox-body']/table/tbody/tr
+${DailyTasks_transfer_Panel_populate}    Xpath=//div/b[contains(text(),'populate for')]
+${DailyTasks_Transfer_addStyles_checkbox_count}    //div[@class='zsblock']//div[text()='☐']
+${DailyTasks_Transfer_addStyles_checkedbox_count}    //div[@class='zsblock']//div[text()='☑']
+${DailyTasks_Transfer_addStyles_checkbox_rowPH}    Xpath=//div[@class='zsblock']/div[row]//div[text()='☐']
+${DailyTasks_Transfer_addStyles_checkedbox_rowPH}    Xpath=//div[@class='zsblock']/div[row]//div[text()='☑']
+${DailyTasks_popPanel_filter}    Xpath=//div/b[contains(text(),'Filter:')]
+${DailyTasks_filterPanel_dropdown_filter}    Xpath=//div/b[contains(text(),'Filter:')]/parent::div/following-sibling::div[1]/select
+${DailyTasks_filterPanel_dropdown_DC/Store}    Xpath=//div/b[contains(text(),'DC/Store:')]/parent::div/following-sibling::div[1]/select
+${DailyTasks_popPanel_BtnFilter}    Xpath=//button[text()='Filter']
+${DailyTasks_DoorFilter_dropdown_cluster}    Xpath=//div[@class='p5 z-hlayout']//select
+${DailyTasks_Transfer_Button_validEdit_rowList_jquery}    var invCol = $(".zstopblock .zsrow .zscell").find("div:contains('EOD Stock Units')").parent().index();var colNum = $(".zstopblock .zsrow .zscell").find("div:contains('Status')").parent().index();var editBtnRowList='';$(".zsblock").children("div:contains('Edit')").each(function(){if(!($(this).children("div:eq("+colNum+")").text()) && parseInt($(this).children("div:eq("+invCol+")").text()) >0){var row=$(this).index();var rowTop = $(this).offset().top;if(row>-1 && editBtnRowList ==''){row++; editBtnRowList=row+'/'+rowTop;} else if(row>-1 && editBtnRowList){row++; editBtnRowList+=','+row+'/'+rowTop;}}});return editBtnRowList;
+${DailyTasks_Transfer_Button_+Store_rowList_jquery}    var a = new Array();var n = 0;$(".zsblock").children("div:contains('+ Store')").each(function(){a[n]= $(this).index()+1;n++;});return a
+${DailyTasks_Transfer_Button_+Stores_rowPH}    Xpath=//div[@class='z-div' and not (contains(@style,'none'))]//div[@class='zsblock']/div[row]//a[text()='+ Stores']
+${DailyTasks_Transfer_+Store_title}    Xpath=//tr[@class='z-auxhead']
+${DailyTasks_Transfer_+Store_transferFromDoor_jquery}    var invCol=$(".z-grid-header:gt(0)").find("th:contains('Stock Units After Transfer')").index();var doorNameCol=$(".z-grid-header:gt(0)").find("th:contains('DC/Store Description')").index();var doorNumCol=$(".z-grid-header:gt(0)").find("th:contains('DC/Store #')").index();var a = new Array();var n =0;$(".z-rows:gt(0)").children("tr").each(function(){var item=parseInt($($(this).children("td")[invCol]).text());if(item>0){a[n] =$(this).index()+";/"+$($(this).children("td")[doorNumCol]).text()+" - "+$($(this).children("td")[doorNameCol]).text()+";/"+item;n++;}});return a;
+${DailyTasks_Transfer_+Store_dropdown_transferFrom}    Xpath=//td[1]/select
+${DailyTasks_Transfer_+Store_dropdown_transferTo}    Xpath=//td[3]/select
+${DailyTasks_Transfer_+Store_input}    Xpath=//td[4]/input
+${DailyTasks_Transfer_+Store_button_+}    Xpath=//td/button[text()='+']
+${DailyTasks_Transfer_+Store_button_-}    Xpath=//td/button[text()='-']
+${DailyTasks_Transfer_+Store_transferToDoor_jquery}    var a = new Array();var n = 0;$("select:eq(1)").children("option:not(:disabled)").each(function(){a[n] = $(this).text();n++;});return a
+${DailyTasks_Transfer_+Store_label}    Xpath=//td[2]/span[@class='z-label']
+${DailyTasks_Transfer_Title_Style#}    Xpath=//div[@class='zstop zsfztop']//div[@class='zstopblock']/div[1]//a[text()='Style #']/ancestor::div[2]    # Xpath=//div[@class='zstop zsfztop']//div[@class='zstopblock']//a[text()='Style #']
+${DailyTasks_Transfer_Button_FreezeLeft+Stores_rowPH}    Xpath=//div[@class='zsleftblock']/div[row]//a[text()='+ Stores']
+${DailyTasks_Panel_cancelJob}    Xpath=//div/b[contains(text(),'cancel a job')]
+${DailyTasks_Status_Blank_jquery}    var a = new Array();var n = 0;var statusCol = $(".zstopblock div").children("div:contains('Status')").index();$(".zsblock").children(" div:gt(1)").each(function(){statusTxt=$(this).children(" div:eq("+statusCol+")").text();if(!statusTxt){a[n]=($(this).index()+1)+"/"+$(this).offset().top;n++;}});return a
+${DailyTasks_Status_RFE_jquery}    var a = new Array();var n = 0;var statusCol = $(".zstopblock div").children("div:contains('Status')").index();$(".zsblock").children(" div:gt(1)").each(function(){statusTxt=$(this).children(" div:eq("+statusCol+")").text();if(statusTxt == "R" || statusTxt == "FE" ){a[n]=($(this).index()+1)+"/"+$(this).offset().top;n++;}});return a
+${DailyTasks_Transfer_ReviewByStyleColor_freezedPosition_jqery}    var a = $(".zstopblock").children("div:eq(1)").children("div:visible:eq(2)").index()+1; return a
+${DailyTasks_Transfer_ReviewByStyleColor_DC/Store_jqery}    var a = new Array();var n = 0;var statusCol = $(".zstopblock div").children("div:contains('DC/Store Description')").index();$(".zsblock").children(" div:gt(1)").each(function(){if($(this).children("div:eq("+statusCol+")").text()){a[n]=($(this).index()+1)+"/"+$(this).offset().top;n++;}});return a
+${DailyTasks_Transfer_ReviewByStyleColor_freezedDC/Store_rowPH}    Xpath=//div[@class='zsleftblock']/div[row]//a
+${DailyTasks_Button_disabledDoorFilter}    Xpath= //li[@title='Door Filter' and contains(@class,'disabled')]
+${DailyTasks_popPanel_filterReviewByStyleColor}    Xpath=//div/b[contains(text(),'Size:')]
+${DailyTasks_ReviewByStyleColor_filterPanel_dropdown}    Xpath=//div/b[contains(text(),'Size:')]/following-sibling::select
+${DailyTasks_criteria_OrderCity_cityUser}    Xpath=//input[@id='stockcategory']/parent::td
+${DailyTasks_criteria_title}    Xpath=//div[@id='notabcontent']/table[1]/tbody/tr[1]/td[1]
+${DailyTasks_Button_Edit_editableInfoList_jquery}    var styleCol = $(".zstopblock").children("div:contains('Style #')").children("div:contains('Style #')").index();var colorCol;$(".zstopblock").children("div:contains('Color')").children("div:contains('Color')").each(function(){if( $(this).parent().next().children("div:eq("+ $(this).index()+")").text() == 'Code')colorCol = $(this).index()});var jobCol = $(".zstopblock").children("div:contains('Job Ticket #')").children("div:contains('Job Ticket #')").index();var a = new Array();var n = 0;$(".zsblock").children("div:contains('Edit')").each(function(){if (!($(this).children("div:eq("+jobCol+")").text())){a[n] = ($(this).index()+1)+"/"+$(this).children("div:contains('Edit')").offset().top+"/"+$(this).children("div:eq("+styleCol+")").text()+"/"+$(this).children("div:eq("+colorCol+")").text();n++;}});return a
+${DailyTasks_Button_Edit_allInfoList_jquery}    var styleCol = $(".zstopblock").children("div:contains('Style #')").children("div:contains('Style #')").index();var colorCol;$(".zstopblock").children("div:contains('Color')").children("div:contains('Color')").each(function(){if( $(this).parent().next().children("div:eq("+ $(this).index()+")").text() == 'Code')colorCol = $(this).index()});var a = new Array();var n = 0;$(".zsblock").children("div:contains('Edit')").each(function(){a[n] = ($(this).index()+1)+"/"+$(this).children("div:contains('Edit')").offset().top+"/"+$(this).children("div:eq("+styleCol+")").text()+"/"+$(this).children("div:eq("+colorCol+")").text();n++;}); return a
+${DailyTasks_tab_styleColorSize_styleColorList_jquery}    var styleCol = $(".zstopblock").children("div:contains('Style #')").children("div:contains('Style #')").index();var colorCol;$(".zstopblock").children("div:contains('Color')").children("div:contains('Color')").each(function(){if( $(this).parent().next().children("div:eq("+ $(this).index()+")").text() == 'Code')colorCol = $(this).index()});var titleRow = $(".zstopblock").children("div").length;var a = new Array();var n = 0;$(".zsblock").children("div:gt("+(titleRow)+")").each(function(){var tmp= $(this).children("div:eq("+styleCol+")").text()+"/"+$(this).children("div:eq("+colorCol+")").text();if(n ==0 || a[n-1] != tmp){a[n] = $(this).children("div:eq("+styleCol+")").text()+"/"+$(this).children("div:eq("+colorCol+")").text();n++;}});return a
+${DailyTasks_PO Prepack_colNum_juqery}    var col;$(".zstopblock").children("div:contains('PO')").each(function(){var row = $(this).index()+1;$(this).children("div:contains('PO'):not(div:contains('PO Update'))").each(function(){if($(".zstopblock").children("div:eq("+row+")").children("div:eq("+$(this).index()+")").text()=='Prepack'){col = $(this).index()+1}})});return col
+${DailyTasks_Allocated Prepack_colNum_juqery}    var col;$(".zstopblock").children("div:contains('Allocated')").each(function(){var row = $(this).index()+1;$(this).children("div:contains('Allocated')").each(function(){if($(".zstopblock").children("div:eq("+row+")").children("div:eq("+$(this).index()+")").text()=='Prepack'){col = $(this).index()+1}})});return col
+${DailyTasks_Receiver Prepack_colNum_juqery}    var col;$(".zstopblock").children("div:contains('Receiver')").each(function(){var row = $(this).index()+1;$(this).children("div:contains('Receiver')").each(function(){if($(".zstopblock").children("div:eq("+row+")").children("div:eq("+$(this).index()+")").text()=='Prepack'){col = $(this).index()+1}})});return col
+${DailyTasks_Reserved Prepack_colNum_juqery}    var col;$(".zstopblock").children("div:contains('Reserved')").each(function(){var row = $(this).index()+1;$(this).children("div:contains('Reserved')").each(function(){if($(".zstopblock").children("div:eq("+row+")").children("div:eq("+$(this).index()+")").text()=='Prepack'){col = $(this).index()+1}})});return col
+${DailyTasks_PO Ordered_colNum_juqery}    var col;$(".zstopblock").children("div:contains('PO Qty')").each(function(){var row = $(this).index()+1;$(this).children("div:contains('PO Qty')").each(function(){if($(".zstopblock").children("div:eq("+row+")").children("div:eq("+$(this).index()+")").text()=='Ordered'){col = $(this).index()+1}})});return col
+${DailyTasks_PO Open Stock_colNum_juqery}    var col;$(".zstopblock").children("div:contains('PO Open')").each(function(){var row = $(this).index()+1;$(this).children("div:contains('PO Open')").each(function(){if($(".zstopblock").children("div:eq("+row+")").children("div:eq("+$(this).index()+")").text()=='Stock'){col = $(this).index()+1}})});return col
+${DailyTasks_Allocated Qty_colNum_juqery}    var col;$(".zstopblock").children("div:contains('Qty')").each(function(){var row = $(this).index()+1;$(this).children("div:contains('Qty')").each(function(){if($(".zstopblock").children("div:eq("+row+")").children("div:eq("+$(this).index()+")").text()=='Allocated'){col = $(this).index()+1}})});return col
+${DailyTasks_Allocated Open Stock_colNum_juqery}    var col;$(".zstopblock").children("div:contains('Qty Allocated')").each(function(){var row = $(this).index()+1;$(this).children("div:contains('Qty Allocated')").each(function(){if($(".zstopblock").children("div:eq("+row+")").children("div:eq("+$(this).index()+")").text()=='Open Stock'){col = $(this).index()+1}})});return col
+${DailyTasks_Receiver Qty_colNum_juqery}    var col;$(".zstopblock").children("div:contains('Receiver')").each(function(){var row = $(this).index()+1;$(this).children("div:contains('Receiver')").each(function(){if($(".zstopblock").children("div:eq("+row+")").children("div:eq("+$(this).index()+")").text()=='Qty'){col = $(this).index()+1}})});return col
+${DailyTasks_Receiver Open Stock_colNum_juqery}    var col;$(".zstopblock").children("div:contains('Receiver')").each(function(){var row = $(this).index()+1;$(this).children("div:contains('Receiver')").each(function(){if($(".zstopblock").children("div:eq("+row+")").children("div:eq("+$(this).index()+")").text()=='Open Stock'){col = $(this).index()+1}})});return col
+${DailyTasks_Reserved Qty_colNum_juqery}    var col;$(".zstopblock").children("div:contains('Qty')").each(function(){var row = $(this).index()+1;$(this).children("div:contains('Qty')").each(function(){if($(".zstopblock").children("div:eq("+row+")").children("div:eq("+$(this).index()+")").text()=='Reserved'){col = $(this).index()+1}})});return col
+${DailyTasks_Reserved Open Stock_colNum_juqery}    var col;$(".zstopblock").children("div:contains('Qty Reserved')").each(function(){var row = $(this).index()+1;$(this).children("div:contains('Qty Reserved')").each(function(){if($(".zstopblock").children("div:eq("+row+")").children("div:eq("+$(this).index()+")").text()=='Open Stock'){col = $(this).index()+1}})});return col
+${DailyTasks_Receiver Balance_colNum_juqery}    var col;$(".zstopblock").children("div:contains('Receiver')").each(function(){var row = $(this).index()+1;$(this).children("div:contains('Receiver')").each(function(){if($(".zstopblock").children("div:eq("+row+")").children("div:eq("+$(this).index()+")").text()=='Balance'){col = $(this).index()+1}})});return col
+${DailyTasks_Style Year_colNum_juqery}    return ($(".zstopblock").children("div:contains('Style Year')").children("div:contains('Style Year')").index()+1)
+${DailyTasks_Style Season_colNum_juqery}    return ($(".zstopblock").children("div:contains('Style Season')").children("div:contains('Style Season')").index()+1)
+${DailyTasks_Status_colNum_juqery}    return ($(".zstopblock").children("div:contains('Status')").children("div:contains('Status')").index()+1)
+${DailyTasks_Job Ticket_colNum_juqery}    return ($(".zstopblock").children("div:contains('Job Ticket #')").children("div:contains('Job Ticket #')").index()+1)
+${DailyTasks_Shop Date_colNum_juqery}    var col;$(".zstopblock").children("div:contains('Shop')").each(function(){var row = $(this).index()+1;$(this).children("div:contains('Shop')").each(function(){if($(".zstopblock").children("div:eq("+row+")").children("div:eq("+$(this).index()+")").text()=='Date'){col = $(this).index()+1}})});return col
+${DailyTasks_In DC Date_colNum_juqery}    var col;$(".zstopblock").children("div:contains('In DC')").each(function(){var row = $(this).index()+1;$(this).children("div:contains('In DC')").each(function(){if($(".zstopblock").children("div:eq("+row+")").children("div:eq("+$(this).index()+")").text()=='Date'){col = $(this).index()+1}})});return col
+${DailyTasks_door_expandRowStartCol_jquery}    var a = new Array();if($(".zstopblock").children("div:contains('+')").children("div:visible:contains('+'):first").index()>-1){a.push($(".zstopblock").children("div:visible:contains('+')").index()+1);a.push($(".zstopblock").children("div:contains('◄►')").index()+1);a.push($(".zstopblock").children("div:contains('+')").children("div:visible:contains('+'):first").index()+1);};return a
+${DailyTasks_titleRowsCount_jquery}    return $(".zstopblock").children("div").length
+${DailyTasks_expandDoor_PHRowCol}    Xpath=//div[@class='zstopblock']/div[Row]/div[Col]
+${DailyTasks_expandDoor_count}    //div[@class='zstopblock']//div[contains(text(),'◄►')]
+${DailyTask_screenWidth}    1780
+${DailyTask_Allocation_options_selectDoorColumns_uncheckBox_PHRow}    Xpath=//div[@class='z-window-header' and text()='Select Door Columns']/following::div//tr[not(contains(@class,'z-listitem-selected'))][Row]//span[contains(@class,'z-listitem-checkbox')]
+${DailyTask_Allocation_options_selectDoorColumns_uncheckBoxsCount}    //div[@class='z-window-header' and text()='Select Door Columns']/following::div//tr[not(contains(@class,'z-listitem-selected'))]//span[contains(@class,'z-listitem-checkbox')]
+${DailyTask_Allocation_options_selectDoorColumns}    Xpath=//div[@class='z-window-header']/following::div//span[contains(@class,'z-listitem-checkbox')][1]//ancestor::div[4]/preceding::div[1]
+${DailyTasks_validateCheckBox_jquery}    var a = new Array();a.push($(".zsblock").children("div").children("div:visible:contains('☐')").length);a.push($(".zsblock").children("div:visible:contains('☐'):first").children("div:visible:contains('☐')").index()+1);return a
+${DailyTasks_Button_cancelJob}    Xpath=//li[@title='Cancel Job']
+${DailyTasks_checkBoxRows_jquery}    var a = new Array();$(".zsblock").children("div:visible:contains('☐')").each(function(){a.push($(this).index()+1);});return a
+${DailyTask_screenHeigh}    870
+${DailyTasks_validToJobcheckBoxRows_jquery}    var col;var a = new Array();$(".zstopblock").children("div:contains('Qty')").each(function(){var row = $(this).index()+1;$(this).children("div:contains('Qty')").each(function(){if($(".zstopblock").children("div:eq("+row+")").children("div:eq("+$(this).index()+")").text()=='Allocated'){col = $(this).index()}})});$(".zsblock").children("div:visible:contains('☐')").each(function(){if(parseInt($(this).children("div:eq("+col+")").text())!= 0){a.push($(this).index()+1);}});return a

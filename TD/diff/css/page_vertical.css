@@ -1,0 +1,6 @@
+body{
+	font-size: 12px
+}
+div#stage {overflow:scroll;width:50%;height:900px;float:left}
+
+div#prod {overflow:scroll;width:50%;height:900px;float:left}

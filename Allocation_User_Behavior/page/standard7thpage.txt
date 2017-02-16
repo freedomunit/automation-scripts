@@ -1,0 +1,25 @@
+*** Variables ***
+${mainPage}       Xpath=//div[@id='maincontent']
+${link_openAll}    Open All
+${link_closeAll}    Close All
+${pageName_first}    Xpath=//big[@class='title1']
+${pageName_second}    Xpath=//big[@class='title2']
+${RB_Criteria_Text_FromDate}    Xpath=//input[@name='fromdate']
+${RB_Criteria_Text_ToDate}    Xpath=//input[@name='todate']
+${RB_Criteria_removeFilter_count}    //table[@id='filtertable']//input[@title='Remove Filter']
+${RB_Criteria_Button_addFilter_rowPlaceHold}    Xpath=//table[@id='filtertable']//tr[@id='rrow']//input[@title='Add Filter']
+${RB_Criteria_Button_removeFilter_rowPlaceHold}    Xpath=//table[@id='filtertable']//tr[@id='rrow']//input[@title='Remove Filter']
+${RB_Criteria_Dropdown_filterHierarchy1}    Xpath=//table[@id='filtertable']//select[@name='hierarchyattr1']
+${RB_Criteria_Options_filterHierarachy1}    Xpath=//table[@id='filtertable']//tr[@id='r1']/td[3]/div
+${RB_Criteria_Option_filterHierarachy1}    Xpath=//table[@id='filtertable']//tr[@id='r1']/td[3]//tr
+${RB_Criteria_filterHierarachy1_optionCount}    //table[@id='filtertable']//tr[@id='r1']/td[3]//tr
+${RB_Criteria_filterHierarachy1_rowCount}    //table[@id='filtertable']//tr[@id='r1']
+${Criteria_filterItems_jquery}    var items='';$("#key tbody").children("tr:gt(0)").each(function(){if(!items){items+=$(this).text();} else{items+=','+$(this).text();}});return(items);
+${Criteria_Dropdown_filterHierarchy_last}    Xpath=//tr[contains(@class,'filtertablerow')][last()]//select
+${Criteria_filterHierarchy_options_last}    Xpath=//tr[contains(@class,'filtertablerow')][last()]//div[@class='multiCtext']    # Xpath=//tr[contains(@class,'filtertablerow')][last()]//div[contains(@class,'multiCtext')]
+${Criteria_filterHierarchy_optionsCount_last}    //tr[contains(@class,'filtertablerow')][last()]//div[contains(@class,'multiC')]//tr
+${Criteria_Button_addFilter_last}    Xpath=//tr[contains(@class,'filtertablerow')][last()]//input[@type='button' and @title='Add Filter']
+${Criteria_Button_removeFilter_last}    Xpath=//tr[contains(@class,'filtertablerow')][last()]//input[@type='button' and @title='Remove Filter']
+${Criteria_filterHierarchy_options_last_checkbox_optionPH}    Xpath=//tr[contains(@class,'filtertablerow')][last()]//div[contains(@class,'multiC')]//tr//label[text()='option']/input[@type='checkbox']
+${Button_closeWindow}    Xpath=//input[@type='button' and @value='Close Window']
+${Link_logout}    Xpath=//a[@class='logout']

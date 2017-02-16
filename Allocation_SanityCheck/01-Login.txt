@@ -1,0 +1,12 @@
+*** Settings ***
+Force Tags        FE-IN    BB-IN    SS-IN    TR-IN    AL-IN    BP-IN    AM-IN
+...               FU-IN    OB-IN    CP-IN    SB-IN    PD-IN    SC-G1-IN    SC-G2-IN
+Resource          page/login.txt
+Resource          page/navigation.txt
+Resource          Setting/environment.txt
+
+*** Test Cases ***
+Login
+    [Tags]    perf-1    perf-B
+    ${browser}    EnvironmentInit and Login    ${prod_URL}    ${user}    ${browser_profile_1}
+    set global variable    ${browser}

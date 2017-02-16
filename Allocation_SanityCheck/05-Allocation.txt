@@ -1,0 +1,534 @@
+*** Settings ***
+Force Tags        SC-G2-AL
+Resource          Setting/environment.txt
+Resource          Setting/performancekeyword.txt
+Resource          page/DailyTasks.txt
+Resource          page/ZK.txt
+
+*** Test Cases ***
+selectDTCriteria
+    [Tags]
+    enterCertainModel    Daily Tasks    ${mainPage}    DailyTask
+    select from list by label    ${DailyTasks_criteria_Dropdown_TaskType}    ${DT_taskType}
+    list selection should be    ${DailyTasks_criteria_Dropdown_TaskType}    ${DT_taskType}
+    select from list by label    ${DailyTasks_criteria_Dropdown_ScreenType}    ${DT_screenType}
+    list selection should be    ${DailyTasks_criteria_Dropdown_ScreenType}    ${DT_screenType}
+    select from list by label    ${DailyTasks_criteria_Dropdown_Status}    ${DT_statusType}
+    list selection should be    ${DailyTasks_criteria_Dropdown_Status}    ${DT_statusType}
+    select from list by label    ${DailyTasks_criteria_Dropdown_OrderCity}    ${DT_orderCity}
+    list selection should be    ${DailyTasks_criteria_Dropdown_OrderCity}    ${DT_orderCity}
+    select from list by label    ${DailyTasks_criteria_Dropdown_DataSourceType}    ${DT_dataType}
+    list selection should be    ${DailyTasks_criteria_Dropdown_DataSourceType}    ${DT_dataType}
+    input text    ${DailyTasks_criteria_Text_FromDate}    ${DT_fromDate}
+    input text    ${DailyTasks_criteria_Text_ToDate}    ${DT_toDate}
+    run keyword if    '${DT_timeType}' == 'Shop Date'    click element    ${DailyTasks_criteria_Radio_ShopDate}
+    ...    ELSE IF    '${DT_timeType}' == 'In DC Date'    click element    ${DailyTasks_criteria_Radio_InDCDate}
+    ${removeFilter_count}    get matching xpath count    ${DailyTasks_criteria_removeFilter_count}
+    run keyword if    ${removeFilter_count}>1    removeFilters    ${DailyTasks_criteria_Button_removeFilter_rowPlaceHold}    ${removeFilter_count}    ${DailyTasks_criteria_Dropdown_filterHierarchy1}
+    run keyword if    ${removeFilter_count}==1    Select From List by index    ${DailyTasks_criteria_Dropdown_filterHierarchy1}    0
+    run keyword if    '@{DT_Criteria}[0]' != '${EMPTY}'    selectCustomCriteria    ${DailyTasks_criteria_Dropdown_filterHierarchy1}    ${DailyTasks_criteria_Option_filterHierarachy1}    ${DailyTasks_criteria_Options_filterHierarachy1}    ${DailyTasks_criteria_filterHierarachy1_optionCount}
+    ...    Xpath=${DailyTasks_criteria_filterHierarachy1_rowCount}//input[@title='Add Filter']    ${DailyTasks_criteria_filterHierarachy1_rowCount}    @{DT_Criteria}
+    enterPageByClick    ${DailyTasks_criteria_top_submit}    ${DailyTasks_tab_selected}    ${DT_screenType}
+
+editSummaryTab
+    [Tags]
+    wait until element is visible    ${ZK_Title_Style#}    30
+    click element    ${ZK_Title_Style#}
+    #    wait until element is visible    Xpath=//div[@class='zsblock']//div[text()='Style #']    30
+    #    click element    Xpath=//div[@class='zsblock']//div[text()='Style #']
+    sleep    1S
+    Wait Until Page Does Not Contain    Processing...    600
+    wait until page contains element    ${ZK_Button_FreezePanel}    30
+    wait until element is visible    ${ZK_Button_FreezePanel}    30
+    click element    ${DailyTasks_Button_FreezePanel}
+    page should not contain    error
+    Wait Until Page Does Not Contain    Processing...    600
+    ${freezeStatus}    get element attribute    ${ZK_Button_FreezePanel}@class
+    should contain    ${freezeStatus}    z-menuitem opened
+    wait until page contains element    ${ZK_selectedFreezeButton}    60
+    Download Excel    ${DailyTasks_Button_Excel}    DailyTasks_Summary
+    wait until page does not contain element    ${ZK_Button_disabledInfo}
+    click element    ${ZK_Button_Info}
+    wait until element is visible    ${ZK_InfoNotesSection}    60
+    element should contain    ${ZK_InfoNotesSection}    Last Modified by
+    click element    ${ZK_Button_Info}
+    wait until page does not contain element    ${ZK_Button_disabledNotes}    30
+    click element    ${ZK_Button_Notes}
+    wait until element is visible    ${ZK_InfoNotesSection}    60
+    click element    ${ZK_Button_Notes}
+    wait until page does not contain element    ${ZK_Button_disabledOptions}    30
+    edit options    ${ZK_Button_Options}    Select Columns to Display    Summary    ${ZK_Options_title}
+    wait until page does not contain element    ${ZK_Button_disabledViewCriteria}    30
+    editDTViewCriteria    ${ZK_Button_ViewCriteria}    Please select the PO/PO Update/ASN/Receiver/On Order data Shop Date time range:    Summary    ${DailyTasks_viewCriteria_verifyPoint}    Allocation
+    ${editCount}    get matching xpath count    ${DailyTasks_Button_EditCount}
+    ${scrollPosition}    run keyword if    ${editCount} == 0    findZKElementByScroll    ${DailyTasks_Button_EditCount}    Top    400
+    ...    ELSE    set variable    0
+    ${editBtnRowList}    execute javascript    ${DailyTasks_Button_Edit_rowList_jquery}
+    @{editBtnRowList}    split string    ${editBtnRowList}    ,
+    ${editBtnRowCount}    get length    ${editBtnRowList}
+    ${row}    run keyword if    ${editBtnRowCount} > 0    evaluate    random.randint(0,${editBtnRowCount}-1)    random
+    @{rowInfo}    split string    @{editBtnRowList}[${row}]    /
+    ${scrollPosition}    evaluate    ${scrollPosition}+@{rowInfo}[1]-400
+    run keyword if    ${scrollPosition}>${screenHeight}-400    execute javascript    $(".zsscroll").scrollTop(${scrollPosition})
+    sleep    3S
+    Wait Until Page Does Not Contain    Processing...    600
+    #    click element    ${ZK_Title_Style#}
+    #    run keyword if    ${scrollPosition}>790    click element    ${ZK_Title_Style#}
+    ${DailyTasks_Button_freezedEdit}    replace string    ${DailyTasks_Button_freezedEdit_rowPH}    [row]    [@{rowInfo}[0]]
+    enterPageByClick    ${DailyTasks_Button_freezedEdit}    ${DailyTasks_tab_selected}    Detail by Style Color Size
+    enterPageByClick    Xpath=${DailyTasks_tabsCount}//div[text() ='Summary']    ${DailyTasks_tab_selected}    Summary
+
+editDetailTab
+    enterPageByClick    Xpath=${DailyTasks_tabsCount}//div[text() ='Detail']    ${DailyTasks_tab_selected}    Detail
+    wait until element is visible    ${ZK_Title_Style#}    30
+    click element    ${ZK_Title_Style#}
+    sleep    1S
+    Wait Until Page Does Not Contain    Processing...    600
+    wait until page contains element    ${ZK_Button_FreezePanel}    30
+    wait until element is visible    ${ZK_Button_FreezePanel}    30
+    click element    ${DailyTasks_Button_FreezePanel}
+    page should not contain    error
+    Wait Until Page Does Not Contain    Processing...    600
+    ${freezeStatus}    get element attribute    ${ZK_Button_FreezePanel}@class
+    should contain    ${freezeStatus}    z-menuitem opened
+    Wait Until Page Contains element    ${ZK_selectedFreezeButton}    30
+    Download Excel    ${DailyTasks_Button_Excel}    DailyTasks_Detail
+    wait until page does not contain element    ${ZK_Button_disabledInfo}
+    click element    ${ZK_Button_Info}
+    wait until element is visible    ${ZK_InfoNotesSection}    60
+    element should contain    ${ZK_InfoNotesSection}    Last Modified by
+    click element    ${ZK_Button_Info}
+    wait until page does not contain element    ${ZK_Button_disabledNotes}    30
+    click element    ${ZK_Button_Notes}
+    wait until element is visible    ${ZK_InfoNotesSection}    60
+    click element    ${ZK_Button_Notes}
+    wait until page does not contain element    ${ZK_Button_disabledOptions}    30
+    edit options    ${ZK_Button_Options}    Select Columns to Display    Detail    ${ZK_Options_title}
+    wait until page does not contain element    ${ZK_Button_disabledViewCriteria}    30
+    editDTViewCriteria    ${ZK_Button_ViewCriteria}    Please select the PO/PO Update/ASN/Receiver/On Order data Shop Date time range:    Detail    ${DailyTasks_viewCriteria_verifyPoint}    Allocation
+    ${editCount}    get matching xpath count    ${DailyTasks_Button_EditCount}
+    ${scrollPosition}    run keyword if    ${editCount} == 0    findZKElementByScroll    ${DailyTasks_Button_EditCount}    Top    400
+    ...    ELSE    set variable    0
+    ${editBtnRowList}    execute javascript    ${DailyTasks_Button_Edit_rowList_jquery}
+    @{editBtnRowList}    split string    ${editBtnRowList}    ,
+    ${editBtnRowCount}    get length    ${editBtnRowList}
+    ${row}    run keyword if    ${editBtnRowCount} > 0    evaluate    random.randint(0,${editBtnRowCount}-1)    random
+    @{rowInfo}    split string    @{editBtnRowList}[${row}]    /
+    ${scrollPosition}    evaluate    ${scrollPosition}+@{rowInfo}[1]-400
+    run keyword if    ${scrollPosition}>${screenHeight}-400    execute javascript    $(".zsscroll").scrollTop(${scrollPosition})
+    sleep    3S
+    Wait Until Page Does Not Contain    Processing...    600
+    #    click element    ${ZK_Title_Style#}
+    #    run keyword if    ${scrollPosition}>790    click element    ${ZK_Title_Style#}
+    ${DailyTasks_Button_freezedEdit}    replace string    ${DailyTasks_Button_freezedEdit_rowPH}    [row]    [@{rowInfo}[0]]
+    enterPageByClick    ${DailyTasks_Button_freezedEdit}    ${DailyTasks_tab_selected}    Detail by Style Color Size
+    enterPageByClick    Xpath=${DailyTasks_tabsCount}//div[text() ='Detail']    ${DailyTasks_tab_selected}    Detail
+
+editDetaibyColorbyDoorTab
+    [Tags]
+    enterPageByClick    Xpath=${DailyTasks_tabsCount}//div[text() ='Detail by Color by Door']    ${DailyTasks_tab_selected}    Detail by Color by Door
+    ${door+Count}    get matching xpath count    ${DailyTasks_Door+_count}
+    ${scrollPosition}    run keyword if    ${door+Count} == 0    findZKElementByScroll    ${DailyTasks_Door+_count}    Left    400
+    ...    ELSE    set variable    0
+    ${doorColList}    execute javascript    ${DailyTasks_Door_colList_jquery}
+    @{doorColList}    split string    ${doorColList}    ,
+    ${doorCount}    get length    ${doorColList}
+    ${colNum}    evaluate    random.randint(0,${doorCount}-1)    random
+    @{colInfo}    split string    @{doorColList}[${colNum}]    /
+    ${scrollPosition}    evaluate    ${scrollPosition}+@{colInfo}[1]-400
+    run keyword if    ${scrollPosition}>${screenWidth}    execute javascript    $(".zsscroll").scrollLeft(${scrollPosition})
+    sleep    3S
+    Wait Until Page Does Not Contain    Processing...    600
+    ${DailyTasks_Door}    replace string    ${DailyTasks_Door+_colPH}    [col]    [@{colInfo}[0]]
+    click element    ${DailyTasks_Door}
+    run keyword and continue on failure    click element    ${DailyTasks_Door}
+    ${DailyTasks_Door-}    replace string    ${DailyTasks_Door}    +    -
+    wait until element is visible    ${DailyTasks_Door-}    60    \    #wait until page contains element
+    #    wait until element contains    Xpath=//div[@class='zstopblock']    Grade:    30
+    Wait Until Page Does Not Contain    Processing...    600
+    click element    ${DailyTasks_Title_selected}
+    wait until page contains element    ${DailyTasks_Door}    60
+    #    wait until element does not contain    Xpath=//div[@class='zstopblock']    Grade:    30
+    Wait Until Page Does Not Contain    Processing...    600
+    ${doorColsCount}    get matching xpath count    ${DailyTasks_DoorCols_count}
+    ${doorCols}    run keyword if    ${doorColsCount} > 0    replace string    ${DailyTasks_DoorCols_colPH}    [col]    [@{colInfo}[0]]
+    run keyword if    ${doorColsCount} > 0    click element    ${doorCols}
+    run keyword if    ${doorColsCount} > 0    wait until element is not visible    ${doorCols}    60
+    run keyword if    ${doorColsCount} > 0    Wait Until Page Does Not Contain    Processing...    600
+    run keyword if    ${doorColsCount} > 0    click element    ${DailyTasks_Title_selected}
+    run keyword if    ${doorColsCount} > 0    wait until page contains element    ${doorCols}    60
+    run keyword if    ${doorColsCount} > 0    Wait Until Page Does Not Contain    Processing...    600
+    execute javascript    $(".zsscroll").scrollLeft(0)
+    sleep    3S
+    Wait Until Page Does Not Contain    Processing...    600
+    Wait Until Page Contains element    ${ZK_Button_Populate}    600
+    click element    ${ZK_Button_Populate}
+    Wait Until Page Contains element    ${DailyTasks_Panel_Populate}    600
+    wait until element is visible    ${DailyTasks_popPanel_BtnCancel}    30
+    Wait Until Page Does Not Contain    Processing...    600
+    click element    ${DailyTasks_popPanel_BtnCancel}
+    Wait Until Page Contains element    ${ZK_Button_Job}    600
+    wait until page does not contain element    ${ZK_Button_disabledJob}    60
+    Wait Until Page Does Not Contain    Processing...    600
+    click element    ${ZK_Button_Job}
+    Wait Until Page Contains element    ${DailyTasks_Panel_createJob}    600
+    wait until element is visible    ${DailyTasks_popPanel_BtnCancel}    30
+    Wait Until Page Does Not Contain    Processing...    600
+    click element    ${DailyTasks_popPanel_BtnCancel}
+    Wait Until Page Contains element    ${ZK_Button_CancelJob}    600
+    wait until page does not contain element    ${ZK_Button_disabledCancelJob}    60
+    Wait Until Page Does Not Contain    Processing...    600
+    click element    ${ZK_Button_CancelJob}
+    Wait Until Page Contains element    ${DailyTasks_Panel_cancelJob}    600
+    wait until element is visible    ${DailyTasks_popPanel_BtnCancel}    30
+    Wait Until Page Does Not Contain    Processing...    600
+    click element    ${DailyTasks_popPanel_BtnCancel}
+    Wait Until Page Contains element    ${ZK_Title_Style#}    600
+    Wait Until Page Does Not Contain    Processing...    600
+    Wait Until element is visible    ${ZK_Title_Style#}    600
+    click element    ${ZK_Title_Style#}
+    run keyword if    ${scrollPosition}>${screenWidth}-400    click element    ${ZK_Title_Style#}
+    sleep    1S
+    Wait Until Page Does Not Contain    Processing...    600
+    wait until page contains element    ${ZK_Button_FreezePanel}    30
+    wait until element is visible    ${ZK_Button_FreezePanel}    30
+    click element    ${DailyTasks_Button_FreezePanel}
+    page should not contain    error
+    Wait Until Page Does Not Contain    Processing...    600
+    ${freezeStatus}    get element attribute    ${ZK_Button_FreezePanel}@class
+    should contain    ${freezeStatus}    z-menuitem opened
+    Wait Until Page Contains element    ${ZK_selectedFreezeButton}    30
+    Download Excel    ${DailyTasks_Button_Excel}    DailyTasks_DetailbyColorbyDoor
+    wait until page does not contain element    ${ZK_Button_disabledInfo}
+    click element    ${ZK_Button_Info}
+    wait until element is visible    ${ZK_InfoNotesSection}    60
+    element should contain    ${ZK_InfoNotesSection}    Last Modified by
+    click element    ${ZK_Button_Info}
+    wait until page does not contain element    ${ZK_Button_disabledNotes}    30
+    click element    ${ZK_Button_Notes}
+    wait until element is visible    ${ZK_InfoNotesSection}    60
+    click element    ${ZK_Button_Notes}
+    wait until page does not contain element    ${ZK_Button_disabledOptions}    30
+    edit options    ${ZK_Button_Options}    Select Attribute Columns    Detail by Color by Door    ${ZK_Options_title}
+    wait until page does not contain element    ${ZK_Button_disabledViewCriteria}    30
+    editDTViewCriteria    ${ZK_Button_ViewCriteria}    Please select the PO/PO Update/ASN/Receiver/On Order data Shop Date time range:    Detail by Color by Door    ${DailyTasks_viewCriteria_verifyPoint}    Allocation
+    ${editCount}    get matching xpath count    ${DailyTasks_Button_EditCount}
+    ${scrollPosition}    run keyword if    ${editCount} == 0    findZKElementByScroll    ${DailyTasks_Button_EditCount}    Top    400
+    ...    ELSE    set variable    0
+    ${editBtnRowList}    execute javascript    ${DailyTasks_Button_Edit_rowList_jquery}
+    @{editBtnRowList}    split string    ${editBtnRowList}    ,
+    ${editBtnRowCount}    get length    ${editBtnRowList}
+    ${row}    run keyword if    ${editBtnRowCount} > 0    evaluate    random.randint(0,${editBtnRowCount}-1)    random
+    @{rowInfo}    split string    @{editBtnRowList}[${row}]    /
+    ${scrollPosition}    evaluate    ${scrollPosition}+@{rowInfo}[1]-400
+    run keyword if    ${scrollPosition}>${screenHeight}-400    execute javascript    $(".zsscroll").scrollTop(${scrollPosition})
+    sleep    3S
+    Wait Until Page Does Not Contain    Processing...    600
+    #    click element    ${ZK_Title_Style#}
+    #    run keyword if    ${scrollPosition}>790    click element    ${ZK_Title_Style#}
+    ${DailyTasks_Button_freezedEdit}    replace string    ${DailyTasks_Button_freezedEdit_rowPH}    [row]    [@{rowInfo}[0]]
+    enterPageByClick    ${DailyTasks_Button_freezedEdit}    ${DailyTasks_tab_selected}    Detail by Style Color Size
+    enterPageByClick    Xpath=${DailyTasks_tabsCount}//div[text() ='Detail by Color by Door']    ${DailyTasks_tab_selected}    Detail by Color by Door
+
+editDetaibySizebyDoorTab
+    [Tags]
+    enterPageByClick    Xpath=${DailyTasks_tabsCount}//div[text() ='Detail by Size by Door']    ${DailyTasks_tab_selected}    Detail by Size by Door
+    ${door+Count}    get matching xpath count    ${DailyTasks_Door+_count}
+    ${scrollPosition}    run keyword if    ${door+Count} == 0    findZKElementByScroll    ${DailyTasks_Door+_count}    Left    400
+    ...    ELSE    set variable    0
+    ${doorColList}    execute javascript    ${DailyTasks_Door_colList_jquery}
+    @{doorColList}    split string    ${doorColList}    ,
+    ${doorCount}    get length    ${doorColList}
+    ${colNum}    evaluate    random.randint(0,${doorCount}-1)    random
+    @{colInfo}    split string    @{doorColList}[${colNum}]    /
+    ${scrollPosition}    evaluate    ${scrollPosition}+@{colInfo}[1]-400
+    run keyword if    ${scrollPosition}>${screenWidth}    execute javascript    $(".zsscroll").scrollLeft(${scrollPosition})
+    sleep    3S
+    Wait Until Page Does Not Contain    Processing...    600
+    ${DailyTasks_Door}    replace string    ${DailyTasks_Door+_colPH}    [col]    [@{colInfo}[0]]
+    click element    ${DailyTasks_Door}
+    run keyword and continue on failure    click element    ${DailyTasks_Door}
+    ${DailyTasks_Door-}    replace string    ${DailyTasks_Door}    +    -
+    Wait Until Page Does Not Contain    Processing...    600
+    wait until element is visible    ${DailyTasks_Door-}    60    \    #wait until page contains element
+    #    wait until element contains    Xpath=//div[@class='zstopblock']    Grade:    30
+    click element    ${DailyTasks_Title_selected}
+    wait until page contains element    ${DailyTasks_Door}    60
+    #    wait until element does not contain    Xpath=//div[@class='zstopblock']    Grade:    30
+    Wait Until Page Does Not Contain    Processing...    600
+    ${doorColsCount}    get matching xpath count    ${DailyTasks_DoorCols_count}
+    ${doorCols}    run keyword if    ${doorColsCount} > 0    replace string    ${DailyTasks_DoorCols_colPH}    [col]    [@{colInfo}[0]]
+    run keyword if    ${doorColsCount} > 0    click element    ${doorCols}
+    run keyword if    ${doorColsCount} > 0    wait until element is not visible    ${doorCols}    60
+    run keyword if    ${doorColsCount} > 0    Wait Until Page Does Not Contain    Processing...    600
+    run keyword if    ${doorColsCount} > 0    click element    ${DailyTasks_Title_selected}
+    run keyword if    ${doorColsCount} > 0    wait until page contains element    ${doorCols}    60
+    run keyword if    ${doorColsCount} > 0    Wait Until Page Does Not Contain    Processing...    600
+    execute javascript    $(".zsscroll").scrollLeft(0)
+    sleep    3S
+    Wait Until Page Does Not Contain    Processing...    600
+    Wait Until Page Contains element    ${ZK_Button_Populate}    600
+    click element    ${ZK_Button_Populate}
+    Wait Until Page Contains element    ${DailyTasks_Panel_Populate}    600
+    wait until element is visible    ${DailyTasks_popPanel_BtnCancel}    30
+    Wait Until Page Does Not Contain    Processing...    600
+    click element    ${DailyTasks_popPanel_BtnCancel}
+    Wait Until Page Contains element    ${ZK_Button_Job}    600
+    wait until page does not contain element    ${ZK_Button_disabledJob}    60
+    Wait Until Page Does Not Contain    Processing...    600
+    click element    ${ZK_Button_Job}
+    Wait Until Page Contains element    ${DailyTasks_Panel_createJob}    600
+    wait until element is visible    ${DailyTasks_popPanel_BtnCancel}    30
+    Wait Until Page Does Not Contain    Processing...    600
+    click element    ${DailyTasks_popPanel_BtnCancel}
+    Wait Until Page Contains element    ${ZK_Button_CancelJob}    600
+    wait until page does not contain element    ${ZK_Button_disabledCancelJob}    60
+    Wait Until Page Does Not Contain    Processing...    600
+    click element    ${ZK_Button_CancelJob}
+    Wait Until Page Contains element    ${DailyTasks_Panel_cancelJob}    600
+    wait until element is visible    ${DailyTasks_popPanel_BtnCancel}    30
+    Wait Until Page Does Not Contain    Processing...    600
+    click element    ${DailyTasks_popPanel_BtnCancel}
+    Wait Until Page Contains element    ${ZK_Title_Style#}    600
+    Wait Until Page Does Not Contain    Processing...    600
+    Wait Until element is visible    ${ZK_Title_Style#}    600
+    click element    ${ZK_Title_Style#}
+    run keyword if    ${scrollPosition}>${screenWidth}-400    click element    ${ZK_Title_Style#}
+    sleep    1S
+    Wait Until Page Does Not Contain    Processing...    600
+    wait until page contains element    ${ZK_Button_FreezePanel}    30
+    wait until element is visible    ${ZK_Button_FreezePanel}    30
+    click element    ${DailyTasks_Button_FreezePanel}
+    page should not contain    error
+    Wait Until Page Does Not Contain    Processing...    600
+    ${freezeStatus}    get element attribute    ${ZK_Button_FreezePanel}@class
+    should contain    ${freezeStatus}    z-menuitem opened
+    Wait Until Page Contains element    ${ZK_selectedFreezeButton}    30
+    Download Excel    ${DailyTasks_Button_Excel}    DailyTasks_DetailbySizebyDoor
+    wait until page does not contain element    ${ZK_Button_disabledInfo}
+    click element    ${ZK_Button_Info}
+    wait until element is visible    ${ZK_InfoNotesSection}    60
+    element should contain    ${ZK_InfoNotesSection}    Last Modified by
+    click element    ${ZK_Button_Info}
+    wait until page does not contain element    ${ZK_Button_disabledNotes}    30
+    click element    ${ZK_Button_Notes}
+    wait until element is visible    ${ZK_InfoNotesSection}    60
+    click element    ${ZK_Button_Notes}
+    wait until page does not contain element    ${ZK_Button_disabledOptions}    30
+    edit options    ${ZK_Button_Options}    Select Attribute Columns    Detail by Size by Door    ${ZK_Options_title}
+    wait until page does not contain element    ${ZK_Button_disabledViewCriteria}    30
+    editDTViewCriteria    ${ZK_Button_ViewCriteria}    Please select the PO/PO Update/ASN/Receiver/On Order data Shop Date time range:    Detail by Size by Door    ${DailyTasks_viewCriteria_verifyPoint}    Allocation
+    ${editCount}    get matching xpath count    ${DailyTasks_Button_EditCount}
+    ${scrollPosition}    run keyword if    ${editCount} == 0    findZKElementByScroll    ${DailyTasks_Button_EditCount}    Top    400
+    ...    ELSE    set variable    0
+    ${editBtnRowList}    execute javascript    ${DailyTasks_Button_Edit_rowList_jquery}
+    @{editBtnRowList}    split string    ${editBtnRowList}    ,
+    ${editBtnRowCount}    get length    ${editBtnRowList}
+    ${row}    run keyword if    ${editBtnRowCount} > 0    evaluate    random.randint(0,${editBtnRowCount}-1)    random
+    @{rowInfo}    split string    @{editBtnRowList}[${row}]    /
+    ${scrollPosition}    evaluate    ${scrollPosition}+@{rowInfo}[1]-400
+    run keyword if    ${scrollPosition}>${screenHeight}-400    execute javascript    $(".zsscroll").scrollTop(${scrollPosition})
+    sleep    3S
+    Wait Until Page Does Not Contain    Processing...    600
+    #    click element    ${ZK_Title_Style#}
+    #    run keyword if    ${scrollPosition}>${screenHeight}    click element    ${ZK_Title_Style#}
+    ${DailyTasks_Button_freezedEdit}    replace string    ${DailyTasks_Button_freezedEdit_rowPH}    [row]    [@{rowInfo}[0]]
+    enterPageByClick    ${DailyTasks_Button_freezedEdit}    ${DailyTasks_tab_selected}    Detail by Style Color Size
+    enterPageByClick    Xpath=${DailyTasks_tabsCount}//div[text() ='Detail by Size by Door']    ${DailyTasks_tab_selected}    Detail by Size by Door
+
+editDetaibyStyleColorSizeTab_Blank
+    [Tags]
+    enterPageByClick    Xpath=${DailyTasks_tabsCount}//div[text() ='Summary']    ${DailyTasks_tab_selected}    Summary
+    @{status_blank_btn}    execute javascript    ${DailyTasks_Status_Blank_jquery}
+    return from keyword if    @{status_blank_btn} == @{EMPTY}
+    ${row}    evaluate    random.randint(0,len(@{status_blank_btn})-1)    random
+    @{rowInfo}    split string    @{status_blank_btn}[${row}]    /
+    ${scrollPosition}    evaluate    @{rowInfo}[1]-400
+    run keyword if    @{rowInfo}[1] >${screenHeight}    execute javascript    $(".zsscroll").scrollTop(${scrollPosition})
+    ${DailyTasks_Button_Edit}    replace string    ${DailyTasks_Button_Edit_rowPH}    [row]    [@{rowInfo}[0]]
+    wait until page contains element    ${DailyTasks_Button_Edit}    60
+    Wait Until Page Does Not Contain    Processing...    600
+    #    click element    ${DailyTasks_Button_Edit}
+    enterPageByClick    ${DailyTasks_Button_Edit}    ${DailyTasks_tab_selected}    Detail by Style Color Size
+    #    enterPageByClick    ${DailyTasks_Button_DoorFilter}    ${DailyTasks_filterDoor_verifyPoint}    Top Doors:
+    #    ${doorClusterCount}    get matching xpath count    ${DailyTasks_DoorFilter_doorClusterCount}
+    #    ${doorCluster}    evaluate    random.randint(1,${doorClusterCount})    random
+    #    click element    Xpath=${DailyTasks_DoorFilter_doorClusterCount}[${doorCluster}]//th${ZK_CheckBox_count}
+    #    page should not contain    error
+    #    ${doorCount}    get matching xpath count    ${DailyTasks_DoorFilter_doorClusterCount}[${doorCluster}]${ZK_checkBox_rowCount}
+    #    ${round}    set variable    1
+    #    : FOR    ${num}    IN RANGE    1    ${doorCount}/2
+    #    ${door}    evaluate    random.randint(1,${doorCount})    random
+    #    wait until page contains element    Xpath=${DailyTasks_DoorFilter_doorClusterCount}[${doorCluster}]//tr[${door}]${ZK_CheckBox_count}    10
+    #    click element    Xpath=${DailyTasks_DoorFilter_doorClusterCount}[${doorCluster}]//tr[${door}]${ZK_CheckBox_count}
+    #    page should not contain    error
+    #    exit for loop if    ${round}>=10
+    #    ${round}    evaluate    ${round}+1
+    #    click element    ${DailyTasks_DoorFilter_button_reset}
+    #    page should not contain    error
+    #    #    wait until page does not contain element    Xpath=${ZK_uncheckBox_rowCount}    60
+    #    input text    ${DailyTasks_DoorFilter_text_topDoors}    ${AM_topDoors}
+    #    @{dropdownItems}    get list items    ${DailyTasks_popPanel_dropdown}
+    #    ${itemCount}    get length    ${dropdownItems}
+    #    ${item}    evaluate    random.randint(0,${itemCount}-1)    random
+    #    select from list by label    ${DailyTasks_popPanel_dropdown}    @{dropdownItems}[${item}]
+    #    click element    ${DailyTasks_popPanel_BtnSubmit}
+    #    page should not contain    error
+    #    #    wait until page contains element    Xpath=${ZK_uncheckBox_rowCount}    60
+    #    list selection should be    ${DailyTasks_popPanel_dropdown}    @{dropdownItems}[${item}]
+    #    enter page by click    ${ZK_Button_Close}    ${DailyTasks_tab_selected}    Detail by Style Color Size
+    enterPageByClick    ${DailyTasks_Button_DoorFilter}    ${DailyTasks_filterDoor_verifyPoint}    Top Doors:
+    ${checkeddoorCount}    get matching xpath count    ${ZK_checkedBox_rowCount}
+    input text    ${DailyTasks_DoorFilter_text_topDoors}    ${AM_topDoors}
+    click element    ${DailyTasks_popPanel_BtnSubmit}
+    sleep    3S
+    Wait Until Page Does Not Contain    Processing...    600
+    page should not contain    error
+    ${checkeddoorCount_new}    get matching xpath count    ${ZK_checkedBox_rowCount}
+    run keyword and continue on failure    run keyword if    '${checkeddoorCount_new}' != '${AM_topDoors}'    Fail    Input # Top Doors Fail !
+    click element    ${DailyTasks_DoorFilter_button_reset}
+    sleep    3S
+    Wait Until Page Does Not Contain    Processing...    600
+    page should not contain    error
+    ${checkeddoorCount_new}    get matching xpath count    ${ZK_checkedBox_rowCount}
+    run keyword and continue on failure    run keyword if    '${checkeddoorCount_new}' != '${checkeddoorCount}'    Fail    Reset Fail !
+    ${selectedOption}    RandomSelectOptionOnDropdown    ${DailyTasks_popPanel_dropdown}
+    click element    ${DailyTasks_popPanel_BtnSubmit}
+    sleep    3S
+    Wait Until Page Does Not Contain    Processing...    600
+    sleep    3S
+    page should not contain    error
+    Wait Until element is visible    ${DailyTasks_popPanel_BtnSubmit}
+    @{checkedCluster}    execute javascript    ${ZK_checkedBox_title_jquery}
+    @{allCluster}    execute javascript    ${ZK_checkBox_title_jquery}
+    run keyword and continue on failure    run keyword if    '${selectedOption}' == 'ALL' and @{checkedCluster} != @{allCluster}    Fail    Filter Cluster Fail !
+    #    run keyword and continue on failure    run keyword if    '${selectedOption}' != 'ALL' and '@{checkedCluster}' != '${selectedOption}'    Fail    Filter Cluster Fail !
+    enter page by click    ${ZK_Button_Close}    ${DailyTasks_tab_selected}    Detail by Style Color Size
+    execute javascript    $(".zsscroll").scrollTop(0)
+    sleep    3S
+    Wait Until Page Does Not Contain    Processing...    600
+    Wait Until Page Contains element    ${ZK_Button_Populate}    600
+    click element    ${ZK_Button_Populate}
+    Wait Until Page Contains element    ${DailyTasks_Panel_Populate}    600
+    wait until element is visible    ${DailyTasks_popPanel_BtnCancel}    30
+    Wait Until Page Does Not Contain    Processing...    600
+    click element    ${DailyTasks_popPanel_BtnCancel}
+    Wait Until Page Contains element    ${ZK_Button_Job}    600
+    wait until page does not contain element    ${ZK_Button_disabledJob}    60
+    Wait Until Page Does Not Contain    Processing...    600
+    click element    ${ZK_Button_Job}
+    Wait Until Page Contains element    ${DailyTasks_Panel_createJob}    600
+    wait until element is visible    ${DailyTasks_popPanel_BtnCancel}    30
+    Wait Until Page Does Not Contain    Processing...    600
+    click element    ${DailyTasks_popPanel_BtnCancel}
+    Wait Until Page Contains element    ${ZK_Title_Style#}    600
+    Wait Until element is visible    ${ZK_Title_Style#}    600
+    Wait Until Page Does Not Contain    Processing...    600
+    click element    ${ZK_Title_Style#}
+    #    run keyword if    ${scrollPosition}>${screenWidth}    click element    ${ZK_Title_Style#}
+    sleep    1S
+    Wait Until Page Does Not Contain    Processing...    600
+    wait until page contains element    ${ZK_Button_FreezePanel}    30
+    wait until element is visible    ${ZK_Button_FreezePanel}    30
+    click element    ${DailyTasks_Button_FreezePanel}
+    page should not contain    error
+    Wait Until Page Does Not Contain    Processing...    600
+    ${freezeStatus}    get element attribute    ${ZK_Button_FreezePanel}@class
+    should contain    ${freezeStatus}    z-menuitem opened
+    Wait Until Page Contains element    ${ZK_selectedFreezeButton}    30
+    Download Excel    ${DailyTasks_Button_Excel}    DailyTasks_DetailbyStyleColorSize_Blank
+    wait until page does not contain element    ${ZK_Button_disabledInfo}
+    click element    ${ZK_Button_Info}
+    wait until element is visible    ${ZK_InfoNotesSection}    60
+    element should contain    ${ZK_InfoNotesSection}    Last Modified by
+    click element    ${ZK_Button_Info}
+    wait until page does not contain element    ${ZK_Button_disabledNotes}    10
+    click element    ${ZK_Button_Notes}
+    wait until element is visible    ${ZK_InfoNotesSection}    60
+    click element    ${ZK_Button_Notes}
+    wait until page does not contain element    ${ZK_Button_disabledOptions}    30
+    edit options    ${ZK_Button_Options}    Select Attribute Columns    Detail by Style Color Size    ${ZK_Options_title}
+    wait until page does not contain element    ${ZK_Button_disabledViewCriteria}    30
+    editDTViewCriteria    ${ZK_Button_ViewCriteria}    Please select the PO/PO Update/ASN/Receiver/On Order data Shop Date time range:    Detail by Style Color Size    ${DailyTasks_viewCriteria_verifyPoint}    Allocation
+
+editDetaibyStyleColorSizeTab_RFE
+    [Tags]
+    enterPageByClick    Xpath=${DailyTasks_tabsCount}//div[text() ='Summary']    ${DailyTasks_tab_selected}    Summary
+    @{status_RFE_btn}    execute javascript    ${DailyTasks_Status_RFE_jquery}
+    return from keyword if    @{status_RFE_btn} == @{EMPTY}
+    ${row}    evaluate    random.randint(0,len(@{status_RFE_btn})-1)    random
+    @{rowInfo}    split string    @{status_RFE_btn}[${row}]    /
+    ${scrollPosition}    evaluate    @{rowInfo}[1]-400
+    run keyword if    @{rowInfo}[1] >${screenHeight}    execute javascript    $(".zsscroll").scrollTop(${scrollPosition})
+    ${DailyTasks_Button_Edit}    replace string    ${DailyTasks_Button_Edit_rowPH}    [row]    [@{rowInfo}[0]]
+    wait until page contains element    ${DailyTasks_Button_Edit}    60
+    Wait Until Page Does Not Contain    Processing...    600
+    enterPageByClick    ${DailyTasks_Button_Edit}    ${DailyTasks_tab_selected}    Detail by Style Color Size
+    enterPageByClick    ${DailyTasks_Button_DoorFilter}    ${DailyTasks_filterDoor_verifyPoint}    Top Doors:
+    ${checkeddoorCount}    get matching xpath count    ${ZK_checkedBox_rowCount}
+    input text    ${DailyTasks_DoorFilter_text_topDoors}    ${AM_topDoors}
+    click element    ${DailyTasks_popPanel_BtnSubmit}
+    sleep    3S
+    Wait Until Page Does Not Contain    Processing...    600
+    page should not contain    error
+    ${checkeddoorCount_new}    get matching xpath count    ${ZK_checkedBox_rowCount}
+    run keyword and continue on failure    run keyword if    '${checkeddoorCount_new}' != '${AM_topDoors}'    Fail    Input # Top Doors Fail !
+    click element    ${DailyTasks_DoorFilter_button_reset}
+    sleep    3S
+    Wait Until Page Does Not Contain    Processing...    600
+    page should not contain    error
+    ${checkeddoorCount_new}    get matching xpath count    ${ZK_checkedBox_rowCount}
+    run keyword and continue on failure    run keyword if    '${checkeddoorCount_new}' != '${checkeddoorCount}'    Fail    Reset Fail !
+    ${selectedOption}    RandomSelectOptionOnDropdown    ${DailyTasks_popPanel_dropdown}
+    click element    ${DailyTasks_popPanel_BtnSubmit}
+    sleep    3S
+    Wait Until Page Does Not Contain    Processing...    600
+    sleep    3S
+    page should not contain    error
+    Wait Until element is visible    ${DailyTasks_popPanel_BtnSubmit}
+    @{checkedCluster}    execute javascript    ${ZK_checkedBox_title_jquery}
+    @{allCluster}    execute javascript    ${ZK_checkBox_title_jquery}
+    run keyword and continue on failure    run keyword if    '${selectedOption}' == 'ALL' and @{checkedCluster} != @{allCluster}    Fail    Filter Cluster Fail !
+    #    run keyword and continue on failure    run keyword if    '${selectedOption}' != 'ALL' and '@{checkedCluster}' != '${selectedOption}'    Fail    Filter Cluster Fail !
+    enter page by click    ${ZK_Button_Close}    ${DailyTasks_tab_selected}    Detail by Style Color Size
+    execute javascript    $(".zsscroll").scrollTop(0)
+    sleep    3S
+    Wait Until Page Does Not Contain    Processing...    600
+    Wait Until Page Contains element    ${ZK_Button_CancelJob}    600
+    click element    ${ZK_Button_CancelJob}
+    Wait Until Page Contains element    ${DailyTasks_Panel_cancelJob}    600
+    wait until element is visible    ${DailyTasks_Panel_cancelJob}    30
+    Wait Until Page Does Not Contain    Processing...    600
+    click element    ${DailyTasks_popPanel_BtnCancel}
+    Wait Until Page Contains element    ${ZK_Title_Style#}    600
+    Wait Until element is visible    ${ZK_Title_Style#}    600
+    Wait Until Page Does Not Contain    Processing...    600
+    click element    ${ZK_Title_Style#}
+    #    run keyword if    ${scrollPosition}>${screenWidth}    click element    ${ZK_Title_Style#}
+    sleep    1S
+    Wait Until Page Does Not Contain    Processing...    600
+    wait until page contains element    ${ZK_Button_FreezePanel}    30
+    wait until element is visible    ${ZK_Button_FreezePanel}    30
+    click element    ${DailyTasks_Button_FreezePanel}
+    page should not contain    error
+    Wait Until Page Does Not Contain    Processing...    600
+    ${freezeStatus}    get element attribute    ${ZK_Button_FreezePanel}@class
+    should contain    ${freezeStatus}    z-menuitem opened
+    Wait Until Page Contains element    ${ZK_selectedFreezeButton}    30
+    Download Excel    ${DailyTasks_Button_Excel}    DailyTasks_DetailbyStyleColorSize_RFE
+    wait until page does not contain element    ${ZK_Button_disabledInfo}
+    click element    ${ZK_Button_Info}
+    wait until element is visible    ${ZK_InfoNotesSection}    60
+    element should contain    ${ZK_InfoNotesSection}    Last Modified by
+    click element    ${ZK_Button_Info}
+    wait until page does not contain element    ${ZK_Button_disabledNotes}    10
+    click element    ${ZK_Button_Notes}
+    wait until element is visible    ${ZK_InfoNotesSection}    60
+    click element    ${ZK_Button_Notes}
+    wait until page does not contain element    ${ZK_Button_disabledOptions}    30
+    edit options    ${ZK_Button_Options}    Select Attribute Columns    Detail by Style Color Size    ${ZK_Options_title}
+    wait until page does not contain element    ${ZK_Button_disabledViewCriteria}    30
+    editDTViewCriteria    ${ZK_Button_ViewCriteria}    Please select the PO/PO Update/ASN/Receiver/On Order data Shop Date time range:    Detail by Style Color Size    ${DailyTasks_viewCriteria_verifyPoint}    Allocation
+
+exitDT
+    enter page by click    ${ZK_Button_Close}    ${mainPage}    DailyTask

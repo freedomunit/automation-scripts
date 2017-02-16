@@ -1,0 +1,17 @@
+*** Variables ***
+${storeGroup_button_top_createStoreGroup}    Xpath=//table[1]//input[@value='Create Store Group']
+${storeGroup_button_bottom_createStoreGroup}    Xpath=//table[3]//input[@value='Create Store Group']
+${storeGroup_button_top_deleteSelected}    Xpath=//table[1]//input[@name='delete']
+${storeGroup_button_bottom_deleteSelected}    Xpath=//table[3]//input[@name='delete']
+${storeGroup_button_top_copySelected}    Xpath=//table[1]//input[@name='copy']
+${storeGroup_button_bottom_copySelected}    Xpath=//table[3]//input[@name='copy']
+${storeGroup_button_top_setDefault}    Xpath=//table[1]//input[@name='setdefault']
+${storeGroup_button_bottom_setDefault}    Xpath=//table[3]//input[@name='setdefault']
+${storeGroup_button_top_clearDefault}    Xpath=//table[1]//input[@name='cleardefault']
+${storeGroup_button_bottom_clearDefault}    Xpath=//table[3]//input[@name='cleardefault']
+${storeGroup_link_clearAll}    Clear All
+${storeGroup_link_checkAll}    Check All
+${storeGroup_title_checkBox}    Xpath=//table[@id='table']/thead/tr[1]/th[1]/input
+${storeGroup_checkBox_rowPlaceHold}    Xpath=//table[@id='table']/tbody/tr[row]/td[1]/input
+${storeGroup_info_rowPlaceHold}    Xpath=//table[@id='table']/tbody/tr[row]/td[2]/a
+${storeGroup_info_count}    //table[@id='table']/tbody/tr

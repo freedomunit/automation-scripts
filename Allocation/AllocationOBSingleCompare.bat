@@ -1,0 +1,1 @@
+pybot -d ..\..\..\robot\Allocation\output --timestampoutputs --log AllocationOBSCompareLog.html --report AllocationOBSCompareReport.html --include OBS-test   ..\..\..\robot\Allocation\interfacetest.txt 

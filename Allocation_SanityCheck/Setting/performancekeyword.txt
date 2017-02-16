@@ -1,0 +1,288 @@
+*** Settings ***
+Resource          environment.txt
+Resource          global_resource.txt
+Resource          ../page/ZK.txt
+Resource          ../page/DailyTasks.txt
+Resource          ../page/standard7thpage.txt
+Library           MyUtil
+
+*** Keywords ***
+enterPageByClick
+    [Arguments]    ${submit_button}    ${verify_element}    ${verify_text}
+    sleep    1S
+    click element    ${submit_button}
+    sleep    3S
+    #    Wait Until Page Contains    Processing...    10
+    Wait Until Page Does Not Contain    Processing...    600
+    #    Wait Until Page Contains    initializing...    10
+    #    Wait Until Page Does Not Contain    initializing...    1000
+    Wait Until Page Contains element    ${verify_element}    30
+    wait until element is visible    ${verify_element}
+    Wait Until element Contains    ${verify_element}    ${verify_text}    60
+
+enterCertainModel
+    [Arguments]    ${model_name}    ${verify_element}    ${verify_text}
+    : FOR    ${round}    IN RANGE    0    1000
+    \    click element    ${navigation_menu}
+    \    sleep    5S
+    \    ${menu_display}    get element attribute    ${navigation_menu_open}@class
+    \    exit for loop if    '${menu_display}' == 'open'
+    run keyword if    '${menu_display}' !='open'    fail
+    run keyword if    '${menu_display}' == 'open'    click link    ${model_name}
+    wait until page does not contain element    ${verify_element}//center    20
+    wait until element contains    ${verify_element}    ${verify_text}    20
+
+enterNewPageInModel
+    [Arguments]    ${trigger_element}    ${verify_element}    ${verify_text}
+    click element    ${trigger_element}
+    sleep    3S
+    Wait Until Page Does Not Contain    Processing...    1000
+    Wait Until element Contains    ${verify_element}    ${verify_text}    1000
+
+downloadExcel
+    [Arguments]    ${trigger_element}    ${model_name}
+    click element    ${trigger_element}
+    sleep    1S
+    Wait Until Page Does Not Contain    Processing...    6000
+    handleSaveFileWindow    ${prod_download_dir}    ${model_name}_${user}
+
+editCell
+    [Arguments]    ${cellXpath}    ${inputValue}
+    double click element    ${cellXpath}
+    double click element    ${ZK_Cell_Selected}
+    #    ${editValue}    get element attribute    ${DailyTasks_Cell_editCell}@style
+    #    Run keyword if    '${editValue}' == ''    double click element    Xpath=//div[@class='zsselecti']
+    wait until element is visible    ${ZK_Cell_Edit}    20
+    input text    ${ZK_Cell_Edit}    ${inputValue}
+    press key    ${ZK_Cell_Edit}    \\13
+    #    click element    ${cellXpath}/parent/following-sibling::*[1]
+    Wait Until Page Does Not Contain    Processing...    100
+
+editOptions
+    [Arguments]    ${optionsBtn}    ${verifyText}    ${mainPage_verifyText}    ${options_title}
+    enter page by click    ${optionsBtn}    ${options_title}    ${verifyText}
+    #    element should be visible    ${optionsBtn}
+    ${checkedCountPath}    replace string    ${ZK_Options_checkedBox_rowCount_sectionPH}    section    ${verifyText}
+    ${uncheckCountPath}    replace string    ${ZK_Options_uncheckBox_rowCount_sectionPH}    section    ${verifyText}
+    ${checkedOptionsCount}    get matching xpath count    ${checkedCountPath}
+    ${checkedOption}    evaluate    random.randint(1,${checkedOptionsCount})    random
+    click element    Xpath=${checkedCountPath}[${checkedOption}]${ZK_checkBox_count}
+    page should not contain    error
+    ${uncheckOptionsCount}    get matching xpath count    ${uncheckCountPath}
+    ${uncheckOption}    evaluate    random.randint(1,${uncheckOptionsCount})    random
+    click element    Xpath=${uncheckCountPath}[${uncheckOption}]${ZK_checkBox_count}
+    page should not contain    error
+    enter page by click    ${ZK_Button_Close}    ${ZK_selectedTab}    ${mainPage_verifyText}
+
+editDTViewCriteria
+    [Arguments]    ${viewCriteriaBtn}    ${verifyText}    ${mainPage_verifyText}    ${viewCriteria_verifyElement}    ${DT_type}
+    enter page by click    ${viewCriteriaBtn}    ${viewCriteria_verifyElement}    ${verifyText}
+    @{statusType}    run keyword if    '${DT_type}' == 'Allocation'    get list items    ${DailyTasks_viewCriteria_Dropdown_Status}
+    @{dataType}    run keyword if    '${DT_type}' == 'Allocation'    get list items    ${DailyTasks_viewCriteria_Dropdown_DataSourceType}
+    ${statusType_count}    run keyword if    '${DT_type}' == 'Allocation'    get length    ${statusType}
+    ${dataType_count}    run keyword if    '${DT_type}' == 'Allocation'    get length    ${dataType}
+    ${statusType_num}    run keyword if    '${DT_type}' == 'Allocation'    evaluate    random.randint(0,${statusType_count}-1)    random
+    ${dataType_num}    run keyword if    '${DT_type}' == 'Allocation'    evaluate    random.randint(0,${dataType_count}-1)    random
+    @{orderCity}    get list items    ${DailyTasks_viewCriteria_Dropdown_OrderCity}
+    ${orderCity_count}    get length    ${orderCity}
+    ${orderCity_num}    evaluate    random.randint(0,${orderCity_count}-1)    random
+    #    ${filterAttr_count}    get matching xpath count    ${DailyTasks_viewCriteria_filterAttributes_count}
+    run keyword if    '${DT_type}' == 'Allocation'    select from list by label    ${DailyTasks_viewCriteria_Dropdown_Status}    @{statusType}[${statusType_num}]
+    run keyword if    '${DT_type}' == 'Allocation'    list selection should be    ${DailyTasks_viewCriteria_Dropdown_Status}    @{statusType}[${statusType_num}]
+    select from list by label    ${DailyTasks_viewCriteria_Dropdown_OrderCity}    @{orderCity}[${orderCity_num}]
+    list selection should be    ${DailyTasks_viewCriteria_Dropdown_OrderCity}    @{orderCity}[${orderCity_num}]
+    run keyword if    '${DT_type}' == 'Allocation'    select from list by label    ${DailyTasks_viewCriteria_Dropdown_DataSourceType}    @{dataType}[${dataType_num}]
+    run keyword if    '${DT_type}' == 'Allocation'    list selection should be    ${DailyTasks_viewCriteria_Dropdown_DataSourceType}    @{dataType}[${dataType_num}]
+    #    input text    ${DailyTasks_viewCriteria_Text_FromDate}    ${DT_fromDate}
+    #    input text    ${DailyTasks_viewCriteria_Text_ToDate}    ${DT_toDate}
+    run keyword if    '${DT_timeType}' == 'Shop Date' and '${DT_type}' == 'Allocation'    click element    ${DailyTasks_viewCriteria_Radio_InDCDate}
+    ...    ELSE IF    '${DT_timeType}' == 'In DC Date' and '${DT_type}' == 'Allocation'    click element    ${DailyTasks_viewCriteria_Radio_ShopDate}
+    ${removeFilter_count}    get matching xpath count    ${DailyTasks_viewCriteria_removeFilter_count}
+    run keyword if    ${removeFilter_count}>=1    removeZKFilters    ${DailyTasks_viewCriteria_Button_removeFilter_last}    ${removeFilter_count}    ${DailyTasks_viewCriteria_removeFirstOptionsCount}    #
+    ...    # run keyword if    '@{DT_Criteria}[0]'    selectZKCustomCriteria    ${DailyTasks_viewCriteria_Dropdown_filterHierarchy_last}    ${DailyTasks_viewCriteria_Options_filterHierarachy_last}    ${DailyTasks_viewCriteria_popPanel_options}
+    ...    # ${DailyTasks_viewCriteria_filterHierarachy_lastOptions_itemPH}    ${DailyTasks_viewCriteria_Button_addFilter_last}    ${DailyTasks_viewCriteria_lastRow_addRowNum}    @{DT_Criteria}
+    #    :FOR    ${item}    IN RANGE    1    ${filterAttr_count}+1
+    #    run keyword if    ${item} != 1    click element    ${DailyTasks_viewCriteria_Button_addFilter_last}
+    #    sleep    3S
+    #    wait until page does not contain    Processing...    60
+    #    wait until element is visible    ${DailyTasks_viewCriteria_Dropdown_filterHierarchy_last}    30
+    #    ${currentAttr}    get text    Xpath=${DailyTasks_viewCriteria_filterAttributes_count}[${item}]/td[2]
+    #    select from list by label    ${DailyTasks_viewCriteria_Dropdown_filterHierarchy_last}    ${currentAttr}
+    dynamicZKSelectCriteria    ${DailyTasks_viewCriteria_Dropdown_filterHierarchy_last}    ${DailyTasks_viewCriteria_Options_filterHierarachy_last}    ${ZK_Criteria_filterHierarachy_popupOptionsCount_last}    ${ZK_Criteria_filterItems_jquery}    ${ZK_Criteria_filterHierarachy_popupOptions_header}    ${ZK_Criteria_filterHierarachy_popupOptions_rowPH}
+    ...    ${ZK_Criteria_filterHierarachy_popupOptions_header_checked}    ${DailyTasks_viewCriteria_Button_addFilter_last}    ${DailyTasks_viewCriteria_Button_removeFilter_last}
+    page should not contain    error
+    enter page by click    ${ZK_Button_Close}    ${ZK_selectedTab}    ${mainPage_verifyText}
+
+removeZKFilters
+    [Arguments]    ${path}    ${count}    ${firstOptionsCount_path}
+    : FOR    ${ot}    IN RANGE    1    ${count}
+    \    click element    ${path}
+    \    sleep    3S
+    ${firstOptionsCount}    get matching xpath count    ${firstOptionsCount_path}
+    : FOR    ${num}    IN RANGE    1    ${firstOptionsCount}+1
+    \    ${firstOptionsCount_path}    replace string    ${firstOptionsCount_path}    //span    //span[${num}]/span
+    \    click element    Xpath=${firstOptionsCount_path}
+
+selectZKCustomCriteria
+    [Arguments]    ${filterHierarchy_last}    ${options_filterHierarchy_last}    ${popPanel_options}    ${popPanel_option_itemPH}    ${addFilterBtn}    ${lastRow_addRowNum}
+    ...    @{criteria}
+    ${criteriaCount}    get length    ${criteria}
+    : FOR    ${item}    IN RANGE    0    ${criteriaCount}
+    \    @{Items}    split string    @{criteria}[${item}]    /
+    \    @{options}    split string    @{Items}[1]    ,
+    \    select from list by label    ${filterHierarchy_last}    @{Items}[0]
+    \    #    wait until page contains element    ${options_filterHierarchy_last}
+    \    wait until element is visible    ${options_filterHierarchy_last}    30
+    \    click element    ${options_filterHierarchy_last}
+    \    wait until page contains element    ${popPanel_options}    30
+    \    selectZKCriteriaOptions    ${popPanel_options}    ${popPanel_option_itemPH}    ${options_filterHierarchy_last}    @{options}
+    \    wait until page contains element    ${addFilterBtn}    30
+    \    click element    ${addFilterBtn}
+    \    wait until page does not contain element    ${popPanel_options}    30
+    \    ${rowsCount}    evaluate    ${item}+2
+    \    wait until page contains element    ${lastRow_addRowNum}[${rowsCount}]    30
+
+selectZKCriteriaOptions
+    [Arguments]    ${popPanel_options}    ${popPanel_option_itemPH}    ${options_filterHierarchy_last}    @{options}
+    ${num}    set variable    0
+    : FOR    ${option}    IN    @{options}
+    \    ${num}    evaluate    ${num}+1
+    \    ${popPanel_option_itemPH}    replace string    ${popPanel_option_itemPH}    item    ${option}
+    \    click element    ${popPanel_option_itemPH}
+    \    wait until page contains element    ${options_filterHierarchy_last}[${num}]    30
+
+findZKElementByScroll
+    [Arguments]    ${elementCountPath}    ${TopOrLeft}    ${scrollSize}
+    ${scrollSize}    convert to integer    ${scrollSize}
+    : FOR    ${num}    IN RANGE    1    1000
+    \    ${scrollPosition}    evaluate    ${scrollSize}*${num}
+    \    ${currentPosition}    run keyword if    ${num}>1    execute javascript    return $("span.zsscrollinfo span").text()
+    \    ...    ELSE IF    ${num} == 1 and '${TopOrLeft}' == 'Top'    set variable    Row
+    \    ...    ELSE IF    ${num} == 1 and '${TopOrLeft}' == 'Left'    set variable    Column
+    \    execute javascript    $(".zsscroll").scroll${TopOrLeft}(${scrollPosition})
+    \    #    sleep    3S
+    \    run keyword if    ${num}==1    wait until element contains    Xpath=//span[@class='zsscrollinfo']/span    ${currentPosition}    200
+    \    ...    ELSE    wait until element does not contain    Xpath=//span[@class='zsscrollinfo']/span    ${currentPosition}    200
+    \    wait until page does not contain    Processing...    600
+    \    ${elementsCount}    get matching xpath count    ${elementCountPath}
+    \    exit for loop if    ${elementsCount} >0
+    [Return]    ${scrollPosition}
+
+dynamicSelectCriteria
+    [Arguments]    ${dropdown_filterHierarachy_last}    ${filterHierarachy_options_last}    ${filterHierarachy_popupOptionsCount_last}
+    ${removeRowPath}    replace string    ${filterHierarachy_options_last}    [last()]    ${EMPTY}
+    ${removeRowPath}    replace string    ${removeRowPath}    Xpath=    ${EMPTY}
+    ${removeRowCount}    get matching xpath count    ${removeRowPath}
+    : FOR    ${num}    IN RANGE    1    ${removeRowCount}+1
+    \    run keyword if    ${removeRowCount} > ${num}    click button    ${Criteria_Button_removeFilter_last}
+    \    run keyword if    ${removeRowCount} == ${num}    select from list by index    ${dropdown_filterHierarachy_last}    0
+    \    run keyword if    ${removeRowCount} == ${num}    list selection should be    ${dropdown_filterHierarachy_last}    ${EMPTY}
+    \    sleep    1S
+    ${filterItems}    execute javascript    ${Criteria_filterItems_jquery}
+    ${filterItems}    replace string    ${filterItems}    \13    ${EMPTY}
+    ${filterItems}    strip string    ${filterItems}
+    @{filterItems}    split string    ${filterItems}    ,
+    : FOR    ${item}    IN    @{filterItems}
+    \    ${item}    strip string    ${item}
+    \    select from list by label    ${dropdown_filterHierarachy_last}    ${item}
+    \    list selection should be    ${dropdown_filterHierarachy_last}    ${item}
+    \    #    page should not contain    error
+    \    wait until page contains element    ${filterHierarachy_options_last}    60
+    \    click element    ${filterHierarachy_options_last}
+    \    #    page should not contain    error
+    \    wait until page contains element    Xpath=${filterHierarachy_popupOptionsCount_last}    30
+    \    ${optionsCount}    get matching xpath count    ${filterHierarachy_popupOptionsCount_last}
+    \    ${optionNum}    evaluate    random.randint(1,${optionsCount})    random
+    \    select checkbox    Xpath=${filterHierarachy_popupOptionsCount_last}[${optionNum}]//input[@type='checkbox']
+    \    checkbox should be selected    Xpath=${filterHierarachy_popupOptionsCount_last}[${optionNum}]//input[@type='checkbox']
+    \    click element    Xpath=//tr[contains(@class,'filtertablerow')][last()]//input[@type='button' and @title='Add Filter']
+    \    wait until page does not contain element    ${filterHierarachy_options_last}    30
+    \    #    page should not contain    error
+    \    sleep    1S
+
+ListConvertToString
+    [Arguments]    ${splitBy}    @{list}
+    ${listLength}    get length    ${list}
+    ${round}    set variable    1
+    ${str}    set variable    ${EMPTY}
+    : FOR    ${item}    IN    @{list}
+    \    ${str}    run keyword if    '${item}'!='${SPACE}'    set variable    ${str}${item}${splitBy}
+    \    ...    ELSE    set variable    ${str}
+    \    ${round}    evaluate    ${round}+1
+    [Return]    ${str}
+
+checkCriteria
+    [Arguments]    ${attri}    ${path_AttriValPH}    @{vals}
+    ${path_valPH}    replace string    ${path_AttriValPH}    'Attri'    '${attri}'
+    : FOR    ${item}    IN    @{vals}
+    \    ${path}    replace string    ${path_valPH}    'Val'    '${item}'
+    \    select checkbox    ${path}
+    \    checkbox should be selected    ${path}
+    \    sleep    1S
+
+dynamicZKSelectCriteria
+    [Arguments]    ${dropdown_filterHierarachy_last}    ${filterHierarachy_options_last}    ${filterHierarachy_popupOptionsCount_last}    ${filterItems_jquery}    ${popupOptions_headerItem}    ${popupOptions_item_rowPH}
+    ...    ${popOptions_header_checked}    ${button_addFilter_last}    ${button_removeFilter_last}
+    ${removeRowPath}    replace string    ${dropdown_filterHierarachy_last}    [last()]    ${EMPTY}
+    ${removeRowPath}    replace string    ${removeRowPath}    Xpath=    ${EMPTY}
+    ${selectedDropdownCountPath}    replace string    ${dropdown_filterHierarachy_last}    Xpath=    ${EMPTY}
+    ${removeRowCount}    get matching xpath count    ${removeRowPath}
+    : FOR    ${num}    IN RANGE    1    ${removeRowCount}+1
+    \    run keyword if    ${removeRowCount} > ${num}    click button    ${button_removeFilter_last}
+    \    ${selectedDropdownCount}    get matching xpath count    ${selectedDropdownCountPath}[@selected='selected']
+    \    run keyword if    ${removeRowCount} == ${num} and ${selectedDropdownCount} > 0    unselect from list    ${dropdown_filterHierarachy_last}
+    \    #    run keyword if    ${removeRowCount} == ${num}    list selection should be    ${dropdown_filterHierarachy_last}    ${EMPTY}
+    \    sleep    1S
+    ${filterItems}    execute javascript    ${filterItems_jquery}
+    ${filterItems}    replace string    ${filterItems}    \13    ${EMPTY}
+    ${filterItems}    strip string    ${filterItems}
+    @{filterItems}    split string    ${filterItems}    ,
+    ${filterItems_count}    get length    ${filterItems}
+    : FOR    ${item}    IN    @{filterItems}
+    \    ${item}    strip string    ${item}
+    \    wait until element is enabled    ${dropdown_filterHierarachy_last}    30
+    \    wait until page does not contain    Processing...    600
+    \    select from list by label    ${dropdown_filterHierarachy_last}    ${item}
+    \    sleep    2S
+    \    ${selectedOption}    execute javascript    return $("select:visible:last :selected").text()
+    \    should be equal as strings    ${selectedOption}    ${item}
+    \    #    page should not contain    error
+    \    #    wait until page contains element    ${filterHierarachy_options_last}    60
+    \    wait until element is visible    ${filterHierarachy_options_last}    60
+    \    click element    ${filterHierarachy_options_last}
+    \    #    page should not contain    error
+    \    #    wait until page contains element    Xpath=${filterHierarachy_popupOptionsCount_last}    30
+    \    wait until page does not contain    Processing...    60
+    \    wait until element is visible    Xpath=${filterHierarachy_popupOptionsCount_last}    30
+    \    ${optionsCount}    get matching xpath count    ${filterHierarachy_popupOptionsCount_last}
+    \    ${optionNum}    evaluate    random.randint(1,${optionsCount})    random
+    \    ${optionRow}    run keyword if    ${optionNum} > 1    evaluate    ${optionNum}-1
+    \    ${optionItemXpath}    run keyword if    ${optionNum} == 1    set variable    ${popupOptions_headerItem}
+    \    ...    ELSE    replace string    ${popupOptions_item_rowPH}    [row]    [${optionRow}]
+    \    wait until page does not contain    Processing...    600
+    \    click element    ${optionItemXpath}
+    \    run keyword if    ${optionNum} == 1    wait until element is visible    ${popOptions_header_checked}    120
+    \    ...    ELSE    wait until page contains element    ${optionItemXpath}/ancestor::tr[contains(@class,'selected')]    120
+    \    #    run keyword if    ${optionNum} == 1    wait until page contains element    ${Security_create/editRuleException_filterHierarachy_popOptions_header_checked}    # ELSE
+    \    ...    # wait until page contains element    ${optionItemXpath}/ancestor::tr[contains(@class,'selected')]
+    \    ${filterItems_count}    evaluate    ${filterItems_count}-1
+    \    run keyword if    ${filterItems_count}>0    wait until element is enabled    ${button_addFilter_last}
+    \    run keyword if    ${filterItems_count}>0    click element    ${button_addFilter_last}
+    \    run keyword if    ${filterItems_count}>0    sleep    1S    #    wait until page does not contain element
+    \    ...    # ${filterHierarachy_options_last}    30
+    \    run keyword if    ${filterItems_count}>0    wait until page does not contain    Processing...    60
+    \    run keyword if    ${filterItems_count}>0    list should have no selections    ${dropdown_filterHierarachy_last}
+    \    #    page should not contain    error
+    \    run keyword if    ${filterItems_count}>0    sleep    1S
+
+RandomSelectOptionOnDropdown
+    [Arguments]    ${dropdown}    ${startRow}=0    ${excludeSelected}=0
+    @{options}    run keyword if    '${excludeSelected}' == '0'    get list items    ${dropdown}
+    ...    ELSE    execute javascript    ${excludeSelected}
+    ${optionsCount}    get length    ${options}
+    return from keyword if    ${optionsCount} == 0
+    ${num}    evaluate    random.randint(${startRow},${optionsCount}-1)    random
+    Wait Until Page Does Not Contain    Processing...    600
+    select from list by label    ${dropdown}    @{options}[${num}]
+    list selection should be    ${dropdown}    @{options}[${num}]
+    [Return]    @{options}[${num}]

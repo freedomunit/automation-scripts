@@ -1,0 +1,3 @@
+*** Variables ***
+${WSChangePrices_top_save}    Xpath=//form[@name='message']/input[@value='Save'][1]
+${WSChangePrices_bottom_save}    Xpath=//form[@name='message']/input[@value='Save'][2]

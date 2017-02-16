@@ -1,0 +1,1 @@
+pybot -d ..\..\..\robot\Allocation\output --timestampoutputs --log AllocationDTCompareLog.html --report AllocationDTCompareReport.html --include DT-test   ..\..\..\robot\Allocation\interfacetest.txt 

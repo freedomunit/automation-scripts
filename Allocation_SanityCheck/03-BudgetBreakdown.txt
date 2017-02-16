@@ -1,0 +1,207 @@
+*** Settings ***
+Force Tags        SC-G1-BB
+Resource          Setting/environment.txt
+Resource          Setting/performancekeyword.txt
+Resource          page/ZK.txt
+Resource          page/BudgetBreakdown.txt
+
+*** Test Cases ***
+selectCriteria
+    [Tags]
+    enterCertainModel    Budget Breakdown List    ${mainPage}    BudgetBreakdownList
+    enter Page by click    ${BBD_ListPage_Button_topCreatePlan}    ${mainPage}    CreateBudget Breakdown
+    input text    ${BBD_criteria_Text_PlanName}    ${BBD_CreatePlan_Name}
+    run keyword if    '@{BBD_CreatePlan_Criteria}[0]' != '${EMPTY}'    selectCustomCriteria    ${BBD_criteria_Dropdown_filterHierarchy1}    ${BBD_criteria_Option_filterHierarachy1}    ${BBD_criteria_Options_filterHierarachy1}    ${BBD_criteria_filterHierarachy1_optionCount}
+    ...    Xpath=${BBD_criteria_filterHierarachy1_rowCount}//input[@title='Add Filter']    ${BBD_criteria_filterHierarachy1_rowCount}    @{BBD_CreatePlan_Criteria}
+    enter Page by click    ${BBD_CreatePlan_Button_topCancel}    ${mainPage}    BudgetBreakdownList
+    ${editPlanLinkCount}    get matching xpath count    ${BBD_ListPage_editPlanCount}
+    ${editPlanLink}    evaluate    random.randint(2,${editPlanLinkCount}+1)    random
+    enter Page by click    Xpath=//table[@class='table5']/tbody[${editPlanLink}]${BBD_ListPage_editPlanCount}    ${mainPage}    EditBudget Breakdown
+    enter Page by click    ${BBD_CreatePlan_Button_topCancel}    ${mainPage}    BudgetBreakdownList
+    @{month}    get list Items    ${BBD_ListPage_Dropdown_month}
+    @{year}    get list Items    ${BBD_ListPage_Dropdown_year}
+    ${monthCount}    get length    ${month}
+    ${yearCount}    get length    ${year}
+    ${selectedMonth}    evaluate    random.randint(0,${monthCount}-1)    random
+    ${selectedYear}    evaluate    random.randint(0,${yearCount}-4)    random
+    select from list by label    ${BBD_ListPage_Dropdown_month}    @{month}[${selectedMonth}]
+    list selection should be    ${BBD_ListPage_Dropdown_month}    @{month}[${selectedMonth}]
+    select from list by label    ${BBD_ListPage_Dropdown_year}    @{year}[${selectedYear}]
+    list selection should be    ${BBD_ListPage_Dropdown_year}    @{year}[${selectedYear}]
+    click element    Xpath=//table[@class='table5']/tbody[${editPlanLink}]${BBD_ListPage_expandCount}
+    wait until page contains element    Xpath=//table[@class='table5']/tbody[${editPlanLink}]${BBD_ListPage_collapseCount}    20
+    ${planLinkCount}    get matching xpath count    //table[@class='table5']/tbody[${editPlanLink}]${BBD_ListPage_planCount}
+    ${planLink}    evaluate    (random.randint(1,${planLinkCount}))*2    random
+    set suite variable    \${firstMonthYear}    @{year}[${selectedYear}]-@{month}[${selectedMonth}]
+    enter Page by click    //table[@class='table5']/tbody[${editPlanLink}]//tr[${planLink}]${BBD_ListPage_planCount}    ${ZK_selectedTab}    ${firstMonthYear}
+
+editMonthTab
+    [Tags]
+    #    ${sheetContent}    get text    ${BBD_Sheet}
+    #    ${nodataFlag}    Get Lines Containing String    ${sheetContent}    There is no data
+    #    run keyword if    '${nodataFlag}'    click element    ${BBD_popDropdown}
+    #    run keyword if    '${nodataFlag}'    wait until page contains element    ${ZK_popDropdown_open}    30
+    #    ${monthCount}    run keyword if    '${nodataFlag}'    get matching xpath count    ${BBD_popDropdown_MonthsCount}
+    #    ${monthNum}    run keyword if    '${nodataFlag}'    evaluate    random.randint(1,${monthCount})    random
+    #    ${month}    run keyword if    '${nodataFlag}'    get text    Xpath=${BBD_popDropdown_MonthsCount}[${monthNum}]
+    #    run keyword if    '${nodataFlag}'    click element    Xpath=${BBD_popDropdown_MonthsCount}[${monthNum}]
+    #    run keyword if    '${nodataFlag}'    wait until page contains element    ${ZK_popDropdown_selectedItem}    30
+    #    run keyword if    '${nodataFlag}'    click element    ${BBD_Button_View}
+    #    run keyword if    '${nodataFlag}'    wait until element contains    ${ZK_selectedTab}    ${month}    100
+    #    click element    ${BBD_totalCell_first}
+    wait until element is visible    ${BBD_Freeze_position}    100
+    click element    ${BBD_Freeze_position}
+    sleep    1S
+    Wait Until Page Does Not Contain    Processing...    600
+    wait until page contains element    ${ZK_Button_FreezePanel}    30
+    wait until element is visible    ${ZK_Button_FreezePanel}    30
+    click element    ${ZK_Button_FreezePanel}
+    page should not contain    error
+    sleep    1S
+    Wait Until Page Does Not Contain    Processing...    600
+    ${freezeStatus}    get element attribute    ${ZK_Button_FreezePanel}@class
+    should contain    ${freezeStatus}    z-menuitem opened
+    wait until page contains element    ${ZK_selectedFreezeButton}    60
+    Download excel    ${ZK_Button_Excel}    BBD_monthTab_${firstMonthYear}
+    wait until page does not contain element    ${ZK_Button_disabledInfo}    30
+    click element    ${ZK_Button_Info}
+    wait until page contains element    ${BBD_InfoNotesSection}    60
+    element should contain    ${BBD_InfoNotesSection}    Last Modified by
+    click element    ${ZK_Button_Info}
+    wait until page does not contain element    ${ZK_Button_disabledNotes}    30
+    click element    ${ZK_Button_Notes}
+    wait until page contains element    ${BBD_InfoNotesSection}    60
+    click element    ${ZK_Button_Notes}
+    wait until page does not contain element    ${ZK_Button_disabledOptions}    30    #    run keyword if    '${nodataFlag}'    edit options
+    ...    # ${ZK_Button_Options}    Select Attribute/Grouped Columns to Display    ${month}    # ELSE    edit options    ${ZK_Button_Options}
+    ...    # Select Attribute/Grouped Columns to Display    ${firstMonthYear}
+    edit options    ${ZK_Button_Options}    Select Attribute/Grouped Columns to Display    ${firstMonthYear}    ${BBD_Options_verifyPoint}
+    ${Sales%Flag}    get element attribute    ${ZK_Button_Sales%}@disabled
+    run keyword if    '${Sales%Flag}' == 'disabled'    click element    ${ZK_Button_Retail$}
+    wait until page does not contain    Processing...    60
+    run keyword if    '${Sales%Flag}' == 'disabled'    wait until element is visible    ${ZK_Button_Retail$_selected}    100
+    #    run keyword if    '${Sales%Flag}' == 'disabled'    click element    ${ZK_Button_Retail$}
+    #    wait until page does not contain    Processing...    60
+    run keyword if    '${Sales%Flag}' == 'disabled'    element should contain    ${BBD_selectedButton_retail$Sales%}    Retail $
+    run keyword if    '${Sales%Flag}' != 'disabled'    click element    ${ZK_Button_Sales%}
+    wait until page does not contain    Processing...    60
+    run keyword if    '${Sales%Flag}' != 'disabled'    wait until element is visible    ${ZK_Button_Sales%_selected}    100
+    #    run keyword if    '${Sales%Flag}' != 'disabled'    click element    ${ZK_Button_Sales%}
+    #    wait until page does not contain    Processing...    60
+    run keyword if    '${Sales%Flag}' != 'disabled'    element should contain    ${BBD_selectedButton_retail$Sales%}    Sales %
+
+editYearTab
+    [Tags]
+    click element    ${BBD_popDropdown}
+    wait until page contains element    ${ZK_popDropdown_open}    30
+    ${yearCount}    get matching xpath count    ${BBD_popDropdown_YearsCount}
+    ${yearNum}    evaluate    random.randint(1,${yearCount})    random
+    ${year}    get text    ${BBD_popDropdown_Year_addNum}[${yearNum}]
+    click element    ${BBD_popDropdown_Year_addNum}[${yearNum}]
+    wait until page contains element    ${ZK_popDropdown_selectedItem}    30
+    click element    ${BBD_Button_View}
+    sleep    3S
+    wait until page does not contain    Processing...    600
+    wait until page contains element    ${ZK_selectedTab}    100
+    wait until element contains    ${ZK_selectedTab}    ${year}    100
+    #    click element    ${BBD_totalCell_first}
+    wait until element is visible    ${BBD_Freeze_position}    100
+    click element    ${BBD_Freeze_position}
+    sleep    1S
+    page should not contain    error
+    Wait Until Page Does Not Contain    Processing...    600
+    wait until page contains element    ${ZK_Button_FreezePanel}    30
+    wait until element is visible    ${ZK_Button_FreezePanel}    30
+    ${freezeStatus}    get element attribute    ${ZK_Button_FreezePanel}@class
+    ${freezeStatusFlag}    get lines containing string    ${freezeStatus}    opened z-menuitem
+    run keyword if    '${freezeStatusFlag}' == '${EMPTY}'    click element    ${ZK_Button_FreezePanel}
+    run keyword if    '${freezeStatusFlag}' == '${EMPTY}'    page should not contain    error
+    run keyword if    '${freezeStatusFlag}' == '${EMPTY}'    sleep    1S
+    run keyword if    '${freezeStatusFlag}' == '${EMPTY}'    Wait Until Page Does Not Contain    Processing...    600
+    ${freezeStatus}    run keyword if    '${freezeStatusFlag}' == '${EMPTY}'    get element attribute    ${ZK_Button_FreezePanel}@class
+    run keyword if    '${freezeStatusFlag}' == '${EMPTY}'    should contain    ${freezeStatus}    z-menuitem opened
+    wait until page contains element    ${ZK_selectedFreezeButton}    60
+    Download excel    ${ZK_Button_Excel}    BBD_yearTab_${year}
+    wait until page does not contain element    ${ZK_Button_disabledInfo}    30
+    click element    ${ZK_Button_Info}
+    wait until page contains element    ${BBD_InfoNotesSection}    60
+    element should contain    ${BBD_InfoNotesSection}    Last Modified by
+    click element    ${ZK_Button_Info}
+    wait until page does not contain element    ${ZK_Button_disabledNotes}    30
+    click element    ${ZK_Button_Notes}
+    wait until page contains element    ${BBD_InfoNotesSection}    60
+    click element    ${ZK_Button_Notes}
+    wait until page does not contain element    ${ZK_Button_disabledOptions}    30
+    edit options    ${ZK_Button_Options}    Select Attribute/Grouped Columns to Display    ${year}    ${BBD_Options_verifyPoint}
+    ${Sales%Flag}    get element attribute    ${ZK_Button_Sales%}@disabled
+    run keyword if    '${Sales%Flag}' == 'disabled'    click element    ${ZK_Button_Retail$}
+    wait until page does not contain    Processing...    60
+    run keyword if    '${Sales%Flag}' == 'disabled'    wait until element is visible    ${ZK_Button_Retail$_selected}    100
+    #    run keyword if    '${Sales%Flag}' == 'disabled'    click element    ${ZK_Button_Retail$}
+    #    wait until page does not contain    Processing...    60
+    run keyword if    '${Sales%Flag}' == 'disabled'    element should contain    ${BBD_selectedButton_retail$Sales%}    Retail $
+    run keyword if    '${Sales%Flag}' != 'disabled'    click element    ${ZK_Button_Sales%}
+    wait until page does not contain    Processing...    60
+    run keyword if    '${Sales%Flag}' != 'disabled'    wait until element is visible    ${ZK_Button_Sales%_selected}    100
+    #    run keyword if    '${Sales%Flag}' != 'disabled'    click element    ${ZK_Button_Sales%}
+    #    wait until page does not contain    Processing...    60
+    run keyword if    '${Sales%Flag}' != 'disabled'    element should contain    ${BBD_selectedButton_retail$Sales%}    Sales %
+
+editQuarterTab
+    click element    ${BBD_popDropdown}
+    wait until page contains element    ${ZK_popDropdown_open}    30
+    ${quarterCount}    get matching xpath count    ${BBD_popDropdown_QuartersCount}
+    ${quarterNum}    evaluate    random.randint(1,${quarterCount})    random
+    ${quarter}    get text    ${BBD_popDropdown_Quarter_addNum}[${quarterNum}]
+    click element    ${BBD_popDropdown_Quarter_addNum}[${quarterNum}]
+    wait until page contains element    ${ZK_popDropdown_selectedItem}    30
+    click element    ${BBD_Button_View}
+    sleep    3S
+    wait until page does not contain    Processing...    600
+    wait until page contains element    ${ZK_selectedTab}    100
+    wait until element contains    ${ZK_selectedTab}    ${quarter}    100
+    #    click element    ${BBD_totalCell_first}
+    sleep    1S
+    page should not contain    error
+    Wait Until Page Does Not Contain    Processing...    600
+    wait until element is visible    ${BBD_Freeze_position}    100
+    click element    ${BBD_Freeze_position}
+    wait until page contains element    ${ZK_Button_FreezePanel}    30
+    wait until element is visible    ${ZK_Button_FreezePanel}    30
+    ${freezeStatus}    get element attribute    ${ZK_Button_FreezePanel}@class
+    ${freezeStatusFlag}    get lines containing string    ${freezeStatus}    opened z-menuitem
+    run keyword if    '${freezeStatusFlag}' == '${EMPTY}'    click element    ${ZK_Button_FreezePanel}
+    run keyword if    '${freezeStatusFlag}' == '${EMPTY}'    page should not contain    error
+    run keyword if    '${freezeStatusFlag}' == '${EMPTY}'    sleep    1S
+    run keyword if    '${freezeStatusFlag}' == '${EMPTY}'    Wait Until Page Does Not Contain    Processing...    600
+    ${freezeStatus}    run keyword if    '${freezeStatusFlag}' == '${EMPTY}'    get element attribute    ${ZK_Button_FreezePanel}@class
+    run keyword if    '${freezeStatusFlag}' == '${EMPTY}'    should contain    ${freezeStatus}    z-menuitem opened
+    wait until page contains element    ${ZK_selectedFreezeButton}    60
+    Download excel    ${ZK_Button_Excel}    BBD_quarterTab_${quarter}
+    wait until page does not contain element    ${ZK_Button_disabledInfo}
+    click element    ${ZK_Button_Info}
+    wait until page contains element    ${BBD_InfoNotesSection}    60
+    element should contain    ${BBD_InfoNotesSection}    Last Modified by
+    click element    ${ZK_Button_Info}
+    wait until page does not contain element    ${ZK_Button_disabledNotes}    30
+    click element    ${ZK_Button_Notes}
+    wait until page contains element    ${BBD_InfoNotesSection}    60
+    click element    ${ZK_Button_Notes}
+    wait until page does not contain element    ${ZK_Button_disabledOptions}    30
+    edit options    ${ZK_Button_Options}    Select Attribute/Grouped Columns to Display    ${quarter}    ${BBD_Options_verifyPoint}
+    ${Sales%Flag}    get element attribute    ${ZK_Button_Sales%}@disabled
+    run keyword if    '${Sales%Flag}' == 'disabled'    click element    ${ZK_Button_Retail$}
+    wait until page does not contain    Processing...    60
+    run keyword if    '${Sales%Flag}' == 'disabled'    wait until element is visible    ${ZK_Button_Retail$_selected}    100
+    #    run keyword if    '${Sales%Flag}' == 'disabled'    click element    ${ZK_Button_Retail$}
+    #    wait until page does not contain    Processing...    60
+    run keyword if    '${Sales%Flag}' == 'disabled'    element should contain    ${BBD_selectedButton_retail$Sales%}    Retail $
+    run keyword if    '${Sales%Flag}' != 'disabled'    click element    ${ZK_Button_Sales%}
+    wait until page does not contain    Processing...    60
+    run keyword if    '${Sales%Flag}' != 'disabled'    wait until element is visible    ${ZK_Button_Sales%_selected}    100
+    #    run keyword if    '${Sales%Flag}' != 'disabled'    click element    ${ZK_Button_Sales%}
+    #    wait until page does not contain    Processing...    60
+    run keyword if    '${Sales%Flag}' != 'disabled'    element should contain    ${BBD_selectedButton_retail$Sales%}    Sales %
+
+exitBBD
+    enter page by click    ${ZK_Button_Close}    ${mainPage}    BudgetBreakdownList

@@ -1,0 +1,107 @@
+*** Settings ***
+Library           String
+Resource          ../page/login.txt
+Library           Selenium2Library
+
+*** Variables ***
+${prod_URL}       http://10.125.2.189
+${user}           superlisa
+${password}       wuhan02
+${stage_URL}      https://10.125.2.172
+${prod_download_dir}    D:\\Robot\\Allocation_SanityCheck\\prod_download
+${browser_type}    firefox
+${browser_profile_1}    C:\\Users\\pc\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\8hl9l980.default
+@{stylebank_criteria}    Year/2015,2016    Bus Verti/ACTIVE LIFESTYLE,CYCLING,GOLF
+${users_setting}    d:\\Robot\\Allocation\\Setting\\comparison setting.xlsx
+${AssortmentMix_setting_tab}    AssortmentMix setting
+${AssortmentMix_criteria_colNumber}    1
+${stylebank_setting_tab}    StyleBank setting
+${stylebank_criteria_colNumber}    5
+${companyprofile_setting_tab}    CompanyProfile setting
+${diff_dir}       d:\\Robot\\Allocation\\diff
+${selenium_speed}    0.1
+${BrandProfile_setting_tab}    BrandProfile setting
+${BrandProfile_criteria_colNumber}    1
+${max_scrollPage_num}    1000
+@{AM_Criteria}    Brand/ONLY    Style Year/2016    Style Season/SUMMER    Grand Category/ACC    Category/ACC,BAG    Order City/10002
+@{DT_Criteria}    Brand/ONLY    Style Year/2016    Style Season/SUMMER
+${DT_dataType}    PO
+${DT_fromDate}    03/25/2016
+${DT_toDate}      04/13/2016
+${DT_taskType}    Post-Allocation
+${DT_screenType}    Summary
+${DT_statusType}    All Transactions
+${DT_timeType}    Shop Date    # In DC Date
+${RB_reportId}    3204
+${RB_fromDate}    03/25/2016
+${RB_toDate}      04/13/2016
+@{RB_Criteria}    Style Year/2016    Style Season/SUMMER
+${Upload_type}    Box Group & Box
+${Upload_fileLocation}    D:\\Robot\\Allocation_perf\\upload\\BOX-CD-10004.xlsx
+${Upload_fileType}    Uncompressed    # Compressed
+${DT_orderCity}    10002
+${AM_ColorCode}    010,020
+${AM_topDoors}    5
+${AM_door#}       1109
+${OBD_taskType}    PO
+${OBD_toDate}     04/13/2016
+${OBD_fromDate}    03/25/2016
+@{OBD_Criteria}    Brand/ONLY    Style Year/2016    Style Season/SUMMER
+${OBD_timeType}    In DC Date
+${BBD_CreatePlan_Name}    sanityCheck
+@{BBD_CreatePlan_Criteria}    Brand/ONLY    Order City/10002
+${AM_Style#}      ${EMPTY}
+${screenWidth}    1800
+${screenHeight}    790
+@{PlanningLevels_attri}    Grand Category    Category    Year    Season
+@{FileUploads_type}    Security    POS Inventory Correction
+@{CP_setting}     Set Planning Attributes    Set Planning Seasons
+@{FileExtract_Criteria}    Brand/ONLY    Style Year/2016    Style Season/SUMMER    Grand Category/ACC    Category/ACC,BAG    Order City/10002
+${FileExtract_toDate}    03/25/2016
+${FileExtract_fromDate}    04/13/2016
+@{BP_Reserve%_Style#ColorCode}    112101    010
+${StyleBank_style#}    112101
+@{StyleBank_downloadCriteria}    Brand/ONLY    Years/2016    Seasons/Summer,Winter
+@{Transfer_Criteria}    Brand/ONLY    Style Year/2016    Style Season/AUTUMN    Grand Category/ACC,BLAZER
+${Transfer_orderCity}    10048
+
+*** Keywords ***
+EnvironmentInit
+    [Arguments]    ${URL}
+    Open Browser    ${URL}    ${browser}    ff_profile_dir=${browser_profile}
+    Maximize Browser Window
+
+Logout Close Browser
+    [Arguments]    ${browser}
+    Switch Browser    ${browser}
+    Click Element    Xpath=//a[@class='logout']
+    Close Browser
+
+EnvironmentInit and Login
+    [Arguments]    ${URL}    ${userName}    ${browser_profile}
+    ${browser}    Open Browser    ${URL}    ${browser_type}    \    \    ${EMPTY}
+    ...    ${browser_profile}
+    Maximize Browser Window
+    Set Selenium Timeout    30
+    wait until page contains element    id=login1    100
+    Input Text    id=login1    ${userName}
+    Input Password    id=password    ${password}
+    #    ${map_status}    get element attribute    ${login_editable_form}@action
+    #    log    ${login_map_uncheck_action}
+    #    run keyword if    '${map_status}' == '${login_map_uncheck_action}'    Click Element    ${login_map}
+    Click Element    Xpath=//input[@class='sb']
+    Sleep    3S
+    ${message}    Get Text    Xpath=//body
+    ${line}    Get Lines Containing String    ${message}    Warning
+    ${count}    Get Line Count    ${line}
+    Run Keyword If    ${count}>0    Click Element    Xpath=//input[@name='answeryes']
+    Page Should Contain    Welcome    30
+    [Return]    ${browser}
+
+Wait Until Page End
+    [Arguments]    @{main_windowhandle}
+    : FOR    ${count}    IN RANGE    10000
+    \    @{windowhandles}    Get Window Handles
+    \    Run Keyword If    @{windowhandles} == @{main_windowhandle}    Exit For Loop
+    \    Sleep    5s
+    \    Run Keyword If    ${count} ==10000    Log    exceed time!

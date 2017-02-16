@@ -1,0 +1,13 @@
+*** Variables ***
+${customerDirectory_link_next_count}    //a[contains(text(),'next')]
+${customerDirectory_link_next}    Xpath=//a[contains(text(),'next')]
+${customerDirectory_link_last_count}    //a[contains(text(),'last')]
+${customerDirectory_link_last}    Xpath=//a[contains(text(),'last')]
+${customerDirectory_retailer_count}    //table[@class='table1']
+${customerDirectory_retailer_checkBox_rowPlaceHold}    Xpath=//table[@class='table1'][row]//th[1]/input
+${customerDirectory_retailer_info_rowPlaceHold}    Xpath=//table[@class='table1'][row]//th[2]/a
+${customerDirectory_retailer_profile_rowPlaceHold}    Xpath=//table[@class='table1'][row]//th[3]/a
+${customerDirectory_retailer_shipping_rowPlaceHold}    Xpath=//table[@class='table1'][row]//th[4]/a
+${customerDirectory_retailer_account_rowPlaceHold}    Xpath=//table[@class='table1'][row]//th[5]/a
+${customerDirectory_retailer_contact_count}    //table[@class='table1'][row]/tbody/tr
+${customerDirectory_retailer_contact_rowAndnumPlaceHold}    Xpath=//table[@class='table1'][row]/tbody/tr[num]//a

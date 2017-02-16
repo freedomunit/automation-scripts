@@ -1,0 +1,4 @@
+*** Variables ***
+${PlanningLevels_Dropdown_planType}    Xpath=//select[@id='select_plantype']
+${PlanningLevels_Button_topSubmit}    Xpath=//input[@name='save' and @type='submit'][1]
+${PlanningLevels_Dropdown_attributes_numPH}    Xpath=//th[text()='Product Attributes']/parent::tr/following-sibling::tr[num]//select

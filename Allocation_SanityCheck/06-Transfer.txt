@@ -1,0 +1,496 @@
+*** Settings ***
+Force Tags        SC-TR
+Resource          page/DailyTasks.txt
+Resource          page/ZK.txt
+Resource          Setting/environment.txt
+Resource          Setting/performancekeyword.txt
+
+*** Test Cases ***
+selectTransferCriteria
+    enterCertainModel    Daily Tasks    ${mainPage}    DailyTask
+    select from list by label    ${DailyTasks_criteria_Dropdown_TaskType}    Transfer
+    list selection should be    ${DailyTasks_criteria_Dropdown_TaskType}    Transfer
+    select from list by label    ${DailyTasks_criteria_Dropdown_OrderCity}    ${Transfer_orderCity}
+    list selection should be    ${DailyTasks_criteria_Dropdown_OrderCity}    ${Transfer_orderCity}
+    ${removeFilter_count}    get matching xpath count    ${DailyTasks_criteria_removeFilter_count}
+    run keyword if    ${removeFilter_count}>1    removeFilters    ${DailyTasks_criteria_Button_removeFilter_rowPlaceHold}    ${removeFilter_count}    ${DailyTasks_criteria_Dropdown_filterHierarchy1}
+    run keyword if    ${removeFilter_count}==1    Select From List by index    ${DailyTasks_criteria_Dropdown_filterHierarchy1}    0
+    run keyword if    '@{Transfer_Criteria}[0]' != '${EMPTY}'    selectCustomCriteria    ${DailyTasks_criteria_Dropdown_filterHierarchy1}    ${DailyTasks_criteria_Option_filterHierarachy1}    ${DailyTasks_criteria_Options_filterHierarachy1}    ${DailyTasks_criteria_filterHierarachy1_optionCount}
+    ...    Xpath=${DailyTasks_criteria_filterHierarachy1_rowCount}//input[@title='Add Filter']    ${DailyTasks_criteria_filterHierarachy1_rowCount}    @{Transfer_Criteria}
+    enterPageByClick    ${DailyTasks_criteria_top_submit}    ${DailyTasks_tab_selected}    Style Color List
+
+editStyleColorListTab
+    ${freezedPosition}    execute javascript    return $(".zstopblock").children("div:eq(1)").children("div:visible:contains('Style #')").index()+1
+    wait until element is visible    Xpath=//div[@class='zsblock']/div[3]/div[${freezedPosition}]    30
+    Wait Until Page Does Not Contain    Processing...    600
+    click element    Xpath=//div[@class='zsblock']/div[3]/div[${freezedPosition}]    #    ${DailyTasks_Transfer_Title_Style#}
+    sleep    1S
+    Wait Until Page Does Not Contain    Processing...    600
+    wait until page contains element    ${ZK_Button_FreezePanel}    30
+    wait until element is visible    ${ZK_Button_FreezePanel}    30
+    click element    ${DailyTasks_Button_FreezePanel}
+    page should not contain    error
+    Wait Until Page Does Not Contain    Processing...    600
+    ${freezeStatus}    get element attribute    ${ZK_Button_FreezePanel}@class
+    should contain    ${freezeStatus}    z-menuitem opened
+    wait until page contains element    ${ZK_selectedFreezeButton}    60
+    Download Excel    ${DailyTasks_Button_Excel}    Transfer_StyleColorList
+    wait until page does not contain element    ${ZK_Button_disabledInfo}
+    Wait Until Page Does Not Contain    Processing...    600
+    click element    ${ZK_Button_Info}
+    wait until element is visible    ${ZK_InfoNotesSection}    30
+    element should contain    ${ZK_InfoNotesSection}    Last Modified by
+    click element    ${ZK_Button_Info}
+    wait until page does not contain element    ${ZK_Button_disabledNotes}    30
+    Wait Until Page Does Not Contain    Processing...    600
+    click element    ${ZK_Button_Notes}
+    wait until element is visible    ${ZK_InfoNotesSection}    30
+    click element    ${ZK_Button_Notes}
+    wait until page does not contain element    ${ZK_Button_disabledOptions}    30
+    Wait Until Page Does Not Contain    Processing...    600
+    edit options    ${ZK_Button_Options}    Select Columns to Display    Style Color List    ${ZK_Options_title}
+    wait until page does not contain element    ${ZK_Button_disabledViewCriteria}    30
+    Wait Until Page Does Not Contain    Processing...    600
+    editDTViewCriteria    ${ZK_Button_ViewCriteria}    Order City:    Style Color List    Xpath=//div[@class='z-vlayout-inner']/div[@class='z-div']//table//tr[2]    Transfer
+    wait until page does not contain element    ${ZK_Button_disabledPopulate}    60
+    Wait Until Page Does Not Contain    Processing...    600
+    click element    ${ZK_Button_Populate}
+    Wait Until Page Contains element    ${DailyTasks_transfer_Panel_populate}    60
+    wait until element is visible    ${DailyTasks_popPanel_BtnCancel}    30
+    Wait Until Page Does Not Contain    Processing...    600
+    click element    ${DailyTasks_popPanel_BtnCancel}
+    Wait Until Page Contains element    ${ZK_Button_Job}    600
+    wait until page does not contain element    ${ZK_Button_disabledJob}    60
+    Wait Until Page Does Not Contain    Processing...    600
+    click element    ${ZK_Button_Job}
+    #    run keyword and continue on failure    click element    ${ZK_Button_Job}
+    Wait Until Page Contains element    ${DailyTasks_Panel_createJob}    60
+    wait until element is visible    ${DailyTasks_popPanel_BtnCancel}    30
+    Wait Until Page Does Not Contain    Processing...    600
+    click element    ${DailyTasks_popPanel_BtnCancel}
+    Wait Until Page Contains element    ${ZK_Button_CancelJob}    600
+    wait until page does not contain element    ${ZK_Button_disabledCancelJob}    60
+    Wait Until Page Does Not Contain    Processing...    600
+    click element    ${ZK_Button_CancelJob}
+    Wait Until Page Contains element    ${DailyTasks_Panel_cancelJob}    60
+    wait until element is visible    ${DailyTasks_popPanel_BtnCancel}    30
+    Wait Until Page Does Not Contain    Processing...    600
+    click element    ${DailyTasks_popPanel_BtnCancel}
+    Wait Until element is visible    ${ZK_Button_AddStyles}    60
+    wait until page does not contain element    ${ZK_Button_disabledAddStyles}    60
+    Wait Until Page Does Not Contain    Processing...    600
+    enterPageByClick    ${ZK_Button_AddStyles}    ${ZK_selectedTab}    Add Style
+    ${checkboxCount}    get matching xpath count    ${DailyTasks_Transfer_addStyles_checkbox_count}
+    ${checkedboxCount}    get matching xpath count    ${DailyTasks_Transfer_addStyles_checkedbox_count}
+    : FOR    ${item}    IN RANGE    0    ${checkboxCount}
+    \    exit for loop if    ${item} >= 5
+    \    ${num}    run keyword if    ${item} == 0    evaluate    random.randint(0,${checkboxCount}-1)    random
+    \    ...    ELSE    evaluate    random.randint(0,${checkboxCount_new}-1)    random
+    \    ${checkbox_row}    execute javascript    var row = $(".zsblock").children("div:contains('☐'):eq(${num})").index(); return row+1;
+    \    ${checkbox_path}    replace string    ${DailyTasks_Transfer_addStyles_checkbox_rowPH}    [row]    [${checkbox_row}]
+    \    ${scrollPosition}    Get Vertical Position    ${checkbox_path}
+    \    ${scrollPosition}    evaluate    ${scrollPosition}-790
+    \    execute javascript    $(".zsscroll").scrollTop(${scrollPosition})
+    \    click element    ${checkbox_path}
+    \    sleep    2S
+    \    ${checkedboxCount_new}    get matching xpath count    ${DailyTasks_Transfer_addStyles_checkedbox_count}
+    \    run keyword if    ${checkedboxCount_new} == ${checkedboxCount}    click element    ${checkbox_path}
+    \    sleep    2S
+    \    page should not contain    error
+    \    run keyword and continue on failure    run keyword if    ${checkedboxCount} >= ${checkedboxCount_new}    fail    Check Style Fail in add styles page!
+    \    ${checkedboxCount}    run keyword if    ${checkedboxCount_new} > ${checkedboxCount}    set variable    ${checkedboxCount_new}
+    \    ...    ELSE    set variable    ${checkedboxCount}
+    \    ${checkboxCount_new}    get matching xpath count    ${DailyTasks_Transfer_addStyles_checkbox_count}
+    ${num}    evaluate    random.randint(0,${checkedboxCount}-1)    random
+    ${checkedbox_row}    execute javascript    var row = $(".zsblock").children("div:contains('☑'):eq(${num})").index(); return row+1;
+    ${checkedbox_path}    replace string    ${DailyTasks_Transfer_addStyles_checkedbox_rowPH}    [row]    [${checkedbox_row}]
+    ${scrollPosition}    Get Vertical Position    ${checkedbox_path}
+    ${scrollPosition}    evaluate    ${scrollPosition}-10
+    run keyword if    ${checkedbox_row} != ${checkbox_row}    execute javascript    $(".zsscroll").scrollTop(${scrollPosition})
+    run keyword if    ${checkedbox_row} != ${checkbox_row}    click element    ${checkedbox_path}
+    ...    ELSE    click element    Xpath=//div[@class='zsselecti']
+    sleep    2S
+    ${checkboxCount}    get matching xpath count    ${DailyTasks_Transfer_addStyles_checkbox_count}
+    run keyword if    ${checkboxCount_new} == ${checkboxCount}    click element    ${checkbox_path}
+    sleep    1S
+    page should not contain    error
+    run keyword and continue on failure    run keyword if    ${checkboxCount_new} >= ${checkboxCount}    fail    Uncheck Style Fail in add styles page!
+    click element    ${ZK_Button_Close}
+    wait until element is visible    ${ZK_popPanel_button_NO}    30
+    enter page by click    ${ZK_popPanel_button_NO}    ${ZK_selectedTab}    Style Color List
+    Wait Until Page Does Not Contain    Processing...    600
+    #    ${editCount}    get matching xpath count    ${DailyTasks_Button_EditCount}
+    #    ${editBtnRowList}    execute javascript    ${DailyTasks_Transfer_Button_validEdit_rowList_jquery}
+    #    @{editBtnRowList}    split string    ${editBtnRowList}    ,
+    #    ${editBtnRowCount}    get length    ${editBtnRowList}
+    #    ${row}    run keyword if    ${editBtnRowCount} > 0    evaluate    random.randint(0,${editBtnRowCount}-1)    random
+    #    @{rowInfo}    split string    @{editBtnRowList}[${row}]    /
+    #    ${scrollPosition}    evaluate    @{rowInfo}[1]-790
+    #    execute javascript    $(".zsscroll").scrollTop(${scrollPosition})
+    #    sleep    3S
+    #    Wait Until Page Does Not Contain    Processing...    600
+    #    #    click element    ${ZK_Title_Style#}
+    #    #    run keyword if    ${scrollPosition}>790    click element    ${ZK_Title_Style#}
+    #    ${DailyTasks_Button_freezedEdit}    replace string    ${DailyTasks_Button_freezedEdit_rowPH}    [row]    [@{rowInfo}[0]]
+    #    click element    ${DailyTasks_Button_freezedEdit}
+    #    enterPageByClick    ${DailyTasks_Button_freezedEdit}    ${DailyTasks_tab_selected}    Review by Style Color
+
+editReviewByStyleColorTab
+    @{status_blank_btn}    execute javascript    ${DailyTasks_Status_Blank_jquery}
+    @{status_RFE_btn}    run keyword if    @{status_blank_btn} == @{EMPTY}    execute javascript    ${DailyTasks_Status_RFE_jquery}
+    ${row}    run keyword if    @{status_RFE_btn} == @{EMPTY}    evaluate    random.randint(0,len(@{status_blank_btn})-1)    random
+    ...    ELSE    evaluate    random.randint(0,len(@{status_RFE_btn})-1)    random
+    @{btnInfo}    run keyword if    @{status_RFE_btn} == @{EMPTY}    split string    @{status_blank_btn}[${row}]    /
+    ...    ELSE    split string    @{status_RFE_btn}[${row}]    /
+    ${scrollPosition}    evaluate    @{btnInfo}[1]-400
+    run keyword if    @{btnInfo}[1] >${screenHeight}    execute javascript    $(".zsscroll").scrollTop(${scrollPosition})
+    ${Transfer_Button_freezedEdit}    replace string    ${DailyTasks_Button_freezedEdit_rowPH}    [row]    [@{btnInfo}[0]]
+    wait until page contains element    ${Transfer_Button_freezedEdit}    60
+    Wait Until Page Does Not Contain    Processing...    600
+    #    click element    ${Transfer_Button_freezedEdit}
+    click element    Xpath=//div[@class='zsleftblock']/div[3]/div[1]
+    enterPageByClick    ${Transfer_Button_freezedEdit}    ${DailyTasks_tab_selected}    Review by Style Color
+    ${freezedPosition}    execute javascript    ${DailyTasks_Transfer_ReviewByStyleColor_freezedPosition_jqery}
+    click element    Xpath=//div[@class='zsblock']/div[3]/div[${freezedPosition}]
+    wait until page contains element    ${ZK_Button_FreezePanel}    30
+    wait until element is visible    ${ZK_Button_FreezePanel}    30
+    Wait Until Page Does Not Contain    Processing...    600
+    click element    ${DailyTasks_Button_FreezePanel}
+    page should not contain    error
+    Wait Until Page Does Not Contain    Processing...    600
+    ${freezeStatus}    get element attribute    ${ZK_Button_FreezePanel}@class
+    should contain    ${freezeStatus}    z-menuitem opened
+    wait until page contains element    ${ZK_selectedFreezeButton}    60
+    Download Excel    ${DailyTasks_Button_Excel}    Transfer_ReviewByStyleColor
+    wait until page does not contain element    ${ZK_Button_disabledInfo}
+    Wait Until Page Does Not Contain    Processing...    600
+    click element    ${ZK_Button_Info}
+    wait until element is visible    ${ZK_InfoNotesSection}    30
+    element should contain    ${ZK_InfoNotesSection}    Last Modified by
+    click element    ${ZK_Button_Info}
+    wait until page does not contain element    ${ZK_Button_disabledNotes}    30
+    Wait Until Page Does Not Contain    Processing...    600
+    click element    ${ZK_Button_Notes}
+    wait until element is visible    ${ZK_InfoNotesSection}    30
+    click element    ${ZK_Button_Notes}
+    wait until page does not contain element    ${ZK_Button_disabledOptions}    30
+    Wait Until Page Does Not Contain    Processing...    600
+    edit options    ${ZK_Button_Options}    Select Columns to Display    Review by Style Color    ${ZK_Options_title}
+    wait until page does not contain element    ${ZK_Button_disabledViewCriteria}    30
+    Wait Until Page Does Not Contain    Processing...    600
+    editDTViewCriteria    ${ZK_Button_ViewCriteria}    Order City:    Review by Style Color    Xpath=//div[@class='z-vlayout-inner']/div[@class='z-div']//table//tr[2]    Transfer
+    wait until page does not contain element    ${ZK_Button_disabledPopulate}    60
+    Wait Until Page Does Not Contain    Processing...    600
+    click element    ${ZK_Button_Populate}
+    Wait Until Page Contains element    ${DailyTasks_transfer_Panel_populate}    60
+    wait until element is visible    ${DailyTasks_popPanel_BtnCancel}    30
+    Wait Until Page Does Not Contain    Processing...    600
+    click element    ${DailyTasks_popPanel_BtnCancel}
+    Wait Until Page Contains element    ${DailyTasks_Button_DoorFilter}    600
+    Wait Until Page does not Contain element    ${DailyTasks_Button_disabledDoorFilter}    30
+    Wait Until Page Does Not Contain    Processing...    600
+    enterPageByClick    ${DailyTasks_Button_DoorFilter}    ${DailyTasks_filterDoor_verifyPoint}    Top Doors:
+    ${checkeddoorCount}    get matching xpath count    ${ZK_checkedBox_rowCount}
+    input text    ${DailyTasks_DoorFilter_text_topDoors}    ${AM_topDoors}
+    click element    ${DailyTasks_popPanel_BtnSubmit}
+    sleep    3S
+    Wait Until Page Does Not Contain    Processing...    600
+    page should not contain    error
+    ${checkeddoorCount_new}    get matching xpath count    ${ZK_checkedBox_rowCount}
+    run keyword and continue on failure    run keyword if    '${checkeddoorCount_new}' != '${AM_topDoors}'    Fail    Input # Top Doors Fail !
+    click element    ${DailyTasks_DoorFilter_button_reset}
+    sleep    3S
+    Wait Until Page Does Not Contain    Processing...    600
+    page should not contain    error
+    ${checkeddoorCount_new}    get matching xpath count    ${ZK_checkedBox_rowCount}
+    run keyword and continue on failure    run keyword if    '${checkeddoorCount_new}' != '${checkeddoorCount}'    Fail    Reset Fail !
+    ${selectedOption}    RandomSelectOptionOnDropdown    ${DailyTasks_popPanel_dropdown}
+    click element    ${DailyTasks_popPanel_BtnSubmit}
+    sleep    3S
+    Wait Until Page Does Not Contain    Processing...    600
+    page should not contain    error
+    #    @{checkedCluster}    execute javascript    ${ZK_checkedBox_title_jquery}
+    #    @{allCluster}    execute javascript    ${ZK_checkBox_title_jquery}
+    #    run keyword and continue on failure    run keyword if    '${selectedOption}' == 'ALL' and '${checkedCluster}' != '${allCluster}'    Fail    Filter Cluster Fail !
+    #    run keyword and continue on failure    run keyword if    '${selectedOption}' != 'ALL' and '@{checkedCluster}' != '${selectedOption}'    Fail    Filter Cluster Fail !
+    enter page by click    ${ZK_Button_Close}    ${DailyTasks_tab_selected}    Review by Style Color
+    Wait Until element is visible    ${ZK_Button_Filter}    60
+    click element    ${ZK_Button_Filter}
+    wait until page contains element    ${DailyTasks_popPanel_filterReviewByStyleColor}    30
+    wait until element is visible    ${DailyTasks_ReviewByStyleColor_filterPanel_dropdown}    30
+    RandomSelectOptionOnDropdown    ${DailyTasks_ReviewByStyleColor_filterPanel_dropdown}
+    click element    ${DailyTasks_popPanel_BtnFilter}
+    sleep    3S
+    Wait Until Page Does Not Contain    Processing...    600
+    wait until element is not visible    ${DailyTasks_popPanel_BtnFilter}    30
+
+editReviewByDoorTab
+    @{DC/Store}    execute javascript    ${DailyTasks_Transfer_ReviewByStyleColor_DC/Store_jqery}
+    ${num}    evaluate    random.randint(0,len(@{DC/Store})-1)    random
+    @{DC/StoreInfo}    split string    @{DC/Store}[${num}]    /
+    ${scrollPosition}    evaluate    @{DC/StoreInfo}[1]-400
+    run keyword if    @{DC/StoreInfo}[1] >${screenHeight}    execute javascript    $(".zsscroll").scrollTop(${scrollPosition})
+    ${review_DC/Store}    replace string    ${DailyTasks_Transfer_ReviewByStyleColor_freezedDC/Store_rowPH}    [row]    [@{DC/StoreInfo}[0]]
+    wait until page contains element    ${review_DC/Store}    60
+    Wait Until Page Does Not Contain    Processing...    600
+    enterPageByClick    ${review_DC/Store}    ${DailyTasks_tab_selected}    Review by Door
+    ${freezedPosition}    execute javascript    ${DailyTasks_Transfer_ReviewByStyleColor_freezedPosition_jqery}
+    click element    Xpath=//div[@class='zsblock']/div[3]/div[${freezedPosition}]
+    wait until page contains element    ${ZK_Button_FreezePanel}    30
+    wait until element is visible    ${ZK_Button_FreezePanel}    30
+    Wait Until Page Does Not Contain    Processing...    600
+    click element    ${DailyTasks_Button_FreezePanel}
+    page should not contain    error
+    Wait Until Page Does Not Contain    Processing...    600
+    ${freezeStatus}    get element attribute    ${ZK_Button_FreezePanel}@class
+    should contain    ${freezeStatus}    z-menuitem opened
+    wait until page contains element    ${ZK_selectedFreezeButton}    60
+    Download Excel    ${DailyTasks_Button_Excel}    Transfer_ReviewByDoor
+    wait until page does not contain element    ${ZK_Button_disabledInfo}
+    Wait Until Page Does Not Contain    Processing...    600
+    click element    ${ZK_Button_Info}
+    wait until element is visible    ${ZK_InfoNotesSection}    30
+    element should contain    ${ZK_InfoNotesSection}    Last Modified by
+    click element    ${ZK_Button_Info}
+    wait until page does not contain element    ${ZK_Button_disabledNotes}    30
+    Wait Until Page Does Not Contain    Processing...    600
+    click element    ${ZK_Button_Notes}
+    wait until element is visible    ${ZK_InfoNotesSection}    30
+    click element    ${ZK_Button_Notes}
+    wait until page does not contain element    ${ZK_Button_disabledOptions}    30
+    Wait Until Page Does Not Contain    Processing...    600
+    edit options    ${ZK_Button_Options}    Select Columns to Display    Review by Door    ${ZK_Options_title}
+    wait until page does not contain element    ${ZK_Button_disabledViewCriteria}    30
+    Wait Until Page Does Not Contain    Processing...    600
+    editDTViewCriteria    ${ZK_Button_ViewCriteria}    Order City:    Review by Door    Xpath=//div[@class='z-vlayout-inner']/div[@class='z-div']//table//tr[2]    Transfer
+    Wait Until Page Does Not Contain    Processing...    600
+    enter page by click    ${ZK_Button_Close}    ${DailyTasks_tab_selected}    Review by Style Color
+
+editDetailbyStyleColorSizeTab_Blank
+    enterPageByClick    Xpath=${DailyTasks_tabsCount}//div[text() ='Style Color List']    ${DailyTasks_tab_selected}    Style Color List
+    @{status_blank_btn}    execute javascript    ${DailyTasks_Status_Blank_jquery}
+    return from keyword if    @{status_blank_btn} == @{EMPTY}
+    ${row}    evaluate    random.randint(0,len(@{status_blank_btn})-1)    random
+    @{rowInfo}    split string    @{status_blank_btn}[${row}]    /
+    ${scrollPosition}    evaluate    @{rowInfo}[1]-400
+    run keyword if    @{rowInfo}[1] >${screenHeight}    execute javascript    $(".zsscroll").scrollTop(${scrollPosition})
+    Wait Until Page Does Not Contain    Processing...    600
+    ${DailyTasks_Button_Edit}    replace string    ${DailyTasks_Button_Edit_rowPH}    [row]    [@{rowInfo}[0]]
+    click element    Xpath=//div[@class='zsblock']/div[3]/div[1]
+    enterPageByClick    ${DailyTasks_Button_Edit}    ${DailyTasks_tab_selected}    Review by Style Color
+    enterPageByClick    Xpath=${DailyTasks_tabsCount}//div[text() ='Detail by Style Color Size']    ${DailyTasks_tab_selected}    Detail by Style Color Size
+    ${freezeCell_col}    execute javascript    return $(".zstopblock").find("div div:contains('Style #')").index()+2
+    wait until element is visible    Xpath=//div[@class='zsblock']/div[4]/div[${freezeCell_col}]    30
+    click element    Xpath=//div[@class='zsblock']/div[4]/div[${freezeCell_col}]
+    sleep    3S
+    run keyword and continue on failure    click element    Xpath=//div[@class='zsblock']/div[4]/div[${freezeCell_col}]
+    Wait Until Page Does Not Contain    Processing...    600
+    wait until page contains element    ${ZK_Button_FreezePanel}    30
+    wait until element is visible    ${ZK_Button_FreezePanel}    30
+    click element    ${DailyTasks_Button_FreezePanel}
+    page should not contain    error
+    Wait Until Page Does Not Contain    Processing...    600
+    ${freezeStatus}    get element attribute    ${ZK_Button_FreezePanel}@class
+    should contain    ${freezeStatus}    z-menuitem opened
+    wait until page contains element    ${ZK_selectedFreezeButton}    60
+    Download Excel    ${DailyTasks_Button_Excel}    Transfer_DetailByStyleColorSize_Blank
+    wait until page does not contain element    ${ZK_Button_disabledInfo}
+    click element    ${ZK_Button_Info}
+    wait until element is visible    ${ZK_InfoNotesSection}    30
+    element should contain    ${ZK_InfoNotesSection}    Last Modified by
+    click element    ${ZK_Button_Info}
+    wait until page does not contain element    ${ZK_Button_disabledNotes}    30
+    click element    ${ZK_Button_Notes}
+    wait until element is visible    ${ZK_InfoNotesSection}    30
+    click element    ${ZK_Button_Notes}
+    wait until page does not contain element    ${ZK_Button_disabledOptions}    30
+    edit options    ${ZK_Button_Options}    Select Columns to Display    Detail by Style Color Size    ${ZK_Options_title}
+    wait until page does not contain element    ${ZK_Button_disabledViewCriteria}    30
+    editDTViewCriteria    ${ZK_Button_ViewCriteria}    Order City:    Detail by Style Color Size    Xpath=//div[@class='z-vlayout-inner']/div[@class='z-div']//table//tr[2]    Transfer
+    wait until page contains element    ${ZK_Button_Populate}    600
+    wait until page does not contain element    ${ZK_Button_disabledPopulate}    60
+    Wait Until Page Does Not Contain    Processing...    600
+    click element    ${ZK_Button_Populate}
+    Wait Until Page Contains element    ${DailyTasks_transfer_Panel_populate}    120
+    wait until element is visible    ${DailyTasks_popPanel_BtnCancel}    30
+    Wait Until Page Does Not Contain    Processing...    600
+    click element    ${DailyTasks_popPanel_BtnCancel}
+    wait until page contains element    ${ZK_Button_Job}    600
+    wait until page does not contain element    ${ZK_Button_disabledJob}    60
+    Wait Until Page Does Not Contain    Processing...    600
+    click element    ${ZK_Button_Job}
+    Wait Until Page Contains element    ${DailyTasks_Panel_createJob}    120
+    wait until element is visible    ${DailyTasks_popPanel_BtnCancel}    30
+    Wait Until Page Does Not Contain    Processing...    600
+    click element    ${DailyTasks_popPanel_BtnCancel}
+    Wait Until Page Contains element    ${DailyTasks_Button_DoorFilter}    600
+    wait until page does not contain element    ${DailyTasks_Button_disabledDoorFilter}    30
+    Wait Until Page Does Not Contain    Processing...    600
+    enterPageByClick    ${DailyTasks_Button_DoorFilter}    ${DailyTasks_filterDoor_verifyPoint}    Top Doors:
+    ${checkeddoorCount}    get matching xpath count    ${ZK_checkedBox_rowCount}
+    input text    ${DailyTasks_DoorFilter_text_topDoors}    ${AM_topDoors}
+    click element    ${DailyTasks_popPanel_BtnSubmit}
+    sleep    3S
+    Wait Until Page Does Not Contain    Processing...    600
+    page should not contain    error
+    ${checkeddoorCount_new}    get matching xpath count    ${ZK_checkedBox_rowCount}
+    run keyword and continue on failure    run keyword if    '${checkeddoorCount_new}' != '${AM_topDoors}'    Fail    Input # Top Doors Fail !
+    click element    ${DailyTasks_DoorFilter_button_reset}
+    sleep    3S
+    Wait Until Page Does Not Contain    Processing...    600
+    page should not contain    error
+    ${checkeddoorCount_new}    get matching xpath count    ${ZK_checkedBox_rowCount}
+    run keyword and continue on failure    run keyword if    '${checkeddoorCount_new}' != '${checkeddoorCount}'    Fail    Reset Fail !
+    ${selectedOption}    RandomSelectOptionOnDropdown    ${DailyTasks_popPanel_dropdown}
+    click element    ${DailyTasks_popPanel_BtnSubmit}
+    sleep    3S
+    Wait Until Page Does Not Contain    Processing...    600
+    page should not contain    error
+    #    @{checkedCluster}    execute javascript    ${ZK_checkedBox_title_jquery}
+    #    @{allCluster}    execute javascript    ${ZK_checkBox_title_jquery}
+    #    run keyword and continue on failure    run keyword if    '${selectedOption}' == 'ALL' and '${checkedCluster}' != '${allCluster}'    Fail    Filter Cluster Fail !
+    #    run keyword and continue on failure    run keyword if    '${selectedOption}' != 'ALL' and '@{checkedCluster}' != '${selectedOption}'    Fail    Filter Cluster Fail !
+    enter page by click    ${ZK_Button_Close}    ${DailyTasks_tab_selected}    Detail by Style Color Size
+    Wait Until element is visible    ${ZK_Button_Filter}    60
+    click element    ${ZK_Button_Filter}
+    wait until page contains element    ${DailyTasks_popPanel_filter}    30
+    wait until element is visible    ${DailyTasks_filterPanel_dropdown_filter}    30
+    RandomSelectOptionOnDropdown    ${DailyTasks_filterPanel_dropdown_filter}
+    @{DC/Store}    get list items    ${DailyTasks_filterPanel_dropdown_DC/Store}
+    ${DC/Store_count}    get length    ${DC/Store}
+    run keyword if    ${DC/Store_count}>0    RandomSelectOptionOnDropdown    ${DailyTasks_filterPanel_dropdown_DC/Store}
+    click element    ${DailyTasks_popPanel_BtnFilter}
+    sleep    3S
+    Wait Until Page Does Not Contain    Processing...    600
+    wait until element is not visible    ${DailyTasks_popPanel_BtnFilter}    30
+    @{+storeBtn}    execute javascript    ${DailyTasks_Transfer_Button_+Store_rowList_jquery}
+    ${rowNum}    evaluate    random.randint(0,len(@{+storeBtn})-1)    random
+    ${+storeBtn_path}    replace string    ${DailyTasks_Transfer_Button_FreezeLeft+Stores_rowPH}    [row]    [@{+storeBtn}[${rowNum}]]
+    enter page by click    ${+storeBtn_path}    ${DailyTasks_Transfer_+Store_title}    Transfer from
+    wait until element is visible    ${DailyTasks_Transfer_+Store_dropdown_transferFrom}    30
+    @{fromDoors}    execute javascript    ${DailyTasks_Transfer_+Store_transferFromDoor_jquery}
+    ${fromDoors_count}    get length    ${fromDoors}
+    run keyword and continue on failure    run keyword if    ${fromDoors_count} == 0    Fail    There are NO Valid Transfer from Door !
+    run keyword if    ${fromDoors_count} == 0    enter page by click    ${ZK_Button_Close}    ${DailyTasks_tab_selected}    Detail by Style Color Size
+    Pass Execution If    ${fromDoors_count} == 0    There are NO Transfer from Door !
+    ${fromNum}    evaluate    random.randint(0,len(@{fromDoors})-1)    random
+    @{fromDoorInfo}    split string    @{fromDoors}[${fromNum}]    ;/
+    #    click element    ${DailyTasks_Transfer_+Store_dropdown_transferFrom}
+    #    wait until element is visible    ${DailyTasks_Transfer_+Store_dropdown_transferFrom}/option    30
+    select from list by index    ${DailyTasks_Transfer_+Store_dropdown_transferFrom}    @{fromDoorInfo}[0]
+    ${selectedOption}    get selected list label    ${DailyTasks_Transfer_+Store_dropdown_transferFrom}
+    ${selectedOption}    replace string    ${selectedOption}    ${SPACE}    ${EMPTY}
+    ${expectedOption}    replace string    @{fromDoorInfo}[1]    ${SPACE}    ${EMPTY}
+    run keyword and continue on failure    run keyword if    '${selectedOption}' != '${expectedOption}'    fail    Select Transfer From door Fail !
+    click element    ${DailyTasks_Transfer_+Store_dropdown_transferTo}
+    wait until element is visible    ${DailyTasks_Transfer_+Store_dropdown_transferTo}/option    30
+    RandomSelectOptionOnDropdown    ${DailyTasks_Transfer_+Store_dropdown_transferTo}    0    ${DailyTasks_Transfer_+Store_transferToDoor_jquery}
+    input text    ${DailyTasks_Transfer_+Store_input}    @{fromDoorInfo}[2]
+    sleep    1S
+    Textfield Value Should Be    ${DailyTasks_Transfer_+Store_input}    @{fromDoorInfo}[2]
+    click element    ${DailyTasks_Transfer_+Store_dropdown_transferTo}
+    wait until element is visible    ${DailyTasks_Transfer_+Store_button_+}    30
+    click element    ${DailyTasks_Transfer_+Store_button_+}
+    sleep    3S
+    Wait Until Page Does Not Contain    Processing...    600
+    wait until element is visible    ${DailyTasks_Transfer_+Store_button_-}    30
+    enter page by click    ${ZK_Button_Close}    ${DailyTasks_tab_selected}    Detail by Style Color Size
+
+editDetailbyStyleColorSizeTab_RFE
+    enterPageByClick    Xpath=${DailyTasks_tabsCount}//div[text() ='Style Color List']    ${DailyTasks_tab_selected}    Style Color List
+    @{status_RFE_btn}    execute javascript    ${DailyTasks_Status_RFE_jquery}
+    return from keyword if    @{status_RFE_btn} == @{EMPTY}
+    ${row}    evaluate    random.randint(0,len(@{status_RFE_btn})-1)    random
+    @{rowInfo}    split string    @{status_RFE_btn}[${row}]    /
+    ${scrollPosition}    evaluate    @{rowInfo}[1]-400
+    run keyword if    @{rowInfo}[1] >${screenHeight}    execute javascript    $(".zsscroll").scrollTop(${scrollPosition})
+    Wait Until Page Does Not Contain    Processing...    600
+    ${DailyTasks_Button_Edit}    replace string    ${DailyTasks_Button_Edit_rowPH}    [row]    [@{rowInfo}[0]]
+    click element    Xpath=//div[@class='zsblock']/div[3]/div[1]
+    enterPageByClick    ${DailyTasks_Button_Edit}    ${DailyTasks_tab_selected}    Review by Style Color
+    enterPageByClick    Xpath=${DailyTasks_tabsCount}//div[text() ='Detail by Style Color Size']    ${DailyTasks_tab_selected}    Detail by Style Color Size
+    ${freezeCell_col}    execute javascript    return $(".zstopblock").find("div div:contains('Style #')").index()+2
+    wait until element is visible    Xpath=//div[@class='zsblock']/div[4]/div[${freezeCell_col}]    30
+    click element    Xpath=//div[@class='zsblock']/div[4]/div[${freezeCell_col}]
+    sleep    3S
+    run keyword and continue on failure    click element    Xpath=//div[@class='zsblock']/div[4]/div[${freezeCell_col}]
+    Wait Until Page Does Not Contain    Processing...    600
+    wait until page contains element    ${ZK_Button_FreezePanel}    30
+    wait until element is visible    ${ZK_Button_FreezePanel}    30
+    click element    ${DailyTasks_Button_FreezePanel}
+    page should not contain    error
+    Wait Until Page Does Not Contain    Processing...    600
+    ${freezeStatus}    get element attribute    ${ZK_Button_FreezePanel}@class
+    should contain    ${freezeStatus}    z-menuitem opened
+    wait until page contains element    ${ZK_selectedFreezeButton}    60
+    Download Excel    ${DailyTasks_Button_Excel}    Transfer_DetailByStyleColorSize_RFE
+    wait until page does not contain element    ${ZK_Button_disabledInfo}
+    Wait Until Page Does Not Contain    Processing...    600
+    click element    ${ZK_Button_Info}
+    wait until element is visible    ${ZK_InfoNotesSection}    30
+    element should contain    ${ZK_InfoNotesSection}    Last Modified by
+    click element    ${ZK_Button_Info}
+    wait until page does not contain element    ${ZK_Button_disabledNotes}    30
+    Wait Until Page Does Not Contain    Processing...    600
+    click element    ${ZK_Button_Notes}
+    wait until element is visible    ${ZK_InfoNotesSection}    30
+    click element    ${ZK_Button_Notes}
+    wait until page does not contain element    ${ZK_Button_disabledOptions}    30
+    Wait Until Page Does Not Contain    Processing...    600
+    edit options    ${ZK_Button_Options}    Select Columns to Display    Detail by Style Color Size    ${ZK_Options_title}
+    wait until page does not contain element    ${ZK_Button_disabledViewCriteria}    30
+    Wait Until Page Does Not Contain    Processing...    600
+    editDTViewCriteria    ${ZK_Button_ViewCriteria}    Order City:    Detail by Style Color Size    Xpath=//div[@class='z-vlayout-inner']/div[@class='z-div']//table//tr[2]    Transfer
+    wait until page contains element    ${ZK_Button_CancelJob}    600
+    wait until page does not contain element    ${ZK_Button_disabledCancelJob}    60
+    Wait Until Page Does Not Contain    Processing...    600
+    click element    ${ZK_Button_CancelJob}
+    Wait Until Page Contains element    ${DailyTasks_Panel_cancelJob}    120
+    wait until element is visible    ${DailyTasks_popPanel_BtnCancel}    30
+    Wait Until Page Does Not Contain    Processing...    600
+    click element    ${DailyTasks_popPanel_BtnCancel}
+    wait until page contains element    ${DailyTasks_Button_DoorFilter}    600
+    wait until page does not contain element    ${DailyTasks_Button_disabledDoorFilter}    30
+    Wait Until Page Does Not Contain    Processing...    600
+    enterPageByClick    ${DailyTasks_Button_DoorFilter}    ${DailyTasks_filterDoor_verifyPoint}    Top Doors:
+    ${checkeddoorCount}    get matching xpath count    ${ZK_checkedBox_rowCount}
+    input text    ${DailyTasks_DoorFilter_text_topDoors}    ${AM_topDoors}
+    click element    ${DailyTasks_popPanel_BtnSubmit}
+    sleep    3S
+    Wait Until Page Does Not Contain    Processing...    600
+    page should not contain    error
+    ${checkeddoorCount_new}    get matching xpath count    ${ZK_checkedBox_rowCount}
+    run keyword and continue on failure    run keyword if    '${checkeddoorCount_new}' != '${AM_topDoors}'    Fail    Input # Top Doors Fail !
+    click element    ${DailyTasks_DoorFilter_button_reset}
+    sleep    3S
+    Wait Until Page Does Not Contain    Processing...    600
+    page should not contain    error
+    ${checkeddoorCount_new}    get matching xpath count    ${ZK_checkedBox_rowCount}
+    run keyword and continue on failure    run keyword if    '${checkeddoorCount_new}' != '${checkeddoorCount}'    Fail    Reset Fail !
+    ${selectedOption}    RandomSelectOptionOnDropdown    ${DailyTasks_popPanel_dropdown}
+    click element    ${DailyTasks_popPanel_BtnSubmit}
+    sleep    3S
+    Wait Until Page Does Not Contain    Processing...    600
+    page should not contain    error
+    #    @{checkedCluster}    execute javascript    ${ZK_checkedBox_title_jquery}
+    #    @{allCluster}    execute javascript    ${ZK_checkBox_title_jquery}
+    #    run keyword and continue on failure    run keyword if    '${selectedOption}' == 'ALL' and '${checkedCluster}' != '${allCluster}'    Fail    Filter Cluster Fail !
+    #    run keyword and continue on failure    run keyword if    '${selectedOption}' != 'ALL' and '@{checkedCluster}' != '${selectedOption}'    Fail    Filter Cluster Fail !
+    enter page by click    ${ZK_Button_Close}    ${DailyTasks_tab_selected}    Detail by Style Color Size
+    Wait Until element is visible    ${ZK_Button_Filter}    60
+    Wait Until Page Does Not Contain    Processing...    600
+    click element    ${ZK_Button_Filter}
+    wait until page contains element    ${DailyTasks_popPanel_filter}    30
+    wait until element is visible    ${DailyTasks_filterPanel_dropdown_filter}    30
+    RandomSelectOptionOnDropdown    ${DailyTasks_filterPanel_dropdown_filter}
+    @{DC/Store}    get list items    ${DailyTasks_filterPanel_dropdown_DC/Store}
+    ${DC/Store_count}    get length    ${DC/Store}
+    run keyword if    ${DC/Store_count}>0    RandomSelectOptionOnDropdown    ${DailyTasks_filterPanel_dropdown_DC/Store}
+    click element    ${DailyTasks_popPanel_BtnFilter}
+    sleep    3S
+    Wait Until Page Does Not Contain    Processing...    600
+    wait until element is not visible    ${DailyTasks_popPanel_BtnFilter}    30
+    enter page by click    ${ZK_Button_Close}    ${DailyTasks_tab_selected}    Style Color List
+
+exitTransfer
+    enter page by click    ${ZK_Button_Close}    ${mainPage}    DailyTask

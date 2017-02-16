@@ -1,0 +1,838 @@
+*** Settings ***
+Resource          Setting/environment.txt
+Resource          Setting/performancekeyword.txt
+Resource          page/login.txt
+Resource          page/navigation.txt
+Resource          page/ReportBuilder.txt
+Resource          page/standard7thpage.txt
+Resource          Setting/global_resource.txt
+Library           String
+Library           Selenium2Library
+Library           AutoItLibrary
+Library           MyUtil_Update
+Resource          page/DailyTasks.txt
+Resource          default_outcome/dailyTasks.txt
+Resource          page/ZK.txt
+Library           xlrd
+Resource          page/BrandProfile.txt
+Resource          page/AssortmentMix.txt
+Library           Collections
+Library           DatabaseLibrary
+Library           openpyxl
+Library           AppiumLibrary
+
+*** Test Cases ***
+runReport
+    [Tags]    RB
+    ${titleRows}=    evaluate    2
+    ${envsCount}=    evaluate    1
+    ${criteriaCol}=    evaluate    8
+    set test variable    ${titleRows}
+    set test variable    ${envsCount}
+    set test variable    ${criteriaCol}
+    ${usersCount}=    get users Count    ${users_setting}    ${report_setting_tab}    ${titleRows}
+    @{env}    get environment setting    ${users_setting}    ${report_setting_tab}    ${envsCount}
+    environment init    @{env}[0]
+    : FOR    ${userNum}    IN RANGE    0    ${usersCount}
+    \    ${userName}    get user    ${users_setting}    ${report_setting_tab}    ${userNum}    ${titleRows}
+    \    @{userCriteria}    get user criteria    ${users_setting}    ${report_setting_tab}    ${userNum}    ${criteriaCol}
+    \    ...    ${titleRows}
+    \    ${fromDate}    get cell value    ${users_setting}    ${report_setting_tab}    ${userNum}    6
+    \    ...    ${titleRows}
+    \    ${toDate}    get cell value    ${users_setting}    ${report_setting_tab}    ${userNum}    7
+    \    ...    ${titleRows}
+    \    ${downloadVisibleFlag}    get cell value    ${users_setting}    ${report_setting_tab}    ${userNum}    1
+    \    ...    ${titleRows}
+    \    ${reportType}    get cell value    ${users_setting}    ${report_setting_tab}    ${userNum}    4
+    \    ...    ${titleRows}
+    \    ${style#}    get cell value    ${users_setting}    ${report_setting_tab}    ${userNum}    5
+    \    ...    ${titleRows}
+    \    ${expect_outcomeFileName}    get cell value    ${users_setting}    ${report_setting_tab}    ${userNum}    3
+    \    ...    ${titleRows}
+    \    login    ${userName}
+    \    enter model without login    Report Builder
+    \    wait until element contains    ${RB_run_title}    ReportBuilder    30
+    \    page should not contain    error
+    \    ${reportID}    get cell value    ${users_setting}    ${report_setting_tab}    ${userNum}    2
+    \    ...    ${titleRows}
+    \    ${selectedReport_xpath}    replace string    ${RB_run_runReport_PHID}    ID    ${reportID}
+    \    enter page by click    ${selectedReport_xpath}    ${RB_run_title}    CriteriaSelection
+    \    run keyword if    '${reportType}'    select from list by value    ${RB_criteria_dropdown_reportType}    ${reportType}
+    \    run keyword if    '${style#}'    input text    ${RB_criteria_input_style#}    ${style#}
+    \    run keyword if    '${fromDate}'    input text    ${RB_criteria_fromDate}    ${fromDate}
+    \    run keyword if    '${toDate}'    input text    ${RB_criteria_toDate}    ${toDate}
+    \    select criteria    ${Criteria_Dropdown_filterHierarchy_last}    ${Criteria_filterHierarchy_options_last}    ${Criteria_filterHierarchy_optionsCount_last}    ${Criteria_filterHierarchy_options_last_checkbox_optionPH}    @{userCriteria}
+    \    ${downloadFile}    download file    ${RB_criteria_topSubmit}    ReportBuilder    ${userName}    ${userNum}
+    \    ...    xlsx
+    \    run keyword and continue on failure    run keyword if    '${expect_outcomeFileName}'    compare excel    ${downloadFile}    ${expect_outcome_dir}${expect_outcomeFileName}
+    \    ...    ${diff_dir}RB_${reportID}_${userName}_${userNum}_DIFF.txt    #    a='D:\\Robot\\Allocation_User_Behavior\\download\\ReportBuilder_ABJ_0.xlsx'
+    \    click element    ${Link_logout}
+    \    wait until page contains    Login with your username and password provided by your Companies Representative.    30
+    close window
+
+Allocation
+    [Tags]    AL
+    ${titleRows}=    evaluate    2
+    ${envsCount}=    evaluate    1
+    ${criteriaCol}=    evaluate    10
+    set test variable    ${titleRows}
+    set test variable    ${envsCount}
+    set test variable    ${criteriaCol}
+    ${usersCount}=    get users Count    ${users_setting}    ${DailyTasks_setting_tab}    ${titleRows}
+    @{env}    get environment setting    ${users_setting}    ${DailyTasks_setting_tab}    ${envsCount}
+    environment init    @{env}[0]
+    Connect To Database Using Custom Params    cx_Oracle    'appuser','sol','10.125.2.234:1521/map7app'
+    : FOR    ${userNum}    IN RANGE    0    ${usersCount}
+    \    ${userName}    get user    ${users_setting}    ${DailyTasks_setting_tab}    ${userNum}    ${titleRows}
+    \    @{userCriteria}    get user criteria    ${users_setting}    ${DailyTasks_setting_tab}    ${userNum}    ${criteriaCol}
+    \    ...    ${titleRows}
+    \    ${fromDate}    get cell value    ${users_setting}    ${DailyTasks_setting_tab}    ${userNum}    7
+    \    ...    ${titleRows}
+    \    ${toDate}    get cell value    ${users_setting}    ${DailyTasks_setting_tab}    ${userNum}    8
+    \    ...    ${titleRows}
+    \    ${downloadVisibleFlag}    get cell value    ${users_setting}    ${DailyTasks_setting_tab}    ${userNum}    1
+    \    ...    ${titleRows}
+    \    ${taskType}    get cell value    ${users_setting}    ${DailyTasks_setting_tab}    ${userNum}    2
+    \    ...    ${titleRows}
+    \    ${screenType}    get cell value    ${users_setting}    ${DailyTasks_setting_tab}    ${userNum}    3
+    \    ...    ${titleRows}
+    \    ${timeRange}    get cell value    ${users_setting}    ${DailyTasks_setting_tab}    ${userNum}    9
+    \    ...    ${titleRows}
+    \    ${status}    get cell value    ${users_setting}    ${DailyTasks_setting_tab}    ${userNum}    4
+    \    ...    ${titleRows}
+    \    ${orderCity}    get cell value    ${users_setting}    ${DailyTasks_setting_tab}    ${userNum}    5
+    \    ...    ${titleRows}
+    \    ${expected_orderCity}    get cell value    ${users_setting}    ${DailyTasks_setting_tab}    ${userNum}    6
+    \    ...    ${titleRows}
+    \    set suite variable    ${timeRange}
+    \    set suite variable    ${fromDate}
+    \    set suite variable    ${toDate}
+    \    set suite variable    @{userCriteria}
+    \    @{stockCategory}    query    select distinct p.attr_value4 from criteria_user_permission p,users u where u.user_id=p.user_id and lower(u.login) =lower('${userName}') order by p.attr_value4
+    \    @{userType}    query    select ut.user_type_name from user_type ut,users u where u.user_type_id=ut.user_type_id and lower(u.login) =lower('${userName}')
+    \    @{stockCategory}    evaluate    [t[0] for t in @{stockCategory}]
+    \    @{userType}    evaluate    [t[0] for t in @{userType}]
+    \    login    ${userName}
+    \    enter model without login    Daily Tasks
+    \    wait until element contains    ${DailyTasks_criteria_title}    DailyTask    30
+    \    run keyword and continue on failure    page should not contain    exception
+    \    @{current_taskType}    get list items    ${DailyTasks_criteria_Dropdown_TaskType}
+    \    @{current_screenType}    get list items    ${DailyTasks_criteria_Dropdown_ScreenType}
+    \    @{current_orderCity}    run keyword if    '@{userType}[0]' == 'admin level four'    get text    ${DailyTasks_criteria_OrderCity_cityUser}
+    \    ...    ELSE    get list items    ${DailyTasks_criteria_Dropdown_OrderCity}
+    \    run keyword and continue on failure    should be true    @{current_taskType} == @{default_taskType}    Task type is wrong!
+    \    run keyword and continue on failure    should be true    @{current_screenType} == @{default_screenType}    Screen Type type is wrong!
+    \    run keyword and continue on failure    should be true    @{current_orderCity} == @{stockCategory}    Order City is wrong to User ${userName}!
+    \    run keyword if    '${taskType}'    select from list by label    ${DailyTasks_criteria_Dropdown_TaskType}    ${taskType}
+    \    run keyword and continue on failure    run keyword if    '${taskType}'    list selection should be    ${DailyTasks_criteria_Dropdown_TaskType}    ${taskType}
+    \    run keyword if    '${screenType}'    select from list by label    ${DailyTasks_criteria_Dropdown_ScreenType}    ${screenType}
+    \    run keyword and continue on failure    run keyword if    '${screenType}'    list selection should be    ${DailyTasks_criteria_Dropdown_ScreenType}    ${screenType}
+    \    run keyword if    '${status}'    select from list by label    ${DailyTasks_criteria_Dropdown_Status}    ${status}
+    \    run keyword and continue on failure    run keyword if    '${status}'    list selection should be    ${DailyTasks_criteria_Dropdown_Status}    ${status}
+    \    run keyword if    '${orderCity}'    select from list by label    ${DailyTasks_criteria_Dropdown_OrderCity}    ${orderCity}
+    \    run keyword and continue on failure    run keyword if    '${orderCity}'    list selection should be    ${DailyTasks_criteria_Dropdown_OrderCity}    ${orderCity}
+    \    run keyword if    '${fromDate}'    input text    ${DailyTasks_criteria_Text_FromDate}    ${fromDate}
+    \    run keyword and continue on failure    run keyword if    '${fromDate}'    Textfield Value Should Be    ${DailyTasks_criteria_Text_FromDate}    ${fromDate}
+    \    run keyword if    '${toDate}'    input text    ${DailyTasks_criteria_Text_ToDate}    ${toDate}
+    \    run keyword and continue on failure    run keyword if    '${toDate}'    Textfield Value Should Be    ${DailyTasks_criteria_Text_ToDate}    ${toDate}
+    \    run keyword if    '${timeRange}' == 'Shop Date'    select radio button    timerangeselection    0
+    \    ...    ELSE IF    '${timeRange}' == 'In DC Date'    select radio button    timerangeselection    1
+    \    run keyword and continue on failure    run keyword if    '${timeRange}' == 'Shop Date'    radio button should be set to    timerangeselection    0
+    \    ...    ELSE IF    '${timeRange}' == 'In DC Date'    radio button should be set to    timerangeselection    1
+    \    select criteria    ${Criteria_Dropdown_filterHierarchy_last}    ${Criteria_filterHierarchy_options_last}    ${Criteria_filterHierarchy_optionsCount_last}    ${Criteria_filterHierarchy_options_last_checkbox_optionPH}    @{userCriteria}
+    \    page should not contain    exception
+    \    #    enterPageByClick    ${DailyTasks_criteria_top_submit}    ${DailyTasks_tab_selected}    ${screenType}
+    \    #    @{errorInfo}    execute javascript    ${js_dir}\\Allocation_Summary_dataValidation.js
+    \    #    @{ZKData}    get ZK sheet Data    ${maxTopPagesCount}    ${maxLeftPagesCount}
+    \    #    ${downloadFile}    downloadZKexcelUpdate    ${ZK_Button_Excel}    DalyTask_${screenType}    ${download_dir}
+    \    ...    # ${userName}    # ${userNum}
+    \    #    run keyword and continue on failure    compareZKAppletWithExcel    ${ZKData}    ${screenType}    ${downloadFile}
+    \    ...    # ${diff_dir}\\DailyTask_${screenType}_${userName}_${userNum}_downloadFileDiff.txt
+    \    allocationUserBehaviorZK2.3    ${DailyTasks_criteria_top_submit}    ${DailyTasks_tab_selected}    ${screenType}    ${userName}    ${userNum}
+    \    ...    Allocation    50    ${DailyTasks_Button_Edit_allInfoList_jquery}
+    \    allocationUserBehaviorZK2.3    Xpath=${DailyTasks_tabsCount}[2]    ${DailyTasks_tab_selected}    Detail    ${userName}    ${userNum}
+    \    ...    Allocation    50    ${DailyTasks_Button_Edit_allInfoList_jquery}
+    \    @{data}    allocationUserBehaviorZK2.3    Xpath=${DailyTasks_tabsCount}[3]    ${DailyTasks_tab_selected}    Detail by Color by Door    ${userName}
+    \    ...    ${userNum}    Allocation    50    ${DailyTasks_Button_Edit_allInfoList_jquery}    True
+    \    #    allocationUserBehaviorZK2.5    Detail by Color by Door    ${userName}    ${userNum}    Allocation
+    \    allocationUserBehaviorZK2.5_expandPartialDoors    Detail by Color by Door    ${userName}    ${userNum}    Allocation    @{data}
+    \    @{data}    allocationUserBehaviorZK2.3    Xpath=${DailyTasks_tabsCount}[4]    ${DailyTasks_tab_selected}    Detail by Size by Door    ${userName}
+    \    ...    ${userNum}    Allocation    50    ${DailyTasks_Button_Edit_editableInfoList_jquery}    True
+    \    allocationUserBehaviorZK2.5_expandPartialDoors    Detail by Size by Door    ${userName}    ${userNum}    Allocation    @{data}
+    \    @{data}    allocationUserBehaviorZK2.3    Xpath=${DailyTasks_tabsCount}[5]    ${DailyTasks_tab_selected}    Detail by Style Color Size    ${userName}
+    \    ...    ${userNum}    Allocation    24    ${DailyTasks_Button_Edit_editableInfoList_jquery}
+    \    allocationUserBehaviorZK2.7    Detail by Style Color Size    ${userName}    ${userNum}    Allocation    ${data}
+
+downloadInBP
+    [Tags]    BP
+    ${titleRows}=    evaluate    2
+    ${envsCount}=    evaluate    1
+    ${criteriaCol}=    evaluate    4
+    set test variable    ${titleRows}
+    set test variable    ${envsCount}
+    set test variable    ${criteriaCol}
+    ${usersCount}=    get users Count    ${users_setting}    ${BPDownload_setting_tab}    ${titleRows}
+    @{env}    get environment setting    ${users_setting}    ${BPDownload_setting_tab}    ${envsCount}
+    ${preUserName}    set variable    ${EMPTY}
+    environment init    @{env}[0]
+    : FOR    ${userNum}    IN RANGE    0    ${usersCount}
+    \    ${userName}    get user    ${users_setting}    ${BPDownload_setting_tab}    ${userNum}    ${titleRows}
+    \    @{userCriteria}    get user criteria    ${users_setting}    ${BPDownload_setting_tab}    ${userNum}    ${criteriaCol}
+    \    ...    ${titleRows}
+    \    ${downloadType}    get cell value    ${users_setting}    ${BPDownload_setting_tab}    ${userNum}    1
+    \    ...    ${titleRows}
+    \    ${expected_outcomeFile}    get cell value    ${users_setting}    ${BPDownload_setting_tab}    ${userNum}    3
+    \    ...    ${titleRows}
+    \    ${fileType}    get cell value    ${users_setting}    ${BPDownload_setting_tab}    ${userNum}    2
+    \    ...    ${titleRows}
+    \    run keyword if    '${preUserName}' != '${userName}' and '${preUserName}' != '${EMPTY}'    click element    ${Link_logout}
+    \    run keyword if    '${preUserName}' != '${userName}'    login    ${userName}
+    \    run keyword if    '${preUserName}' != '${userName}'    enter model without login    Brand Profile
+    \    ${preUserName}    set variable    ${userName}
+    \    select from list by label    ${BP_downloadDropdown}    ${downloadType}
+    \    list selection should be    ${BP_downloadDropdown}    ${downloadType}
+    \    run keyword if    '${downloadType}' !='Promotion Type Style Door' and '${downloadType}' !='Promotion Type'    enter page by click    ${BP_downloadBtn}    ${mainPage}    DownloadFilterCriteria - ${downloadType}
+    \    run keyword if    '${downloadType}' !='Promotion Type Style Door' and '${downloadType}' !='Promotion Type'    select criteria    ${Criteria_Dropdown_filterHierarchy_last}    ${Criteria_filterHierarchy_options_last}    ${Criteria_filterHierarchy_optionsCount_last}
+    \    ...    ${Criteria_filterHierarchy_options_last_checkbox_optionPH}    @{userCriteria}
+    \    ${downloadFile}    download file    ${BP_downloadBtn}    ${downloadType}    ${userName}    ${userNum}
+    \    ...    ${fileType}
+    \    @{downloadExcel}    run keyword if    '${fileType}'.upper() == 'ZIP'    extractZIP    ${downloadFile}    ${download_dir}
+    \    ...    ${userName}_${userNum}_
+    \    ...    ELSE    create list    ${downloadFile}
+    \    ${expected_outcomeFileType}    fetch from right    ${expected_outcomeFile}    .
+    \    @{expectedExcel}    run keyword if    '${expected_outcomeFileType}'.upper() == 'ZIP'    extractZIP    ${expected_outcomeFile}    ${expect_outcome_dir}BP_download\\
+    \    ...    ${userName}_${userNum}_
+    \    ...    ELSE    create list    ${expected_outcomeFile}
+    \    run keyword and continue on failure    compareBPExcelList    ${userName}    ${userNum}    ${downloadType}    @{expectedExcel}
+    \    ...    @{downloadExcel}
+    \    run keyword if    '${downloadType}' !='Promotion Type Style Door' and '${downloadType}' !='Promotion Type'    enter page by click    ${BP_cancelBtn}    ${mainPage}    BrandProfile
+    close window
+
+AssortmentMix
+    [Tags]    AM
+    ${titleRows}=    evaluate    2
+    ${envsCount}=    evaluate    1
+    ${criteriaCol}=    evaluate    2
+    set test variable    ${titleRows}
+    set test variable    ${envsCount}
+    set test variable    ${criteriaCol}
+    ${usersCount}=    get users Count    ${users_setting}    ${AssortmentMix_setting_tab}    ${titleRows}
+    @{env}    get environment setting    ${users_setting}    ${AssortmentMix_setting_tab}    ${envsCount}
+    environment init    @{env}[0]
+    Connect To Database Using Custom Params    cx_Oracle    'appuser','sol','10.125.2.234:1521/map7app'
+    : FOR    ${userNum}    IN RANGE    0    ${usersCount}
+    \    ${userName}    get user    ${users_setting}    ${AssortmentMix_setting_tab}    ${userNum}    ${titleRows}
+    \    @{userCriteria}    get user criteria    ${users_setting}    ${AssortmentMix_setting_tab}    ${userNum}    ${criteriaCol}
+    \    ...    ${titleRows}
+    \    ${downloadVisibleFlag}    get cell value    ${users_setting}    ${AssortmentMix_setting_tab}    ${userNum}    1
+    \    ...    ${titleRows}
+    \    set suite variable    @{userCriteria}
+    \    set suite variable    ${userNum}
+    \    set suite variable    ${userName}
+    \    @{stockCategory}    query    select distinct p.attr_value4 from criteria_user_permission p,users u where u.user_id=p.user_id and lower(u.login) =lower('${userName}') order by p.attr_value4
+    \    @{doors}    query    select distinct d.door_num from company_door d, users u, criteria_user_permission c where u.user_id = c.user_id and c.attr_value4 = d.stock_category and lower(u.login) = lower('${userName}') order by d.door_num
+    \    @{stockCategory}    evaluate    [t[0] for t in @{stockCategory}]
+    \    @{doors}    evaluate    [t[0] for t in @{doors}]
+    \    login    ${userName}
+    \    enter model without login    Assortment Mix
+    \    wait until element contains    ${mainPage}    AssortmentMix    30
+    \    run keyword and continue on failure    page should not contain    exception
+    \    select criteria    ${Criteria_Dropdown_filterHierarchy_last}    ${Criteria_filterHierarchy_options_last}    ${Criteria_filterHierarchy_optionsCount_last}    ${Criteria_filterHierarchy_options_last_checkbox_optionPH}    @{userCriteria}
+    \    run keyword and continue on failure    page should not contain    exception
+    \    enter page by click    ${AssortmentMix_criteria_topButton_addStyle/Colors}    ${mainPage}    AddStyles
+    \    ${styleColorsCheckboxCount}    get matching xpath count    ${AssortmentMix_addStyles_checkBox_rowCount}
+    \    select checkbox    ${AssortmentMix_addStyles_checkBox_top}
+    \    run keyword and continue on failure    checkbox should be selected    ${AssortmentMix_addStyles_checkBox_top}
+    \    ${styleColorsCheckedCount}    execute javascript    ${AssortmentMix_addStyles_checkBox_checkedStyleColorsCount}
+    \    run keyword and continue on failure    run keyword if    ${styleColorsCheckboxCount} != ${styleColorsCheckedCount}    fail    It is incorrect to click check all checkbox!
+    \    enter page by click    ${AssortmentMix_addStyles_button_top_cancel}    ${mainPage}    AssortmentMix
+    \    enter page by click    ${AssortmentMix_criteria_topButton_addStyle/Colors}    ${mainPage}    AddStyles
+    \    enter page by click    ${AssortmentMix_addStyles_link_searchCriteria}    ${mainPage}    AssortmentMix
+    \    enter page by click    ${AssortmentMix_criteria_topButton_addStyle/Colors}    ${mainPage}    AddStyles
+    \    @{selectedStyleColorRows}    randomSelectCheckbox    ${AssortmentMix_addStyles_checkBox_rowPH}    ${styleColorsCheckboxCount}    10
+    \    @{selectedStyleColorsInfo}    execute javascript    var a = new Array();var n =0;$(".checkedrowcolor").each(function(){a[n]= new Array();a[n][0]=$(this).children("td:eq(1)").text().trim();a[n][1]=$(this).children("td:eq(3)").text().trim();n++;});return a
+    \    enter page by click    ${AssortmentMix_addStyles_topButton_addStyleColors}    ${ZK_selectedTab}    Assortment Mix
+    \    @{ZKData}    get ZK sheet Data    ${maxTopPagesCount}    ${maxLeftPagesCount}
+    \    @{dataByCol}    evaluate    zip(*@{ZKData})
+    \    @{initData}    set variable    @{ZKData}
+    \    set suite variable    @{ZKData}
+    \    set suite variable    @{dataByCol}
+    ${EMPTY}
+    \    ${styleYearCol}    execute javascript    ${DailyTasks_Style Year_colNum_juqery}
+    \    ${styleSeasonCol}    execute javascript    ${DailyTasks_Style Season_colNum_juqery}
+    \    @{expected_styleYear}    split string    @{userCriteria}[0]    //
+    \    @{expected_styleSeason}    split string    @{userCriteria}[1]    //
+    \    @{expected_styleYear}    split string    @{expected_styleYear}[1]    ,
+    \    @{expected_styleSeason}    split string    @{expected_styleSeason}[1]    ,
+    \    @{styleYear_diff}    evaluate    [(a+1,b) for (a,b) in enumerate(@{dataByCol}[${styleYearCol}]) if a >1 and b !='' and b not in @{expected_styleYear}]
+    \    @{styleSeason_diff}    evaluate    [(a+1,b) for (a,b) in enumerate(@{dataByCol}[${styleSeasonCol}]) if a>1 and b != '' and b.upper() not in @{expected_styleSeason}]
+    \    run keyword and continue on failure    run keyword if    @{styleYear_diff} != @{EMPTY}    fail    Style Year is incorrect! @{styleYear_diff}
+    \    run keyword and continue on failure    run keyword if    @{styleSeason_diff} != @{EMPTY}    \    Style Season is incorrect! @{styleSeason_diff}
+    \    ${dataByCol}    @{ZKData}    AssortmentMixValidationLoacationAttr    5    Assortment Mix    5
+    \    ${downloadFile}    downloadZKexcelUpdate    ${ZK_Button_Excel}    Assortment Mix    ${download_dir}    ${userName}
+    \    ...    ${userNum}
+    \    run keyword and continue on failure    compareZKAppletWithExcel    ${ZKData}    Assortment Mix    ${downloadFile}    ${diff_dir}\\Assortment Mix_${userName}_${userNum}_downloadFileDiff.txt
+    \    ...    2
+    \    enter page by click    ${AssortmentMix_Button_TargetDoors}    ${ZK_selectedTab}    Target Doors
+    \    @{doorStartEndCol}    execute javascript    var startCol=$(".zstopblock").children("div:contains('${stockCategory[0][0]}')").children("div:contains('${stockCategory[0][0]}')").index()-1;var a = new Array();a.push(startCol+2);a.push($(".zstopblock").children("div:last").children("div:gt("+startCol+")").length+startCol+1);return(a)
+    \    ${doorCol}    evaluate    random.randint(@{doorStartEndCol}[0],@{doorStartEndCol}[1]/2)    random
+    \    ${doorLinkPath}    replace string    ${AssortmentMix_TargetDoor_doorLink_colPH}    [col]    [${doorCol}]
+    \    ${doorName}    get text    ${doorLinkPath}
+    \    enter page by click    ${doorLinkPath}    ${ZK_selectedTab}    ${doorName}
+    \    @{currentStockCategory}    get list items    ${AssortmentMix_DoorInfo_dropDown_stockCategory}
+    \    @{currentDoors}    get list items    ${AssortmentMix_DoorInfo_dropDown_door}
+    \    @{stckCategoruDiff}    evaluate    [(a,b) for a,b in zip(@{currentStockCategory},${stockCategory}) if a != b]
+    \    @{doorsDiff}    evaluate    [(a,b) for a,b in zip(@{currentDoors},${doors}) if a != b]
+    \    run keyword and continue on failure    run keyword if    @{stckCategoruDiff} != @{EMPTY}    fail    Stock Category is incorrect in door tab ! @{stckCategoruDiff}
+    \    run keyword and continue on failure    run keyword if    @{doorsDiff} != @{EMPTY}    fail    Doors is incorrect in door tab ! @{doorsDiff}
+    \    @{inputDoorNum}    evaluate    random.sample(@{currentDoors},1)    random
+    \    input text    ${AssortmentMix_DoorInfo_text_door}    @{inputDoorNum}[0]ttt
+    \    run keyword and continue on failure    Textfield Value Should be    ${AssortmentMix_DoorInfo_text_door}    @{inputDoorNum}[0]ttt
+    \    click element    ${AssortmentMix_Button_submit}
+    \    run keyword and continue on failure    wait until page contains element    ${ZK_popPanel_message}    60
+    \    run keyword and continue on failure    wait until element contains    ${ZK_popPanel_message}    The door @{inputDoorNum}[0]ttt is not existent in our system. Please input a correct door and re-submit. Thank you.    30
+    \    enter page by click    ${ZK_popPanel_message_button_OK}    ${ZK_selectedTab}    ${doorName}
+    \    click element    ${AssortmentMix_Button_cancel}
+    \    run keyword and continue on failure    Textfield Value Should be    ${AssortmentMix_DoorInfo_text_door}    ${EMPTY}
+    \    input text    ${AssortmentMix_DoorInfo_text_door}    @{inputDoorNum}[0]
+    \    run keyword and continue on failure    Textfield Value Should be    ${AssortmentMix_DoorInfo_text_door}    @{inputDoorNum}[0]
+    \    click element    ${AssortmentMix_Button_submit}
+    \    Wait Until Page Does Not Contain    Processing...    60
+    \    sleep    3S
+    \    run keyword and continue on failure    element should contain    ${ZK_selectedTab}    @{inputDoorNum}[0]
+    \    run keyword and continue on failure    element should contain    ${AssortmentMix_DoorInfo_doorCell}    @{inputDoorNum}[0]
+    \    @{vaildSelectStyles}    execute javascript    ${AssortmentMix_DoorInfo_validSelectStyle_jquery}
+    \    @{selectStyleRowCol}    evaluate    random.sample(@{vaildSelectStyles},1)    random
+    \    ${selectStylePath}    replace string    ${AssortmentMix_DoorInfo_styleCell_rowcolPH}    [row]    [${selectStyleRowCol[0][0]}]
+    \    ${selectStylePath}    replace string    ${selectStylePath}    [col]    [${selectStyleRowCol[0][1]}]
+    \    double click element    ${selectStylePath}
+    \    #    click element    ${selectStylePath}
+    \    #    capture page screenshot
+    \    ${selectStyleStyle}    get element attribute    ${selectStylePath}@style
+    \    capture page screenshot
+    \    run keyword and continue on failure    should contain    ${selectStyleStyle}    background-color: rgb(0, 209, 0);    After double click, select style cell is not change to Green in Door tab!
+    \    run keyword and continue on failure    element should contain    ${selectStylePath}    ✓
+    \    @{ZKData}    get ZK sheet Data    ${maxTopPagesCount}    ${maxLeftPagesCount}
+    \    ${downloadFile}    downloadZKexcelUpdate    ${ZK_Button_Excel}    Assortment Mix_DoorInfo    ${download_dir}    ${userName}
+    \    ...    ${userNum}
+    \    run keyword and continue on failure    compareZKAppletWithExcel    ${ZKData}    @{inputDoorNum}[0]    ${downloadFile}    ${diff_dir}\\Assortment Mix_DoorInfo_${userName}_${userNum}_downloadFileDiff.txt
+    \    ...    2
+    \    click element    ${AssortmentMix_Button_SaveClose}
+    \    wait until page contains element    ${ZK_popPanel_message_button_Yes}
+    \    enter page by click    ${ZK_popPanel_message_button_Yes}    ${ZK_selectedTab}    Target Doors
+    \    @{vaildSelectStyles}    execute javascript    ${AssortmentMix_TargetDoor_validSelectStyle_jquery}
+    \    @{selectStyleRowCol}    evaluate    random.sample(@{vaildSelectStyles},1)    random
+    \    ${selectStylePath}    replace string    ${AssortmentMix_DoorInfo_styleCell_rowcolPH}    [row]    [${selectStyleRowCol[0][0]}]
+    \    ${selectStylePath}    replace string    ${selectStylePath}    [col]    [${selectStyleRowCol[0][1]}]
+    \    ${selectStyleLeftPosition}    Get Horizontal Position    ${selectStylePath}
+    \    run keyword if    ${selectStyleLeftPosition}>1700    execute javascript    $(".zsscroll").scrollLeft(1650)
+    \    run keyword if    ${selectStyleLeftPosition}>1700    sleep    3S
+    \    run keyword if    ${selectStyleLeftPosition}>1700    wait until page does not contain    Processing...    60
+    \    double click element    ${selectStylePath}
+    \    ${selectStyleStyle}    get element attribute    ${selectStylePath}@style
+    \    capture page screenshot
+    \    run keyword and continue on failure    should contain    ${selectStyleStyle}    background-color: rgb(0, 209, 0);    After double click, select style cell is not change to Green in Door tab!
+    \    run keyword and continue on failure    element should contain    ${selectStylePath}    ✓
+    \    @{ZKData}    get ZK sheet Data    ${maxTopPagesCount}    ${maxLeftPagesCount}
+    \    @{dataByCol}    evaluate    zip(*@{ZKData})
+    \    @{totalStyleColorCountDiff}    evaluate    [(b[1],b.count("✓"),b[-1]) for a,b in enumerate(@{dataByCol}) if a >=@{doorStartEndCol}[0] and b.count("✓")!= int(b[-1])]
+    \    run keyword and continue on failure    run keyword if    @{totalStyleColorCountDiff} != @{EMPTY}    fail    Total Style Color Count is incorrect on Target Doors Tab! @{totalStyleColorCountDiff}
+    \    ${downloadFile}    downloadZKexcelUpdate    ${ZK_Button_Excel}    Assortment Mix_TargetDoors    ${download_dir}    ${userName}
+    \    ...    ${userNum}
+    \    run keyword and continue on failure    compareZKAppletWithExcel    ${ZKData}    Target Doors    ${downloadFile}    ${diff_dir}\\Assortment Mix_TargetDoors_${userName}_${userNum}_downloadFileDiff.txt
+    \    ...    2
+    \    click element    ${AssortmentMix_Button_SaveClose}
+    \    wait until page contains element    ${ZK_popPanel_message_button_Yes}
+    \    enter page by click    ${ZK_popPanel_message_button_Yes}    ${ZK_selectedTab}    Assortment Mix
+    \    click element    ${AssortmentMix_Button_SaveClose}
+    \    wait until page contains element    ${ZK_popPanel_message_button_Yes}
+    \    enter page by click    ${ZK_popPanel_message_button_Yes}    ${mainPage}    AssortmentMix
+
+*** Keywords ***
+allocationUserBehaviorZK2.3
+    [Arguments]    ${enterXpath}    ${verifyElement}    ${verifyTxt}    ${userName}    ${userNum}    ${modelName}
+    ...    ${expandDoorStartCol}    ${editBtnJquery}    ${downloadVisible}=${EMPTY}
+    enterPageByClick    ${enterXpath}    ${verifyElement}    ${verifyTxt}
+    @{ZKData}    get ZK sheet Data    ${maxTopPagesCount}    ${maxLeftPagesCount}
+    @{totalRows}    evaluate    [a for (a,b) in enumerate(@{ZKData}) if 'Total' in str(b)]    #    total row Num is index and start from 0.
+    ${titleEndRowNum}    execute javascript    ${DailyTasks_titleRowsCount_jquery}
+    ${downloadFile}    downloadZKexcelUpdate    ${ZK_Button_Excel}    ${modelName}_${verifyTxt}    ${download_dir}    ${userName}    ${userNum}
+    ${doorInfoRowsCount}    evaluate    ${titleEndRowNum}-2
+    ${downloadFile}    run keyword if    '${downloadVisible}'    copyZKXLSXWithoutExpandDoorInfo    ${downloadFile}    ${expandDoorStartCol}    ${doorInfoRowsCount}
+    ...    ELSE    set variable    ${downloadFile}
+    run keyword and continue on failure    compareZKAppletWithExcel    ${ZKData}    ${verifyTxt}    ${downloadFile}    ${diff_dir}\\${modelName}_${verifyTxt}_${userName}_${userNum}_downloadFileDiff.txt    ${titleEndRowNum}
+    ...    ${expandDoorStartCol}    ${downloadVisible}
+    return from keyword if    '${verifyTxt}' == 'Detail by Style Color Size'    @{ZKData}
+    ${styleYearCol}    execute javascript    ${DailyTasks_Style Year_colNum_juqery}
+    ${styleSeasonCol}    execute javascript    ${DailyTasks_Style Season_colNum_juqery}
+    ${statusCol}    execute javascript    ${DailyTasks_Status_colNum_juqery}
+    ${jobTicketCol}    execute javascript    ${DailyTasks_Job Ticket_colNum_juqery}
+    ${dateCol}    run keyword if    '${timeRange}' == 'Shop Date'    execute javascript    ${DailyTasks_Shop Date_colNum_juqery}
+    ...    ELSE    execute javascript    ${DailyTasks_In DC Date_colNum_juqery}
+    @{expected_styleYear}    split string    @{userCriteria}[1]    //
+    @{expected_styleSeason}    split string    @{userCriteria}[2]    //
+    #    ${expected_fromdate}    evaluate    datetime.datetime.strptime('${fromdate}','%m/%d/%Y')    datetime
+    #    ${expected_todate}    evaluate    datetime.datetime.strptime('${todate}','%m/%d/%Y')    datetime
+    @{styleYear}    evaluate    [t[${styleYearCol}] for t in @{ZKData} if @{ZKData}.index(t) >= ${titleEndRowNum}]
+    @{styleSeason}    evaluate    [t[${styleSeasonCol}] for t in @{ZKData} if @{ZKData}.index(t) >= ${titleEndRowNum}]
+    @{date}    evaluate    [t[${dateCol}] for t in @{ZKData} if @{ZKData}.index(t) >= ${titleEndRowNum}]
+    @{jobTicket}    evaluate    [t[${jobTicketCol}] for t in @{ZKData} if @{ZKData}.index(t) >= ${titleEndRowNum}]
+    @{status}    evaluate    [t[${statusCol}] for t in @{ZKData} if @{ZKData}.index(t) >= ${titleEndRowNum}]
+    @{styleYear_diff}    evaluate    [(a+${titleEndRowNum}+1,b) for (a,b) in enumerate(@{styleYear}) if str(b)!=str(@{expected_styleYear}[1]) and (a + ${titleEndRowNum}) not in @{totalRows}]
+    @{styleSeason_diff}    evaluate    [(a+${titleEndRowNum}+1,b) for (a,b) in enumerate(@{styleSeason}) if str(b).lower() != str('@{expected_styleSeason}[1]').lower() and (a + ${titleEndRowNum}) not in @{totalRows}]
+    @{date_diff}    compareDateStrList    ${date}    ${fromdate}    ${todate}    ${titleEndRowNum}    ${totalRows}
+    ...    #    # [(a+${titleEndRowNum},b) for (a,b) in enumerate(@{date}) if datetime.datetime.strptime(str(b),'%m/%d/%Y') < ${expected_fromdate} or datetime.datetime.strptime(str(b),'%m/%d/%Y') >${expected_todate}]
+    @{status_diff}    evaluate    [(a + ${titleEndRowNum}+1,b,d) for (a,b) in enumerate(@{status}) for (c,d) in enumerate(@{jobTicket}) if (str(d)==' ' and str(b) !=' ' and a == c) or (d and str(b) != 'R' and a == c) and (a + ${titleEndRowNum}) not in @{totalRows}]
+    run keyword and continue on failure    run keyword if    @{styleYear_diff} != @{EMPTY}    fail    ${userName}_${userNum}_${modelName}_${verifyTxt} Style Year is Incorrect!@{styleYear_diff}
+    run keyword and continue on failure    run keyword if    @{styleSeason_diff} != @{EMPTY}    fail    ${userName}_${userNum}_${modelName}_${verifyTxt} Style Season is Incorrect!@{styleSeason_diff}
+    run keyword and continue on failure    run keyword if    @{date_diff} != @{EMPTY}    fail    ${userName}_${userNum}_${modelName}_${verifyTxt} ${timeRange} is Incorrect!@{date_diff}
+    run keyword and continue on failure    run keyword if    @{status_diff} != @{EMPTY}    fail    ${userName}_${userNum}_${modelName}_${verifyTxt} Status is Incorrect!@{status_diff}
+    ${po_prepackCol}    execute javascript    ${DailyTasks_PO Prepack_colNum_juqery}
+    @{po_prepack}    getColDataFromList    ${titleEndRowNum}    ${po_prepackCol}    ${ZKData}
+    ${po_openStockCol}    execute javascript    ${DailyTasks_PO Open Stock_colNum_juqery}
+    ${po_orderedCol}    execute javascript    ${DailyTasks_PO Ordered_colNum_juqery}
+    @{po_openStock}    evaluate    [t[${po_openStockCol}] for t in @{ZKData} if @{ZKData}.index(t) >= ${titleEndRowNum}]
+    @{po_ordered}    evaluate    [t[${po_orderedCol}] for t in @{ZKData} if @{ZKData}.index(t) >= ${titleEndRowNum}]
+    @{po_prepack_value}    evaluate    [t for t in @{po_prepack} if int(t) !=0]
+    run keyword if    @{po_prepack_value}!= @{EMPTY}    log    po prepack have values!
+    @{po_diff}    run keyword if    @{po_prepack_value} == @{EMPTY} and @{po_openStock} != @{po_ordered}    evaluate    [(a+${titleEndRowNum}+1,b,d) for (a,b) in enumerate(@{po_openStock}) for (c,d)in enumerate(@{po_ordered}) if a == c and b!= d]
+    run keyword and continue on failure    run keyword if    @{po_diff} != @{EMPTY} or @{po_openStock} != @{po_ordered}    fail    ${userName}_${userNum}_${modelName}_${verifyTxt} When po prepack have no value, po open stock is not euqal to po ordered!@{po_diff}
+    ${receiver_prepackCol}    execute javascript    ${DailyTasks_Receiver Prepack_colNum_juqery}
+    @{receiver_prepack}    getColDataFromList    ${titleEndRowNum}    ${receiver_prepackCol}    ${ZKData}
+    ${receiver_openStockCol}    execute javascript    ${DailyTasks_Receiver Open Stock_colNum_juqery}
+    ${Receiver_orderedCol}    execute javascript    ${DailyTasks_Receiver Qty_colNum_juqery}
+    ${Receiver_balanceCol}    execute javascript    ${DailyTasks_Receiver Balance_colNum_juqery}
+    @{Receiver_openStock}    evaluate    [t[${Receiver_openStockCol}] for t in @{ZKData} if @{ZKData}.index(t) >= ${titleEndRowNum}]
+    @{Receiver_ordered}    evaluate    [t[${Receiver_orderedCol}] for t in @{ZKData} if @{ZKData}.index(t) >= ${titleEndRowNum}]
+    @{Receiver_balance}    evaluate    [t[${Receiver_balanceCol}] for t in @{ZKData} if @{ZKData}.index(t) >= ${titleEndRowNum}]
+    @{receiver_prepack_value}    evaluate    [t for t in @{Receiver_prepack} if int(t) !=0]
+    run keyword if    @{receiver_prepack_value} != @{EMPTY}    log    ${userName}_${userNum}_${modelName}_${verifyTxt} Receiver prepack have values![t for t in @{Receiver_prepack} if t !=0]
+    @{Receiver_diff}    run keyword if    @{receiver_prepack_value} == @{EMPTY} and @{Receiver_openStock} != @{Receiver_ordered}    evaluate    [(a+${titleEndRowNum}+1,b,d) for (a,b) in enumerate(@{Receiver_openStock}) for (c,d) in enumerate(@{Receiver_ordered}) if a == c and b!= d]
+    @{balance_diff}    run keyword if    @{receiver_prepack_value} == @{EMPTY} and @{po_prepack_value} == @{EMPTY}    evaluate    [(a+${titleEndRowNum}+1,b,d,f) for (a,b) in enumerate(@{Receiver_balance}) \ for(c,d) in enumerate(@{Receiver_ordered}) for (e,f) in enumerate(@{po_ordered}) if a == c and a == e and int(b) !=int(f) - int(d)]
+    run keyword and continue on failure    run keyword if    @{Receiver_diff} != @{EMPTY} or @{Receiver_openStock} != @{Receiver_ordered}    fail    ${userName}_${userNum}_${modelName}_${verifyTxt} When Receiver prepack have no value, Receiver open stock is not euqal to Receiver ordered!@{Receiver_diff}
+    run keyword and continue on failure    run keyword if    @{balance_diff} != @{EMPTY}    or len(@{Receiver_balance}) != len(@{po_ordered}) or len(@{Receiver_balance}) != len(@{Receiver_ordered})    fail    ${userName}_${userNum}_${modelName}_${verifyTxt} When Receiver prepack and po prepack have no value, Receiver balance is not euqal to (PO Qty - Receiver Qty)!@{balance_diff}
+    ${allocated_prepackCol}    execute javascript    ${DailyTasks_Allocated Prepack_colNum_juqery}
+    @{allocated_prepack}    getColDataFromList    ${titleEndRowNum}    ${allocated_prepackCol}    ${ZKData}
+    ${allocated_openStockCol}    execute javascript    ${DailyTasks_Allocated Open Stock_colNum_juqery}
+    ${allocated_orderedCol}    execute javascript    ${DailyTasks_Allocated Qty_colNum_juqery}
+    @{allocated_openStock}    evaluate    [t[${allocated_openStockCol}] for t in @{ZKData} if @{ZKData}.index(t) >= ${titleEndRowNum}]
+    @{allocated_ordered}    evaluate    [t[${allocated_orderedCol}] for t in @{ZKData} if @{ZKData}.index(t) >= ${titleEndRowNum}]
+    @{allocated_prepack_value}    evaluate    [t for t in @{allocated_prepack} if int( t) !=0]
+    run keyword if    @{allocated_prepack_value} != @{EMPTY}    log    ${userName}_${userNum}_${modelName}_${verifyTxt} allocated prepack have values!
+    @{allocated_diff}    run keyword if    @{allocated_prepack_value} == @{EMPTY} and @{allocated_openStock} != @{allocated_ordered}    evaluate    [(a+${titleEndRowNum}+1,b,d) for (a,b) in enumerate(@{allocated_openStock}) for (c,d) in enumerate(@{allocated_ordered}) if a == c and b!= d]
+    run keyword and continue on failure    run keyword if    @{allocated_diff} != @{EMPTY} or @{allocated_openStock} != @{allocated_ordered}    fail    ${userName}_${userNum}_${modelName}_${verifyTxt} When allocated prepack have no value, allocated open stock is not euqal to allocated ordered!@{allocated_diff}
+    ${reserved_prepackCol}    execute javascript    ${DailyTasks_Reserved Prepack_colNum_juqery}
+    @{reserved_prepack}    getColDataFromList    ${titleEndRowNum}    ${reserved_prepackCol}    ${ZKData}
+    ${reserved_openStockCol}    execute javascript    ${DailyTasks_Reserved Open Stock_colNum_juqery}
+    ${reserved_orderedCol}    execute javascript    ${DailyTasks_Reserved Qty_colNum_juqery}
+    @{reserved_openStock}    evaluate    [t[${reserved_openStockCol}] for t in @{ZKData} if @{ZKData}.index(t) >= ${titleEndRowNum}]
+    @{reserved_ordered}    evaluate    [t[${reserved_orderedCol}] for t in @{ZKData} if @{ZKData}.index(t) >= ${titleEndRowNum}]
+    @{reserved_prepack_value}    evaluate    [t for t in @{reserved_prepack} if int( t) !=0]
+    run keyword if    @{reserved_prepack_value} != @{EMPTY}    log    ${userName}_${userNum}_${modelName}_${verifyTxt} \ reserved prepack have values!
+    @{reserved_diff}    run keyword if    @{reserved_prepack_value} == @{EMPTY} and @{reserved_openStock} != @{reserved_ordered}    evaluate    [(a+${titleEndRowNum}+1,b,d) for (a,b) in enumerate(@{reserved_openStock}) for (c,d) in enumerate(@{reserved_ordered}) if a == c and b!= d]
+    @{reserved_allocated_receiver_diff}    run keyword if    @{receiver_prepack_value} == @{EMPTY} and @{allocated_prepack_value}== @{EMPTY} and @{reserved_prepack_value} == @{EMPTY}    evaluate    [(a+${titleEndRowNum}+1,b,d,f) for (a,b) in enumerate(@{reserved_ordered}) for(c,d) in enumerate(@{Receiver_ordered}) for(e,f) in enumerate(@{allocated_ordered}) if int(b) != int(d)-int(f) and a == c and a == e]
+    run keyword and continue on failure    run keyword if    @{reserved_diff} != @{EMPTY} or @{reserved_openStock} != @{reserved_ordered}    fail    ${userName}_${userNum}_${modelName}_${verifyTxt} When reserved prepack have no value, reserved open stock is not euqal to reserved ordered!@{reserved_diff}
+    run keyword and continue on failure    run keyword if    @{reserved_allocated_receiver_diff} != @{EMPTY} or len(@{reserved_ordered}) != len(@{allocated_ordered}) or len(@{reserved_ordered}) != len(@{Receiver_ordered})    fail    ${userName}_${userNum}_${modelName}_${verifyTxt} When Receiver prepack, Reserved prepack and Allocated prepack have no value, Reserved Qty is not euqal to (Receiver Qty-Allocated Qty)!@{reserved_allocated_receiver_diff}
+    @{editList}    execute javascript    ${editBtnJquery}
+    ${selectedEditBtnRow}    evaluate    random.randint(0,len(@{editList})/2-1)    random
+    @{selectedEditBtnInfo}    split string    @{editList}[${selectedEditBtnRow}]    /
+    ${editBtnPath}    replace string    ${DailyTasks_Button_Edit_rowPH}    [row]    [@{selectedEditBtnInfo}[0]]
+    run keyword if    @{selectedEditBtnInfo}[1] >=780    execute javascript    $(".zsscroll").scrollTop(@{selectedEditBtnInfo}[1]-780)
+    run keyword if    @{selectedEditBtnInfo}[1] >=780    sleep    1S
+    run keyword if    @{selectedEditBtnInfo}[1] >=780    Wait Until Page Does Not Contain    Processing...    600
+    run keyword if    @{selectedEditBtnInfo}[1] >=780    sleep    3S
+    run keyword if    @{selectedEditBtnInfo}[1] >=780    wait until element is enabled    ${editBtnPath}    60
+    newTabByEditBtnInZK    ${editBtnPath}    ${DailyTasks_tab_selected}    Detail by Style Color Size    ${verifyTxt}
+    @{styleColor}    execute javascript    ${DailyTasks_tab_styleColorSize_styleColorList_jquery}
+    ${styleColor_count}    evaluate    len(@{styleColor})
+    run keyword and continue on failure    run keyword if    '@{styleColor}[0]'!='@{selectedEditBtnInfo}[2]/@{selectedEditBtnInfo}[3]' or ${styleColor_count} !=1    Fail    ${userName}_${userNum}_${modelName}_${verifyTxt} Style # and Color Code are incorrect in Detail by Style by Color by Size tab.
+    [Return]    @{ZKData}
+
+allocationUserBehaviorZK2.7
+    [Arguments]    ${verifyTxt}    ${userName}    ${userNum}    ${modelName}    ${ZKData}
+    ${modifyRow}    evaluate    random.randint(16,min(len(@{ZKData})/2-1,40))    random
+    ${titleEndRowNum}    execute javascript    ${DailyTasks_titleRowsCount_jquery}
+    ${styleYearCol}    execute javascript    ${DailyTasks_Style Year_colNum_juqery}
+    ${styleSeasonCol}    execute javascript    ${DailyTasks_Style Season_colNum_juqery}
+    ${statusCol}    execute javascript    ${DailyTasks_Status_colNum_juqery}
+    ${jobTicketCol}    execute javascript    ${DailyTasks_Job Ticket_colNum_juqery}
+    ${dateCol}    run keyword if    '${timeRange}' == 'Shop Date'    execute javascript    ${DailyTasks_Shop Date_colNum_juqery}
+    ...    ELSE    execute javascript    ${DailyTasks_In DC Date_colNum_juqery}
+    @{expected_styleYear}    split string    @{userCriteria}[1]    //
+    @{expected_styleSeason}    split string    @{userCriteria}[2]    //
+    @{styleYear}    evaluate    [t[${styleYearCol}] for t in @{ZKData} if @{ZKData}.index(t) > ${titleEndRowNum}]
+    @{styleSeason}    evaluate    [t[${styleSeasonCol}] for t in @{ZKData} if @{ZKData}.index(t) > ${titleEndRowNum}]
+    @{date}    evaluate    [t[${dateCol}] for t in @{ZKData} if @{ZKData}.index(t) > ${titleEndRowNum}]
+    @{jobTicket}    evaluate    [t[${jobTicketCol}] for t in @{ZKData} if @{ZKData}.index(t) > ${titleEndRowNum}]
+    @{status}    evaluate    [t[${statusCol}] for t in @{ZKData} if @{ZKData}.index(t) > ${titleEndRowNum}]
+    @{styleYear_diff}    evaluate    [(a+${titleEndRowNum},b) for (a,b) in enumerate(@{styleYear}) if str(b)!=str(@{expected_styleYear}[1])]
+    @{styleSeason_diff}    evaluate    [(a+${titleEndRowNum},b) for (a,b) in enumerate(@{styleSeason}) if str(b).lower() != str('@{expected_styleSeason}[1]').lower()]
+    @{date_diff}    compareDateStrList    ${date}    ${fromdate}    ${todate}    ${titleEndRowNum}    #
+    ...    # [(a+${titleEndRowNum},b) for (a,b) in enumerate(@{date}) if datetime.datetime.strptime(str(b),'%m/%d/%Y') < ${expected_fromdate} or datetime.datetime.strptime(str(b),'%m/%d/%Y') >${expected_todate}]
+    @{status_diff}    evaluate    [(a + ${titleEndRowNum},b,d) for (a,b) in enumerate(@{status}) for (c,d) in enumerate(@{jobTicket}) if \ a== c and ((str(d)==' ' and str(b) !=' ') or (str(d)!=' ' and str(b) ==' ') or (str(d)==' ' and str(b) == 'R'))]
+    run keyword and continue on failure    run keyword if    @{styleYear_diff} != @{EMPTY}    fail    ${userName}_${userNum}_${modelName}_${verifyTxt} Style Year is Incorrect!@{styleYear_diff}
+    run keyword and continue on failure    run keyword if    @{styleSeason_diff} != @{EMPTY}    fail    ${userName}_${userNum}_${modelName}_${verifyTxt} Style Season is Incorrect!@{styleSeason_diff}
+    run keyword and continue on failure    run keyword if    @{date_diff} != @{EMPTY}    fail    ${userName}_${userNum}_${modelName}_${verifyTxt} ${timeRange} is Incorrect!@{date_diff}
+    run keyword and continue on failure    run keyword if    @{status_diff} != @{EMPTY}    fail    ${userName}_${userNum}_${modelName}_${verifyTxt} Status is Incorrect!@{status_diff}
+    @{sizesCol}    evaluate    [(a,b) for (a,b) in enumerate (@{ZKData}[0]) if @{ZKData}[0][a] != @{ZKData}[0][a-1] and a >= @{ZKData}[0].index('Total')]
+    @{allSizesTitleCol}    evaluate    [(a,b,d) for (a,b) in enumerate (@{ZKData}[0]) for (c,d) in enumerate (@{ZKData}[14]) if a >= @{ZKData}[0].index('Total') and a == c]
+    log many    @{allSizesTitleCol}
+    @{totalReceiverQty}    evaluate    [t for t in @{ZKData} if 'Total Receiver Qty:' in t][0]
+    @{pullQty}    evaluate    [t for t in (@{ZKData}) if 'Pull Qty:' in t][0]
+    @{pullReserveQty}    evaluate    [t for t in (@{ZKData}) if 'Pull Reserve Qty:' in t][0]
+    @{pushQty}    evaluate    [t for t in (@{ZKData}) if 'Push Qty:' in t][0]
+    @{pushReserveQty}    evaluate    [t for t in (@{ZKData}) if 'Push Reserve Qty:' in t][0]
+    @{allocatedQty}    evaluate    [t for t in (@{ZKData}) if 'Allocated Qty:' in t][0]
+    @{adjustedReserveOpenStock}    evaluate    [t for t in (@{ZKData}) if 'Adjusted Reserve Open Stock Units:' in t][0]
+    ${totalFirstCol}    evaluate    [t[0] for t in @{sizesCol} if 'Total' in t][0]
+    ${adj}    evaluate    @{ZKData}[${titleEndRowNum}][[t[0] for t in @{allSizesTitleCol} if 'Total' in t and 'Adj' in t][0]]
+    ${adjOpenStock}    evaluate    @{ZKData}[${titleEndRowNum}][[t[0] for t in @{allSizesTitleCol} if 'Total' in t and 'Adj Open Stock' in t][0]]
+    ${adjPrepack}    evaluate    @{ZKData}[${titleEndRowNum}][[t[0] for t in @{allSizesTitleCol} if 'Total' in t and 'Adj Prepack' in t][0]]
+    ${sumSizeAdj}    evaluate    sum([int(@{ZKData}[${titleEndRowNum}][a]) for a in [t[0] for t in @{allSizesTitleCol} if 'Total' not in t and 'Adj' in t]])
+    ${sumSizeAdjOpenStock}    evaluate    sum([int(@{ZKData}[${titleEndRowNum}][a]) for a in [t[0] for t in @{allSizesTitleCol} if 'Total' not in t and 'AdjOpen Stock' in t]])
+    run keyword and continue on failure    run keyword if    ${adjPrepack} ==0 and @{totalReceiverQty}[${totalFirstCol}] !=@{pullQty}[${totalFirstCol}] + @{pullReserveQty}[${totalFirstCol}] and @{status} == @{EMPTY}    fail    ${userName}_${userNum}_${modelName}_${verifyTxt} Total Receiver Qty is not equal to Pull Qty + Pull Reserve Qty!@{totalReceiverQty}[${totalFirstCol}],@{pullQty}[${totalFirstCol}]+ @{pullReserveQty}[${totalFirstCol}]
+    run keyword and continue on failure    run keyword if    ${adjPrepack} ==0 and @{totalReceiverQty}[${totalFirstCol}] !=@{pushQty}[${totalFirstCol}] + @{pushReserveQty}[${totalFirstCol}] and @{status} == @{EMPTY}    fail    ${userName}_${userNum}_${modelName}_${verifyTxt} Total Receiver Qty is not equal to Push Qty + Push Reserve Qty! @{totalReceiverQty}[${totalFirstCol}],@{pushQty}[${totalFirstCol}] + @{pushReserveQty}[${totalFirstCol}]
+    run keyword and continue on failure    run keyword if    ${adjPrepack} ==0 and @{allocatedQty}[${totalFirstCol}] !=${adj}    fail    ${userName}_${userNum}_${modelName}_${verifyTxt} Allocated Qty is not equal to Total Adj!
+    run keyword and continue on failure    run keyword if    ${adjPrepack} ==0 and @{adjustedReserveOpenStock}[${totalFirstCol}] !=@{totalReceiverQty}[${totalFirstCol}]-${adjOpenStock}    fail    ${userName}_${userNum}_${modelName}_${verifyTxt} Adjusted Reserve Open Stock is not equal to Total Receiver Qty - Total Adj Open Stock!
+    run keyword and continue on failure    run keyword if    ${adjPrepack} ==0 and ${adj} !=${sumSizeAdj}    fail    ${userName}_${userNum}_${modelName}_${verifyTxt} Total Adj is not equal to Sum All Size Adj!
+    run keyword and continue on failure    run keyword if    ${adjPrepack} ==0 and ${adjOpenStock} !=${sumSizeAdjOpenStock}    fail    ${userName}_${userNum}_${modelName}_${verifyTxt} Total Adj Open Stock is not equal to Sum All Size Adj Open Stock!
+    @{modifySize}    evaluate    random.sample(@{sizesCol[1:]},1)    random
+    @{modifyCol}    evaluate    [t for t in @{allSizesTitleCol} if 'Total' in t or @{modifySize}[0][1] in t]
+    log many    @{modifyCol}
+    validationEditableCellsInStyleColorSize    ${modifyRow}    @{modifyCol}
+    @{ZKData}    get ZK sheet Data    ${maxTopPagesCount}    ${maxLeftPagesCount}
+    @{totalReceiverQty}    evaluate    [t for t in @{ZKData} if 'Total Receiver Qty:' in t][0]
+    @{pullQty}    evaluate    [t for t in (@{ZKData}) if 'Pull Qty:' in t][0]
+    @{pullReserveQty}    evaluate    [t for t in (@{ZKData}) if 'Pull Reserve Qty:' in t][0]
+    @{pushQty}    evaluate    [t for t in (@{ZKData}) if 'Push Qty:' in t][0]
+    @{pushReserveQty}    evaluate    [t for t in (@{ZKData}) if 'Push Reserve Qty:' in t][0]
+    @{allocatedQty}    evaluate    [t for t in (@{ZKData}) if 'Allocated Qty:' in t][0]
+    @{adjustedReserveOpenStock}    evaluate    [t for t in (@{ZKData}) if 'Adjusted Reserve Open Stock Units:' in t][0]
+    ${totalFirstCol}    evaluate    [t[0] for t in @{sizesCol} if 'Total' in t][0]
+    ${adj}    evaluate    @{ZKData}[${titleEndRowNum}][[t[0] for t in @{allSizesTitleCol} if 'Total' in t and 'Adj' in t][0]]
+    ${adjOpenStock}    evaluate    @{ZKData}[${titleEndRowNum}][[t[0] for t in @{allSizesTitleCol} if 'Total' in t and 'Adj Open Stock' in t][0]]
+    ${adjPrepack}    evaluate    @{ZKData}[${titleEndRowNum}][[t[0] for t in @{allSizesTitleCol} if 'Total' in t and 'Adj Prepack' in t][0]]
+    ${sumSizeAdj}    evaluate    sum([int(@{ZKData}[${titleEndRowNum}][a]) for a in [t[0] for t in @{allSizesTitleCol} if 'Total' not in t and 'Adj' in t]])
+    ${sumSizeAdjOpenStock}    evaluate    sum([int(@{ZKData}[${titleEndRowNum}][a]) for a in [t[0] for t in @{allSizesTitleCol} if 'Total' not in t and 'AdjOpen Stock' in t]])
+    run keyword and continue on failure    run keyword if    ${adjPrepack} ==0 and @{totalReceiverQty}[${totalFirstCol}] !=@{pullQty}[${totalFirstCol}] + @{pullReserveQty}[${totalFirstCol}] and @{status} == @{EMPTY}    fail    ${userName}_${userNum}_${modelName}_${verifyTxt} After modify cell, Total Receiver Qty is not equal to Pull Qty + Pull Reserve Qty! @{totalReceiverQty}[${totalFirstCol}],@{pullQty}[${totalFirstCol}]+ @{pullReserveQty}[${totalFirstCol}]
+    run keyword and continue on failure    run keyword if    ${adjPrepack} ==0 and @{totalReceiverQty}[${totalFirstCol}] !=@{pushQty}[${totalFirstCol}] + @{pushReserveQty}[${totalFirstCol}] and @{status} == @{EMPTY}    fail    ${userName}_${userNum}_${modelName}_${verifyTxt} After modify cell, Total Receiver Qty is not equal to Push Qty + Push Reserve Qty! @{totalReceiverQty}[${totalFirstCol}],@{pushQty}[${totalFirstCol}] + @{pushReserveQty}[${totalFirstCol}]
+    run keyword and continue on failure    run keyword if    ${adjPrepack} ==0 and @{allocatedQty}[${totalFirstCol}] !=${adj}    fail    ${userName}_${userNum}_${modelName}_${verifyTxt} After modify cell, Allocated Qty is not equal to Total Adj!
+    run keyword and continue on failure    run keyword if    ${adjPrepack} ==0 and @{adjustedReserveOpenStock}[${totalFirstCol}] !=@{totalReceiverQty}[${totalFirstCol}]-${adjOpenStock}    fail    ${userName}_${userNum}_${modelName}_${verifyTxt} After modify cell, Adjusted Reserve Open Stock is not equal to Total Receiver Qty - Total Adj Open Stock!
+    run keyword and continue on failure    run keyword if    ${adjPrepack} ==0 and ${adj} !=${sumSizeAdj}    fail    ${userName}_${userNum}_${modelName}_${verifyTxt} After modify cell, Total Adj is not equal to Sum All Size Adj!
+    run keyword and continue on failure    run keyword if    ${adjPrepack} ==0 and ${adjOpenStock} !=${sumSizeAdjOpenStock}    fail    ${userName}_${userNum}_${modelName}_${verifyTxt} After modify cell, Total Adj Open Stock is not equal to Sum All Size Adj Open Stock!
+
+allocationUserBehaviorZK2.5
+    [Arguments]    ${verifyTxt}    ${userName}    ${userNum}    ${modelName}
+    enterPageByClick    Xpath=${DailyTasks_tabsCount}//div[text()='${verifyTxt}']    ${DailyTasks_tab_selected}    ${verifyTxt}
+    enterPageByClick    ${ZK_Button_Options}    ${DailyTask_Allocation_options_selectDoorColumns}    Select Door Columns
+    ${uncheckDoorBoxsCount}    get matching xpath count    ${DailyTask_Allocation_options_selectDoorColumns_uncheckBoxsCount}
+    : FOR    ${item}    IN RANGE    0    ${uncheckDoorBoxsCount}
+    \    ${uncheckDoorBoxpath}    replace string    ${DailyTask_Allocation_options_selectDoorColumns_uncheckBox_PHRow}    [Row]    [1]
+    \    click element    ${uncheckDoorBoxpath}
+    enterPageByClick    ${ZK_Button_Options}    ${DailyTasks_tab_selected}    ${verifyTxt}
+    ${titleEndRowNum}    execute javascript    ${DailyTasks_titleRowsCount_jquery}
+    @{doorExpandRowsStartCol}    execute javascript    ${DailyTasks_door_expandRowStartCol_jquery}
+    ${leftPosition}    set variable    0
+    : FOR    ${item}    IN RANGE    0    ${maxLeftPagesCount}
+    \    exit for loop if    @{doorExpandRowsStartCol} != @{EMPTY}
+    \    ${lastLeftPosition}    execute javascript    ${ZK_colLeftPosition_last_jquery}
+    \    ${leftPosition}    evaluate    ${leftPosition}+${lastLeftPosition}
+    \    execute javascript    $(".zsscroll").scrollLeft(${leftPosition})
+    \    Wait Until Page Contains    Processing...    10
+    \    Wait Until Page Does Not Contain    Processing...    600
+    \    sleep    3S
+    \    @{doorExpandRowsStartCol}    execute javascript    ${DailyTasks_door_expandRowStartCol_jquery}
+    ${expandDoorRowPath}    replace string    ${DailyTasks_expandDoor_PHRowCol}    [Row]    [@{doorExpandRowsStartCol}[0]]
+    ${expandDoorRowPath}    replace string    ${expandDoorRowPath}    [Col]    [@{doorExpandRowsStartCol}[2]]
+    click element    ${expandDoorRowPath}
+    Wait Until Page Contains    Processing...    10
+    #    wait until element is visible    ${ZK_mainLoad_Processing}    30
+    Wait Until Page Does Not Contain    Processing...    60
+    sleep    3S
+    Wait Until Page Does Not Contain element    ${expandDoorRowPath}//div[contains(text(),'+')]    60
+    ${col}    set variable    @{doorExpandRowsStartCol}[2]
+    ${expandDoorPHColPath}    run keyword if    @{doorExpandRowsStartCol}[1] !=0    replace string    ${DailyTasks_expandDoor_PHRowCol}    [Row]    [@{doorExpandRowsStartCol}[1]]
+    : FOR    ${item}    IN RANGE    0    ${maxLeftPagesCount}
+    \    #    exit for loop if    @{doorExpandRowsStartCol}[1] == 0
+    \    ${expandDoorColCount}    get matching xpath count    //div[@class='zstopblock']//div[contains(text(),'◄►')]
+    \    ${leftPosition}    run keyword if    ${expandDoorColCount} == 0    evaluate    ${leftPosition}+${DailyTask_screenWidth}
+    \    ...    ELSE    set variable    ${leftPosition}
+    \    run keyword if    ${expandDoorColCount} == 0    execute javascript    $(".zsscroll").scrollLeft(${leftPosition})
+    \    run keyword if    ${expandDoorColCount} == 0    sleep    1S
+    \    run keyword if    ${expandDoorColCount} == 0    Wait Until Page Does Not Contain    Processing...    600
+    \    run keyword if    ${expandDoorColCount} == 0    sleep    3S
+    \    ${expandDoorColCount}    run keyword if    ${expandDoorColCount} == 0    get matching xpath count    //div[@class='zstopblock']//div[contains(text(),'◄►')]
+    \    ...    ELSE    set variable    ${expandDoorColCount}
+    \    exit for loop if    ${expandDoorColCount} == 0
+    \    ${col}    execute javascript    return $(".zstopblock").children("div:contains('◄►')").children("div:contains('◄►'):first").index()+1
+    \    ${expandDoorColPath}    replace string    ${expandDoorPHColPath}    [Col]    [${col}]
+    \    ${expandDoorColLeftPosition}    Get Horizontal Position    ${expandDoorColPath}
+    \    ${leftPosition}    run keyword if    ${expandDoorColLeftPosition} >${DailyTask_screenWidth}    evaluate    ${leftPosition}+${expandDoorColLeftPosition}-50
+    \    ...    ELSE    set variable    ${leftPosition}
+    \    run keyword if    ${expandDoorColLeftPosition} > ${DailyTask_screenWidth}    execute javascript    $(".zsscroll").scrollLeft(${leftPosition})
+    \    run keyword if    ${expandDoorColLeftPosition} > ${DailyTask_screenWidth}    sleep    1S
+    \    run keyword if    ${expandDoorColLeftPosition} >${DailyTask_screenWidth}    Wait Until Page Does Not Contain    Processing...    600
+    \    run keyword if    ${expandDoorColLeftPosition} > ${DailyTask_screenWidth}    sleep    3S
+    \    click element    ${expandDoorColPath}
+    \    Wait Until Page Contains    Processing...    10
+    \    #    ${expandDoorColCountPath}    replace string    ${expandDoorColPath}//div[contains(text(),'◄►')]    Xpath=    ${EMPTY}
+    \    #    ${expandDoorColCount}    get matching xpath count    ${expandDoorColCountPath}
+    \    #    run keyword if    ${expandDoorColCount} != 0    click element    ${expandDoorColPath}
+    \    #    wait until element is visible    ${ZK_mainLoad_Processing}    30
+    \    Wait Until Page Does Not Contain    Processing...    60
+    \    sleep    1S
+    \    Wait Until Page Does Not Contain element    ${expandDoorColPath}//div[contains(text(),'◄►')]    60
+    execute javascript    $(".zsscroll").scrollLeft(0)
+    Wait Until Page Contains    Processing...    10
+    Wait Until Page Does Not Contain    Processing...    600
+    sleep    3S
+    @{ZKData}    get ZK sheet Data    ${maxTopPagesCount}    ${maxLeftPagesCount}
+    log many    @{ZKData}
+
+allocationUserBehaviorZK2.5_expandPartialDoors
+    [Arguments]    ${verifyTxt}    ${userName}    ${userNum}    ${modelName}    @{data}
+    enterPageByClick    Xpath=${DailyTasks_tabsCount}//div[text()='${verifyTxt}']    ${DailyTasks_tab_selected}    ${verifyTxt}
+    enterPageByClick    ${ZK_Button_Options}    ${DailyTask_Allocation_options_selectDoorColumns}    Select Door Columns
+    ${uncheckDoorBoxsCount}    get matching xpath count    ${DailyTask_Allocation_options_selectDoorColumns_uncheckBoxsCount}
+    : FOR    ${item}    IN RANGE    0    ${uncheckDoorBoxsCount}
+    \    ${uncheckDoorBoxpath}    replace string    ${DailyTask_Allocation_options_selectDoorColumns_uncheckBox_PHRow}    [Row]    [1]
+    \    click element    ${uncheckDoorBoxpath}
+    enterPageByClick    ${ZK_Button_Options}    ${DailyTasks_tab_selected}    ${verifyTxt}
+    ${titleEndRowNum}    execute javascript    ${DailyTasks_titleRowsCount_jquery}
+    @{doorExpandRowsStartCol}    execute javascript    ${DailyTasks_door_expandRowStartCol_jquery}
+    ${leftPosition}    set variable    0
+    : FOR    ${item}    IN RANGE    0    ${maxLeftPagesCount}
+    \    exit for loop if    @{doorExpandRowsStartCol} != @{EMPTY}
+    \    ${lastLeftPosition}    execute javascript    ${ZK_colLeftPosition_last_jquery}
+    \    ${leftPosition}    evaluate    ${leftPosition}+${lastLeftPosition}
+    \    execute javascript    $(".zsscroll").scrollLeft(${leftPosition})
+    \    sleep    3S
+    \    Wait Until Page Does Not Contain    Processing...    600
+    \    sleep    3S
+    \    @{doorExpandRowsStartCol}    execute javascript    ${DailyTasks_door_expandRowStartCol_jquery}
+    ${findFirstDoorLeftPosition}    set variable    ${leftPosition}
+    ${qtyAllocatedCol}    execute javascript    ${DailyTasks_Allocated Qty_colNum_juqery}
+    ${qtyAllocatedPrepackCol}    execute javascript    ${DailyTasks_Allocated Prepack_colNum_juqery}
+    @{qtyAllocated_diff}    evaluate    [(a+1,e[${qtyAllocatedCol}],sum(d)) for a,b in enumerate(@{data}) for c,d in enumerate(b) if a >@{doorExpandRowsStartCol}[1] and c>= @{doorExpandRowsStartCol}[2] and b[${qtyAllocatedPrepackCol}] ==0 and b[${qtyAllocatedCol}] != sum(d)]    #    [(a,e[${qtyAllocatedCol}],sum(d)) for a,b in enumerate(@{data}) for c,d in enumerate(b) for e in b if a >@{doorExpandRowsStartCol}[1] and c>= @{doorExpandRowsStartCol}[2] and e[${qtyAllocatedPrepackCol}] ==0 and e[${qtyAllocatedCol}] != sum(d)]
+    ${expandDoorRowPath}    replace string    ${DailyTasks_expandDoor_PHRowCol}    [Row]    [@{doorExpandRowsStartCol}[0]]
+    ${expandDoorRowPath}    replace string    ${expandDoorRowPath}    [Col]    [@{doorExpandRowsStartCol}[2]]
+    #    click element    ${expandDoorRowPath}
+    successToClickElement    ${expandDoorRowPath}    -
+    sleep    1S
+    #    wait until element is visible    ${ZK_mainLoad_Processing}    30
+    Wait Until Page Does Not Contain    Processing...    60
+    sleep    3S
+    Wait Until Page Does Not Contain element    ${expandDoorRowPath}//div[contains(text(),'+')]    60
+    ${expandDoorColCount}    get matching xpath count    //div[@class='zstopblock']//div[contains(text(),'◄►')]
+    ${col}    set variable    @{doorExpandRowsStartCol}[2]
+    ${expandDoorPHColPath}    run keyword if    @{doorExpandRowsStartCol}[1] !=0    replace string    ${DailyTasks_expandDoor_PHRowCol}    [Row]    [@{doorExpandRowsStartCol}[1]]
+    : FOR    ${item}    IN RANGE    0    5    #    ${expandDoorColCount}
+    \    ${col}    run keyword if    ${item} > 0    execute javascript    return $(".zstopblock").children("div:contains('◄►')").children("div:contains('◄►'):first").index()+1
+    \    ...    ELSE    set variable    ${col}
+    \    ${leftPosition}    run keyword if    ${col} == 0    evaluate    ${leftPosition}+${DailyTask_screenWidth}
+    \    ...    ELSE    set variable    ${leftPosition}
+    \    run keyword if    ${col} == 0    execute javascript    $(".zsscroll").scrollLeft(${leftPosition})
+    \    run keyword if    ${col} == 0    sleep    1S
+    \    run keyword if    ${col} == 0    Wait Until Page Does Not Contain    Processing...    600
+    \    run keyword if    ${col} == 0    sleep    3S
+    \    ${col}    run keyword if    ${col} == 0    execute javascript    return $(".zstopblock").children("div:contains('◄►')").children("div:contains('◄►'):first").index()+1
+    \    ...    ELSE    set variable    ${col}
+    \    ${col_tmp}    evaluate    ${col}-2
+    \    ${expandDoorColPath}    replace string    ${expandDoorPHColPath}    [Col]    [${col}]
+    \    ${expandDoorColLeftPosition}    Get Horizontal Position    ${expandDoorColPath}
+    \    ${leftPosition}    run keyword if    ${expandDoorColLeftPosition} >${DailyTask_screenWidth}    evaluate    ${leftPosition}+${expandDoorColLeftPosition}-50
+    \    ...    ELSE    set variable    ${leftPosition}
+    \    run keyword if    ${expandDoorColLeftPosition} > ${DailyTask_screenWidth}    execute javascript    $(".zsscroll").scrollLeft(${leftPosition})
+    \    run keyword if    ${expandDoorColLeftPosition} > ${DailyTask_screenWidth}    sleep    1S
+    \    run keyword if    ${expandDoorColLeftPosition} >${DailyTask_screenWidth}    Wait Until Page Does Not Contain    Processing...    600
+    \    run keyword if    ${expandDoorColLeftPosition} > ${DailyTask_screenWidth}    sleep    3S
+    \    click element    ${expandDoorColPath}
+    \    Wait Until Page Does Not Contain element    ${expandDoorColPath}//div[contains(text(),'◄►')]    120
+    \    Capture Page Screenshot
+    \    ${adjCol}    execute javascript    return $(".zstopblock").children("div:eq(@{doorExpandRowsStartCol}[1])").children("div:gt(${col_tmp}):contains('Adj'):not(div:contains('Prepack')):not(div:contains('Open Stock'))").index()+1
+    \    ${adjPrepackCol}    execute javascript    return $(".zstopblock").children("div:eq(@{doorExpandRowsStartCol}[1])").children("div:gt(${col_tmp}):contains('Adj'):contains('Prepack')").index()+1
+    \    ${leftPosition}    run keyword if    ${adjPrepackCol} == 0    detemineVisibleElementAndLeftScrollTo    ${leftPosition}    return $(".zstopblock").children("div:eq(@{doorExpandRowsStartCol}[1])").children("div:gt(${col_tmp}):contains('Adj'):not(div:contains('Prepack')):not(div:contains('Open Stock'))").offset().left
+    \    ...    ELSE    set variable    ${leftPosition}
+    \    ${adjPrepackCol}    run keyword if    ${adjPrepackCol} == 0    execute javascript    return $(".zstopblock").children("div:eq(@{doorExpandRowsStartCol}[1])").children("div:gt(${col_tmp}):contains('Adj'):contains('Prepack')").index()+1
+    \    ...    ELSE    set variable    ${adjPrepackCol}
+    \    ${adjOpenStockCol}    execute javascript    return $(".zstopblock").children("div:eq(@{doorExpandRowsStartCol}[1])").children("div:gt(${col_tmp}):contains('Adj'):contains('Open Stock')").index()+1
+    \    ${leftPosition}    run keyword if    ${adjOpenStockCol} == 0    detemineVisibleElementAndLeftScrollTo    ${leftPosition}    return $(".zstopblock").children("div:eq(@{doorExpandRowsStartCol}[1])").children("div:gt(${col_tmp}):contains('Adj'):contains('Prepack')").offset().left
+    \    ...    ELSE    set variable    ${leftPosition}
+    \    ${adjOpenStockCol}    run keyword if    ${adjOpenStockCol} == 0    execute javascript    return $(".zstopblock").children("div:eq(@{doorExpandRowsStartCol}[1])").children("div:gt(${col_tmp}):contains('Adj'):contains('Open Stock')").index()+1
+    \    ...    ELSE    set variable    ${adjOpenStockCol}
+    \    ${pullCol}    execute javascript    return $(".zstopblock").children("div:eq(@{doorExpandRowsStartCol}[1])").children("div:gt(${col_tmp}):contains('Pull'):not(div:contains('Prepack')):not(div:contains('Open Stock'))").index()+1
+    \    ${leftPosition}    run keyword if    ${pullCol} == 0    detemineVisibleElementAndLeftScrollTo    ${leftPosition}    return $(".zstopblock").children("div:eq(@{doorExpandRowsStartCol}[1])").children("div:gt(${col_tmp}):contains('Adj'):contains('Open Stock')").offset().left
+    \    ...    ELSE    set variable    ${leftPosition}
+    \    ${pullCol}    run keyword if    ${pullCol} == 0    execute javascript    return $(".zstopblock").children("div:eq(@{doorExpandRowsStartCol}[1])").children("div:gt(${col_tmp}):contains('Pull'):not(div:contains('Prepack')):not(div:contains('Open Stock'))").index()+1
+    \    ...    ELSE    set variable    ${pullCol}
+    \    ${pullPrepackCol}    execute javascript    return $(".zstopblock").children("div:eq(@{doorExpandRowsStartCol}[1])").children("div:gt(${col_tmp}):contains('Pull'):contains('Prepack')").index()+1
+    \    ${leftPosition}    run keyword if    ${pullPrepackCol} == 0    detemineVisibleElementAndLeftScrollTo    ${leftPosition}    return $(".zstopblock").children("div:eq(@{doorExpandRowsStartCol}[1])").children("div:gt(${col_tmp}):contains('Pull'):not(div:contains('Prepack')):not(div:contains('Open Stock'))").offset().left
+    \    ...    ELSE    set variable    ${leftPosition}
+    \    ${pullPrepackCol}    run keyword if    ${pullPrepackCol} == 0    execute javascript    return $(".zstopblock").children("div:eq(@{doorExpandRowsStartCol}[1])").children("div:gt(${col_tmp}):contains('Pull'):contains('Prepack')").index()+1
+    \    ...    ELSE    set variable    ${pullPrepackCol}
+    \    ${pullOpenStockCol}    execute javascript    return $(".zstopblock").children("div:eq(@{doorExpandRowsStartCol}[1])").children("div:gt(${col_tmp}):contains('Pull'):contains('Open Stock')").index()+1
+    \    ${leftPosition}    run keyword if    ${pullOpenStockCol} == 0    detemineVisibleElementAndLeftScrollTo    ${leftPosition}    return $(".zstopblock").children("div:eq(@{doorExpandRowsStartCol}[1])").children("div:gt(${col_tmp}):contains('Pull'):contains('Prepack')").offset().left
+    \    ...    ELSE    set variable    ${leftPosition}
+    \    ${pullOpenStockCol}    run keyword if    ${pullOpenStockCol} == 0    execute javascript    return $(".zstopblock").children("div:eq(@{doorExpandRowsStartCol}[1])").children("div:gt(${col_tmp}):contains('Pull'):contains('Open Stock')").index()+1
+    \    ...    ELSE    set variable    ${pullOpenStockCol}
+    \    ${pushCol}    execute javascript    return $(".zstopblock").children("div:eq(@{doorExpandRowsStartCol}[1])").children("div:gt(${col_tmp}):contains('Push'):not(div:contains('Prepack')):not(div:contains('Open Stock'))").index()+1
+    \    ${leftPosition}    run keyword if    ${pushCol} == 0    detemineVisibleElementAndLeftScrollTo    ${leftPosition}    return $(".zstopblock").children("div:eq(@{doorExpandRowsStartCol}[1])").children("div:gt(${col_tmp}):contains('Pull'):contains('Open Stock')").offset().left
+    \    ...    ELSE    set variable    ${leftPosition}
+    \    ${pushCol}    run keyword if    ${pushCol} == 0    execute javascript    return $(".zstopblock").children("div:eq(@{doorExpandRowsStartCol}[1])").children("div:gt(${col_tmp}):contains('Push'):not(div:contains('Prepack')):not(div:contains('Open Stock'))").index()+1
+    \    ...    ELSE    set variable    ${pushCol}
+    \    ${pushPrepackCol}    execute javascript    return $(".zstopblock").children("div:eq(@{doorExpandRowsStartCol}[1])").children("div:gt(${col_tmp}):contains('Push'):contains('Prepack')").index()+1
+    \    ${leftPosition}    run keyword if    ${pushPrepackCol} == 0    detemineVisibleElementAndLeftScrollTo    ${leftPosition}    return $(".zstopblock").children("div:eq(@{doorExpandRowsStartCol}[1])").children("div:gt(${col_tmp}):contains('Push'):not(div:contains('Prepack')):not(div:contains('Open Stock'))").offset().left
+    \    ...    ELSE    set variable    ${leftPosition}
+    \    ${pushPrepackCol}    run keyword if    ${pushPrepackCol} == 0    execute javascript    return $(".zstopblock").children("div:eq(@{doorExpandRowsStartCol}[1])").children("div:gt(${col_tmp}):contains('Push'):contains('Prepack')").index()+1
+    \    ...    ELSE    set variable    ${pushPrepackCol}
+    \    ${pushOpenStockCol}    execute javascript    return $(".zstopblock").children("div:eq(@{doorExpandRowsStartCol}[1])").children("div:gt(${col_tmp}):contains('Push'):contains('Open Stock')").index()+1
+    \    ${leftPosition}    run keyword if    ${pushOpenStockCol} == 0    detemineVisibleElementAndLeftScrollTo    ${leftPosition}    return $(".zstopblock").children("div:eq(@{doorExpandRowsStartCol}[1])").children("div:gt(${col_tmp}):contains('Push'):contains('Prepack')").offset().left
+    \    ...    ELSE    set variable    ${leftPosition}
+    \    ${pushOpenStockCol}    run keyword if    ${pushOpenStockCol} == 0    execute javascript    return $(".zstopblock").children("div:eq(@{doorExpandRowsStartCol}[1])").children("div:gt(${col_tmp}):contains('Push'):contains('Open Stock')").index()+1
+    \    ...    ELSE    set variable    ${pushOpenStockCol}
+    \    ${expandedDoorsColStr}    run keyword if    ${item} == 0    set variable    ${adjCol},${adjPrepackCol},${adjOpenStockCol},${pullCol},${pullPrepackCol},${pullOpenStockCol},${pushCol},${pushPrepackCol},${pushOpenStockCol}
+    \    ...    ELSE    set variable    ${expandedDoorsColStr};${adjCol},${adjPrepackCol},${adjOpenStockCol},${pullCol},${pullPrepackCol},${pullOpenStockCol},${pushCol},${pushPrepackCol},${pushOpenStockCol}
+    execute javascript    $(".zsscroll").scrollLeft(0)
+    sleep    1S
+    Wait Until Page Does Not Contain    Processing...    600
+    sleep    3S
+    @{expandedDoorsCol}    split string    ${expandedDoorsColStr}    ;
+    @{ZKData}    get ZK sheet Data    ${maxTopPagesCount}    ${maxLeftPagesCount}
+    : FOR    ${item}    IN RANGE    0    5    #    ${expandDoorColCount}
+    \    @{doorCols}    split string    @{expandedDoorsCol}[${item}]    ,
+    \    @{adj}    evaluate    [b[@{doorCols}[0]] for b in @{ZKData}]
+    \    ${doorNameRow}    evaluate    @{doorExpandRowsStartCol}[1]-1
+    \    ${doorName}    replace string    @{adj}[${doorNameRow}]    ►◄    ${EMPTY}
+    \    @{adjPrepack}    evaluate    [b[@{doorCols}[1]] for b in @{ZKData}]
+    \    @{adjOpenStock}    evaluate    [b[@{doorCols}[2]] for b in @{ZKData}]
+    \    @{adj_diff}    evaluate    [(a+1,b) for (a,b) in enumerate (zip(@{adj},@{adjPrepack},@{adjOpenstock})) if a>@{doorExpandRowsStartCol}[1] and b[1]==0 and b[0] != b[2]]    #    [(a,b,d,f) for a,b in enumerate(@{adj}) for c,d in enumerate(@{adjPrepack}) \ for e,f in enumerate(@{adjOpenstock}) if a>@{doorExpandRowsStartCol}[1] and a==c and a==e and d==0 and b != f]
+    \    @{pull}    evaluate    [b[@{doorCols}[3]] for b in @{ZKData}]
+    \    @{pullPrepack}    evaluate    [b[@{doorCols}[4]] for \ b in @{ZKData}]
+    \    @{pullOpenStock}    evaluate    [b[@{doorCols}[5]] for b in @{ZKData}]
+    \    @{pull_diff}    evaluate    [(a+1,b) for a,b in enumerate (zip(@{pull},@{pullPrepack},@{pullOpenstock})) if a>@{doorExpandRowsStartCol}[1] if b[1]==0 and b[0] != b[2]]
+    \    @{push}    evaluate    [b[@{doorCols}[6]] for b in @{ZKData}]
+    \    @{pushPrepack}    evaluate    [b[@{doorCols}[7]] for b in @{ZKData}]
+    \    @{pushOpenStock}    evaluate    [b[@{doorCols}[8]] for b in @{ZKData}]
+    \    @{push_diff}    evaluate    [(a+1,b) for a,b in enumerate(zip(@{push},@{pushPrepack},@{pushOpenstock})) if a>@{doorExpandRowsStartCol}[1] and b[1]==0 and b[0] != b[2]]
+    \    run keyword and continue on failure    run keyword if    @{adj_diff} != @{EMPTY}    fail    ${userName}_${userNum}_${modelName}_${verifyTxt}_${doorName} Adj is not equal to Adj Open Stock!@{adj_diff}
+    \    run keyword and continue on failure    run keyword if    @{pull_diff} != @{EMPTY}    fail    ${userName}_${userNum}_${modelName}_${verifyTxt}_${doorName} Pull is not equal to Pull Open Stock!@{pull_diff}
+    \    run keyword and continue on failure    run keyword if    @{push_diff} != @{EMPTY}    fail    ${userName}_${userNum}_${modelName}_${verifyTxt}_${doorName} Push is not equal to Push Open Stock!@{push_diff}
+    \    run keyword and continue on failure    run keyword if    @{qtyAllocated_diff} != @{EMPTY}    fail    ${userName}_${userNum}_${modelName}_${verifyTxt} Qty Allocated \ is not equal to sum of all doors Adj!@{qtyAllocated_diff}
+    cancelInPopulateJob    ${userName}    ${userNum}    ${modelName}    ${verifyTxt}    ${ZK_Button_CancelJob}    ${DailyTasks_Panel_cancelJob}
+    ...    ${ZK_Button_disabledCancelJob}    cancelJob    @{doorExpandRowsStartCol}[1]    True    @{ZKData}
+    @{dataAfterCancelJob}    cancelInPopulateJob    ${userName}    ${userNum}    ${modelName}    ${verifyTxt}    ${ZK_Button_CancelJob}
+    ...    ${DailyTasks_Panel_cancelJob}    ${ZK_Button_disabledCancelJob}    submitCancelJob    @{doorExpandRowsStartCol}[1]    True    @{ZKData}
+    cancelInPopulateJob    ${userName}    ${userNum}    ${modelName}    ${verifyTxt}    ${ZK_Button_Job}    ${DailyTasks_Panel_createJob}
+    ...    ${ZK_Button_disabledJob}    createJob    @{doorExpandRowsStartCol}[1]    True    @{dataAfterCancelJob}
+    @{dataAfterCreateJob}    createJobAndValidationData    ${userName}    ${userNum}    ${modelName}    ${verifyTxt}    Suggested
+    ...    @{doorExpandRowsStartCol}[1]    True    @{ZKData}
+    cancelInPopulateJob    ${userName}    ${userNum}    ${modelName}    ${verifyTxt}    ${ZK_Button_Populate}    ${DailyTasks_Panel_Populate}
+    ...    ${ZK_Button_disabledPopulate}    populate    @{doorExpandRowsStartCol}[1]    True    @{dataAfterCreateJob}
+    @{dataAfterPopulate}    populateAndValidationData    ${userName}    ${userNum}    ${modelName}    ${verifyTxt}    Pull
+    ...    ${expandDoorColCount}    ${expandDoorPHColPath}    ${findFirstDoorLeftPosition}    True    @{doorExpandRowsStartCol}
+    @{dataAfterPopulate}    populateAndValidationData    ${userName}    ${userNum}    ${modelName}    ${verifyTxt}    Push
+    ...    ${expandDoorColCount}    ${expandDoorPHColPath}    ${findFirstDoorLeftPosition}    True    @{doorExpandRowsStartCol}
+
+detemineVisibleElementAndLeftScrollTo
+    [Arguments]    ${currentPosition}    ${elementLeftPosition_jquery}    ${scrollFlag}=True
+    ${elementLeftPosition}    execute javascript    ${elementLeftPosition_jquery}
+    ${leftPosition}    run keyword if    ${scrollFlag}    evaluate    ${currentPosition} + ${elementLeftPosition}
+    ...    ELSE    set variable    ${currentPosition}
+    run keyword if    ${scrollFlag}    execute javascript    $(".zsscroll").scrollLeft(${leftPosition})
+    run keyword if    ${scrollFlag}    sleep    1S
+    run keyword if    ${scrollFlag}    Wait Until Page Does Not Contain    Processing...    600
+    run keyword if    ${scrollFlag}    sleep    3S
+    [Return]    ${leftPosition}
+
+compareBPExcelList
+    [Arguments]    ${userName}    ${userNum}    ${model}    ${expectedExcelList}    ${downloadExcelList}
+    @{downloadExcelList}    create list    ${downloadExcelList}
+    @{expectedExcelList}    create list    ${expectedExcelList}
+    run keyword and continue on failure    run keyword if    len(@{downloadExcelList}) != len(@{expectedExcelList})    fail    ${userName}_${userNum}_${model}_Download file counts aren't equal to expected outcome file counts!
+    run keyword and continue on failure    run keyword if    @{downloadExcelList} == @{EMPTY} or @{expectedExcelList} == @{EMPTY}    fail    ${userName}_${userNum}_${model}_Download File or Expected File are Blank!
+    return from keyword if    @{downloadExcelList} == @{EMPTY} or @{expectedExcelList} == @{EMPTY}
+    : FOR    ${item}    IN RANGE    0    min( len(@{downloadExcelList}), len(@{expectedExcelList}))
+    \    compare excel    @{expectedExcelList}[${item}]    @{downloadExcelList}[${item}]    ${diff_dir}${userName}_${userNum}_${model}_${item}_diff.txt
+
+AssortmentMixValidationLoacationAttr
+    [Arguments]    ${checkCount}    ${tabName}    ${topDoorsCount}
+    @{styleColorRows}    evaluate    [a+1 for (a,b) in enumerate(@{ZKdata}) if 'Customize' in b and a>1]
+    ${topShopsCol}    evaluate    [a for (a,b) in enumerate(@{dataByCol}) if 'Top Shops' in b][0]
+    ${customizeCol}    evaluate    [a for (a,b) in enumerate(@{dataByCol}) if 'Customize' in b][0]
+    ${gradeCol}    evaluate    [a for (a,b) in enumerate(@{dataByCol}) if 'Grade' in b][0]
+    ${affiliatedCityCol}    evaluate    [a for (a,b) in enumerate(@{dataByCol}) if 'Affiliated City' in b][0]
+    ${subCityCol}    evaluate    [a for (a,b) in enumerate(@{dataByCol}) if 'Sub-City' in b][0]
+    ${businessCircleCol}    evaluate    [a for (a,b) in enumerate(@{dataByCol}) if 'Business Circle' in b][0]
+    ${availableShopsCol}    evaluate    [a for (a,b) in enumerate(@{dataByCol}) if 'Available' in b and 'Shops' in b][0]
+    @{locationCols}    create list    ${topShopsCol}    ${gradeCol}    ${affiliatedCityCol}    ${subCityCol}    ${businessCircleCol}
+    ...    ${availableShopsCol}
+    @{randomCheckBoxRow}    evaluate    sorted(random.sample(@{styleColorRows},min( ${checkCount},len(@{styleColorRows}))))    random
+    : FOR    ${item}    IN    @{randomCheckBoxRow}
+    \    ${currentCustomizePath}    replace string    ${AssortmentMix_Button_Customize_rowPH}    [row]    [${item}]
+    \    successToClickCheckBox    ${currentCustomizePath}
+    \    run keyword and continue on failure    page should not contain    exception
+    \    wait until element contains    Xpath=//tr[@class='filtertablerow'][1]/preceding-sibling::tr    \# of Top Doors:
+    \    @{customizeLocationValues}    execute javascript    ${AssortmentMix_Customize_LocationAttr_jquery}
+    \    ${item_tmp}    evaluate    ${item}-1
+    \    @{currentLocationValues}    evaluate    [b[${item_tmp}] for (a,b) in enumerate(@{dataByCol}) if a in @{locationCols}]
+    \    @{locationDiff}    evaluate    [(a,b) for (a,b) in zip(@{customizeLocationValues},@{currentLocationValues}) if a != b]
+    \    run keyword and continue on failure    run keyword if    @{locationDiff} != @{EMPTY}    fail    Location Attr are diffrence from that of Customize page! Row:${item}_@{locationDiff}
+    \    run keyword and continue on failure    run keyword if    ('@{customizeLocationValues}[2]' or '@{customizeLocationValues}[3]' or '@{customizeLocationValues}[4]' ) and '@{customizeLocationValues}[1]' =='${EMPTY}l'    fail    Grade is incorrect! Row:${item}
+    \    input text    ${AssortmentMix_Customize_text_topDoors}    ${topDoorsCount}
+    \    sleep    3S
+    \    run keyword and continue on failure    Textfield Value Should be    ${AssortmentMix_Customize_text_topDoors}    ${topDoorsCount}
+    \    click element    ${AssortmentMix_Customize_button_submit}
+    \    Wait Until Page Does Not Contain    Processing...    60
+    \    sleep    3S
+    \    @{customizeLocationValues}    execute javascript    ${AssortmentMix_Customize_LocationAttr_jquery}
+    \    Capture Page Screenshot
+    \    run keyword and continue on failure    run keyword if    '@{customizeLocationValues}[0]' and ('@{customizeLocationValues}[2]' or '@{customizeLocationValues}[3]' or '@{customizeLocationValues}[4]' )    fail    When input # of top doors, Affiliated City/Sub-City/Business Circle is incorrect! \ Row:${item}
+    \    enter page by click    ${ZK_Button_SaveClose}    ${ZK_selectedTab}    Assortment Mix
+    \    @{ZKData}    get ZK sheet Data    ${maxTopPagesCount}    ${maxLeftPagesCount}
+    \    @{dataByCol}    evaluate    zip(*@{ZKData})
+    \    @{currentLocationValues}    evaluate    [b[${item_tmp}] for (a,b) in enumerate(@{dataByCol}) if a in @{locationCols}]
+    \    @{locationDiff}    evaluate    [(a,b) for (a,b) in zip(@{customizeLocationValues},@{currentLocationValues}) if a != b]
+    \    run keyword and continue on failure    run keyword if    @{locationDiff} != @{EMPTY}    fail    After input # of Top Doors, Location Attr are diffrence from that of Customize page! Row:${item}_@{locationDiff}
+    [Return]    ${dataByCol}    @{ZKData}
+
+validationEditableCellsInStyleColorSize
+    [Arguments]    ${editRow}    @{editCols}
+    ${currentRow}    replace string    ${ZK_sheet_cell_rowcolPH}    [row]    [${editRow}]
+    #    ${nextRowNum}    evaluate    ${editRow}+1
+    #    ${nextRow}    replace string    ${ZK_sheet_cell_rowcolPH}    [row]    ${nextRowNum}
+    : FOR    ${item}    IN    @{editCols}
+    \    #    ${col}    evaluate    int(@{item}[0])-1
+    \    ${currentCellPath}    replace string    ${currentRow}    [col]    [@{item}[0]]
+    \    #    ${nextCellPath}    replace string    ${nextRow}    [col]    [@{item}[0]]
+    \    ${currentCellPosition}    Get Vertical Position    ${currentCellPath}
+    \    continue for loop if    ${currentCellPosition} == 0
+    \    click element    ${currentCellPath}
+    \    ${selectedStatus}    get matching xpath count    //div[@class='zsdata']//div[@class='zsselecti']
+    \    run keyword if    ${selectedStatus} == 0    click element    ${currentCellPath}
+    \    ${cellTopPosition}    Get Vertical Position    ${currentCellPath}
+    \    ${selectedTopPosition}    Get Vertical Position    ${ZK_Cell_Selected}
+    \    run keyword if    abs(${cellTopPosition}-${selectedTopPosition}) >5    click element    ${currentCellPath}
+    \    run keyword if    'Total' in '@{item}[1]' and ('Adj' not in '@{item}[2]' or 'Prepack' not in '@{item}[2]')    double click element    ${ZK_Cell_Selected}
+    \    run keyword if    'Total' in '@{item}[1]' and ('Adj' not in '@{item}[2]' or 'Prepack' not in '@{item}[2]')    wait until element is visible    ${ZK_message_non-editableCell}
+    \    run keyword and continue on failure    run keyword if    'Total' in '@{item}[1]' and ('Adj' not in '@{item}[2]' or 'Prepack' not in '@{item}[2]')    element should contain    ${ZK_message_non-editableCell}    Can not edit on a protected cell.
+    \    run keyword if    'Total' in '@{item}[1]' and ('Adj' not in '@{item}[2]' or 'Prepack' not in '@{item}[2]')    capture page screenshot
+    \    run keyword if    'Total' in '@{item}[1]' and 'Adj' in '@{item}[2]' and 'Prepack' in '@{item}[2]'    double click element    ${ZK_Cell_Selected}
+    \    run keyword if    'Total' in '@{item}[1]' and 'Adj' in '@{item}[2]' and 'Prepack' in '@{item}[2]'    input text    ${ZK_Cell_Edit}    1    #
+    \    ...    # '@{item}[1] '== 'Total' and 'Adj' in '@{item}[2]' and Prepack' in '@{item}[2]'
+    \    run keyword if    'Total' in '@{item}[1]' and 'Adj' in '@{item}[2]' and 'Prepack' in '@{item}[2]'    press key    ${ZK_Cell_Edit}    \\13
+    \    run keyword and continue on failure    run keyword if    'Total' in '@{item}[1]' and 'Adj' in '@{item}[2]' and 'Prepack' in '@{item}[2]'    element should contain    ${currentCellPath}    1
+    \    run keyword if    'Total' in '@{item}[1]' and 'Adj' in '@{item}[2]' and 'Prepack' in '@{item}[2]'    double click element    ${ZK_Cell_Selected}
+    \    run keyword if    'Total' in '@{item}[1]' and 'Adj' in '@{item}[2]' and 'Prepack' in '@{item}[2]'    input text    ${ZK_Cell_Edit}    -1
+    \    run keyword if    'Total' in '@{item}[1]' and 'Adj' in '@{item}[2]' and 'Prepack' in '@{item}[2]'    press key    ${ZK_Cell_Edit}    \\13
+    \    run keyword if    'Total' not in '@{item}[1]' and ('Adj' not in '@{item}[2]' or \ 'Open Stock' not in '@{item}[2]')    double click element    ${ZK_Cell_Selected}
+    \    run keyword if    'Total' not in '@{item}[1]' and ('Adj' not in '@{item}[2]' or \ 'Open Stock' not in '@{item}[2]')    wait until element is visible    ${ZK_message_non-editableCell}
+    \    run keyword and continue on failure    run keyword if    'Total' not in '@{item}[1]' and ('Adj' not in '@{item}[2]' or \ 'Open Stock' not in '@{item}[2]')    element should contain    ${ZK_message_non-editableCell}    Can not edit on a protected cell.
+    \    run keyword if    'Total' not in '@{item}[1]' and 'Adj' \ in '@{item}[2]' and 'Open Stock' in '@{item}[2]'    double click element    ${ZK_Cell_Selected}
+    \    run keyword if    'Total' not in '@{item}[1]' and 'Adj' \ in '@{item}[2]' and 'Open Stock' in '@{item}[2]'    input text    ${ZK_Cell_Edit}    1
+    \    run keyword if    'Total' not in '@{item}[1]' and 'Adj' \ in '@{item}[2]' and 'Open Stock' in '@{item}[2]'    press key    ${ZK_Cell_Edit}    \\13
+    \    run keyword and continue on failure    run keyword if    'Total' not in '@{item}[1]' and 'Adj' \ in '@{item}[2]' and 'Open Stock' in '@{item}[2]'    element should contain    ${currentCellPath}    1
+    \    ${currentSelectedTopPosition}    run keyword if    'Total' not in '@{item}[1]' and 'Adj' \ in '@{item}[2]' and 'Open Stock' in '@{item}[2]'    Get Vertical Position    ${ZK_Cell_Selected}
+    \    run keyword if    'Total' not in '@{item}[1]' and 'Adj' \ in '@{item}[2]' and 'Open Stock' in '@{item}[2]' and ${currentSelectedTopPosition} < ${cellTopPosition}    press key    ${ZK_Cell_Edit}    \\13
+    \    run keyword if    'Total' not in '@{item}[1]' and 'Adj' \ in '@{item}[2]' and 'Open Stock' in '@{item}[2]'    double click element    ${ZK_Cell_Selected}
+    \    run keyword if    'Total' not in '@{item}[1]' and 'Adj' \ in '@{item}[2]' and 'Open Stock' in '@{item}[2]'    input text    ${ZK_Cell_Edit}    -1
+    \    run keyword if    'Total' not in '@{item}[1]' and 'Adj' \ in '@{item}[2]' and 'Open Stock' in '@{item}[2]'    press key    ${ZK_Cell_Edit}    \\13

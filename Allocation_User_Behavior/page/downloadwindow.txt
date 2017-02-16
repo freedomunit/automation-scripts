@@ -1,0 +1,23 @@
+*** Variables ***
+${download_browse_rx}    360
+${download_browse_ry}    205
+${download_ok_rx}    298
+${download_ok_ry}    305
+${download_folder_title}    Choose Download Folder
+${download_folder_edit}    Edit1
+${download_folder_select}    Button1
+${download_folder_cancel}    Button2
+${download_save_title_firefox}    Enter name of file to save to…    # firefox:Enter name of file to save to… chrome:Save As
+${download_save_save}    Button1
+${download_save_cancel}    Button2
+${download_save_filename}    Edit1
+${download_PDF_title}    Save As    # firefox:Opening orders.pdf \ chrome:Save As
+${download_stylebank_title}    Save As    # firefox:Opening efsnPackage.do_linesheetDownload.xls \ chrome:Save As
+${download_saveRadio_rx}    46
+${download_saveRadio_ry}    207
+${download_IE_title}    File Download
+${download_IE_saveButton}    Button2
+${closeWindow_IE_title}    Windows Internet Explorer
+${closeWindow_IE_yesButton}    Button1
+${download_save_title_chrome}    Save As
+${upload_button_open}    Button1

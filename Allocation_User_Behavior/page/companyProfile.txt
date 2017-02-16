@@ -1,0 +1,12 @@
+*** Variables ***
+${CP_link_openAll}    Open All
+${CP_link_closeAll}    Close All
+${CP_link_styleAttributeSelection}    Xpath=//a[text()='Style Attribute Selection']
+${CP_button_top_setCriteria}    Xpath=//form[@id='form1']/table[1]//input[@name='savecompanyprofile']
+${CP_button_bottom_setCriteria}    Xpath=//form[@id='form1']/table[3]//input[@name='savecompanyprofile']
+${CP_dropdown}    Xpath=//select[@name='setActions']
+${CP_button_go}    Xpath=//input[@name='goButton']
+${CP_button_back}    Xpath=//input[@value='Back'][1]
+${CP_pageName_first}    Xpath=//big[@class='title1']
+${CP_spreadButton_count}    //img[@class='plus']
+${CP_collapseButton_count}    //img[@class='minus']

@@ -1,0 +1,44 @@
+body{
+	font-size: 12px
+}
+
+big{
+	font-size: 30px
+	font-weight: bold;
+}
+
+table {
+    border-collapse: collapse;
+    border: 1px solid #000000;    
+}
+
+th {
+    border-collapse: collapse;
+    border: 1px solid #000000;
+    width: 75px;
+}
+
+td {
+    border-collapse: collapse;
+    border: 1px solid #000000;
+    width: 75px;
+}
+
+.difference {
+	 border-collapse: collapse;
+    border: 1px solid #000000;
+    width: 75px;
+    background:#fff000;
+}
+
+tr[class="difference"] {
+	 border-collapse: collapse;
+    border: 1px solid #000000;
+    width: 75px;
+    background:#ff0000;
+}
+
+.divdifference {	
+	 width: auto;
+   	 color:red;
+}

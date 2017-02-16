@@ -1,0 +1,51 @@
+*** Settings ***
+Force Tags        SC-G1-OB
+Resource          page/OrderBreakdown.txt
+Resource          page/ZK.txt
+Resource          Setting/environment.txt
+Resource          Setting/performancekeyword.txt
+
+*** Test Cases ***
+selectOBDCriteria
+    [Tags]
+    enterCertainModel    Order Breakdown    ${mainPage}    OrderBreakdown
+    select from list by label    ${OBD_criteria_Dropdown_TaskType}    ${OBD_taskType}
+    list selection should be    ${OBD_criteria_Dropdown_TaskType}    ${OBD_taskType}
+    input text    ${OBD_criteria_Text_FromDate}    ${OBD_fromDate}
+    input text    ${OBD_criteria_Text_ToDate}    ${OBD_toDate}
+    run keyword if    '${OBD_timeType}' == 'Shop Date'    click element    ${OBD_criteria_Radio_ShopDate}
+    ...    ELSE IF    '${OBD_timeType}' == 'In DC Date'    click element    ${OBD_criteria_Radio_InDCDate}
+    ${removeFilter_count}    get matching xpath count    ${OBD_criteria_removeFilter_count}
+    run keyword if    ${removeFilter_count}>1    removeFilters    ${OBD_criteria_Button_removeFilter_rowPlaceHold}    ${removeFilter_count}    ${OBD_criteria_Dropdown_filterHierarchy1}
+    run keyword if    ${removeFilter_count}==1    Select From List by index    ${OBD_criteria_Dropdown_filterHierarchy1}    0
+    run keyword if    '@{OBD_Criteria}[0]' != '${EMPTY}'    selectCustomCriteria    ${OBD_criteria_Dropdown_filterHierarchy1}    ${OBD_criteria_Option_filterHierarachy1}    ${OBD_criteria_Options_filterHierarachy1}    ${OBD_criteria_filterHierarachy1_optionCount}
+    ...    Xpath=${OBD_criteria_filterHierarachy1_rowCount}//input[@title='Add Filter']    ${OBD_criteria_filterHierarachy1_rowCount}    @{OBD_Criteria}
+    enter page by click    ${OBD_criteria_top_submit}    ${ZK_selectedTab}    ${OBD_taskType} Summary Color
+
+editSummaryColorTab
+    click element    ${ZK_Title_Style#}
+    run keyword and continue on failure    click element    ${ZK_Title_Style#}
+    click element    ${ZK_Button_FreezePanel}
+    Wait Until Page Does Not Contain    Processing...    600
+    ${freezeStatus}    get element attribute    ${ZK_Button_FreezePanel}@class
+    should contain    ${freezeStatus}    z-menuitem opened
+    wait until page contains element    ${ZK_selectedFreezeButton}    60
+    page should not contain    error
+    Download excel    ${OBD_Button_Excel}    OBD_${OBD_taskType} Summary Color
+    edit options    ${OBD_Button_Options}    Select Attribute Columns    ${OBD_taskType} Summary Color    Xpath=//div[@class='z-panel-body']/div/div/div[@class='z-hlayout-inner'][1]/div[1]/div[1]/div[1]/div[1]/div[@class='z-hlayout-inner'][1]/div/div[1]/div[@class='z-window-header']
+
+editSummarySizeTab
+    enter page by click    Xpath=${OBD_tabsCount}[2]    ${ZK_selectedTab}    ${OBD_taskType} Summary Size
+    click element    ${ZK_Title_Style#}
+    run keyword and continue on failure    click element    ${ZK_Title_Style#}
+    click element    ${ZK_Button_FreezePanel}
+    Wait Until Page Does Not Contain    Processing...    600
+    ${freezeStatus}    get element attribute    ${ZK_Button_FreezePanel}@class
+    should contain    ${freezeStatus}    z-menuitem opened
+    wait until page contains element    ${ZK_selectedFreezeButton}    60
+    page should not contain    error
+    Download excel    ${OBD_Button_Excel}    OBD_${OBD_taskType} Summary Size
+    edit options    ${OBD_Button_Options}    Select Attribute Columns    ${OBD_taskType} Summary Size    Xpath=//div[@class='z-panel-body']/div/div/div[@class='z-hlayout-inner'][1]/div[1]/div[1]/div[1]/div[1]/div[@class='z-hlayout-inner'][1]/div/div[1]/div[@class='z-window-header']
+
+exitOBD
+    enter page by click    ${ZK_Button_Close}    ${mainPage}    OrderBreakdown

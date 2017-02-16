@@ -1,0 +1,23 @@
+*** Settings ***
+Force Tags        SC-G1-SB
+Resource          Setting/environment.txt
+Resource          Setting/performancekeyword.txt
+Resource          page/ZK.txt
+Resource          page/stylebank.txt
+
+*** Test Cases ***
+editSB
+    [Tags]
+    enterCertainModel    Style Bank    ${mainPage}    StyleBank
+    input text    ${stylebank_inputText_style#}    ${StyleBank_style#}
+    #    Textarea Value Should Be    ${stylebank_inputText_style#}    ${StyleBank_style#}
+    click element    ${stylebank_Button_Search}
+    wait until page contains    ${StyleBank_style#}
+    enter page by click    ${stylebank_Button_AdvancedSearch}    ${mainPage}    Enter the search criteria for styles you would like to view, and click the Search button.
+    : FOR    ${item}    IN    @{StyleBank_downloadCriteria}
+    \    @{keyVals}    split string    ${item}    /
+    \    @{vals}    split string    @{keyVals}[1]    ,
+    \    check criteria    @{keyVals}[0]    ${stylebank_advanced_filterAttrVal_AttriValPH}    @{vals}
+    select from list by label    ${stylebank_searched_dropdown_option}    Style/Color/Size Linesheet
+    list selection should be    ${stylebank_searched_dropdown_option}    Style/Color/Size Linesheet
+    download excel    ${stylebank_searched_generateReport}    StyleBank

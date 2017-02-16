@@ -1,0 +1,3 @@
+*** Variables ***
+${po_top_submit}    Xpath=//form[@name='message']/table[2]//input[@value='Submit']
+${po_bottom_submit}    Xpath=//form[@name='message']/table[4]//input[@value='Submit']

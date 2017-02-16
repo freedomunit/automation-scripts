@@ -1,0 +1,94 @@
+*** Settings ***
+Library           String
+Resource          ../page/login.txt
+Library           Selenium2Library
+
+*** Variables ***
+${password}       wuhan02
+${prod_download_dir}    d:\\Robot\\Allocation\\prod_download
+${stage_download_dir}    d:\\Robot\\Allocation\\stage_download
+${browser_type}    firefox
+${browser_profile_1}    C:\\Users\\pc\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\gwdm8a98.default    # C:\Users\lyang\AppData\Roaming\Mozilla\Firefox\Profiles\44tti0qr.default-1454405152917/\\scfi6yo6.default
+${users_setting}    d:\\Robot\\Allocation\\Setting\\comparison setting.xlsx
+${AssortmentMix_setting_tab}    AssortmentMix setting
+${AssortmentMix_criteria_colNumber}    2
+${stylebank_setting_tab}    StyleBank setting
+${stylebank_criteria_colNumber}    3
+${companyprofile_setting_tab}    CompanyProfile setting
+${diff_dir}       d:\\Robot\\Allocation\\diff
+${selenium_speed}    0.1
+${browser_profile_2}    C:\\Users\\pc\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\gwdm8a98.default
+${BrandProfile_setting_tab}    BrandProfile setting
+${BrandProfile_criteria_colNumber}    1
+${max_scrollPage_num}    10000
+${DailyTasks_setting_tab}    DailyTasks setting
+${DailyTasks_criteria_colNumber}    9
+${DailyTasks_taskType_colNumber}    2
+${DailyTasks_screenType_colNumber}    3
+${DailyTasks_status_colNumber}    4
+${DailyTasks_orderCity_colNumber}    5
+${DailyTasks_fromDate_colNumber}    6
+${DailyTasks_toDate_colNumber}    7
+${DailyTasks_timeRange_colNumber}    8
+${max_scrollLeftPage_num}    1000
+${DT_appendMark}    </div>\n<div style="-moz-user-select: none; width: 1754px;" class="zstop zsfztop" zs.t="STopPanel">
+${OrderBreakdown_setting_tab}    OrderBreakdown setting
+${OrderBreakdown_criteria_colNumber}    6
+${OrderBreakdown_taskType_colNumber}    2
+${OrderBreakdown_fromDate_colNumber}    3
+${OrderBreakdown_toDate_colNumber}    4
+${OrderBreakdown_timeRange_colNumber}    5
+${AssortmentMix_visibleFlag_colNumber}    1
+${DailyTasks_visibleFlag_colNumber}    1
+${OrderBreakdown_visibleFlag_colNumber}    1
+${stylebank_visibleFlag_colNumber}    1
+${stylebank_reportType_colNumber}    2
+${stylebank_compareStyles_count}    10
+${ZKLoadTestingParam_DT_dir}    D:\\Robot\\Allocation\\ZKLoadTestingParam\\users_DT.dat
+${ZKLoadTestingParam_Transfer_dir}    D:\\Robot\\Allocation\\ZKLoadTestingParam\\users_Transfer.dat
+${Transfer_setting_tab}    Transfer setting
+${Transfer_criteria_colNumber}    9
+${Transfer_taskType_colNumber}    2
+
+
+*** Keywords ***
+EnvironmentInit
+    [Arguments]    ${URL}
+    Open Browser    ${URL}    ${browser}    ff_profile_dir=${browser_profile}
+    Maximize Browser Window
+
+Logout Close Browser
+    [Arguments]    ${browser}
+    Switch Browser    ${browser}
+    Click Element    Xpath=//a[@class='logout']
+    Close Browser
+
+EnvironmentInit and Login
+    [Arguments]    ${URL}    ${userName}    ${browser_profile}
+    ${browser}    Open Browser    ${URL}    browser=${browser_type}    ff_profile_dir=${browser_profile}
+    log    ${browser_profile}
+    log    ${browser_type}
+    Maximize Browser Window
+    wait until page contains element    id=login1    100
+    Input Text    id=login1    ${userName}
+    Input Password    id=password    ${password}
+    #    ${map_status}    get element attribute    ${login_editable_form}@action
+    #    log    ${login_map_uncheck_action}
+    #    run keyword if    '${map_status}' == '${login_map_uncheck_action}'    Click Element    ${login_map}
+    Click Element    Xpath=//input[@class='sb']
+    Sleep    3S
+    ${message}    Get Text    Xpath=//body
+    ${line}    Get Lines Containing String    ${message}    Warning
+    ${count}    Get Line Count    ${line}
+    Run Keyword If    ${count}>0    Click Element    Xpath=//input[@name='answeryes']
+    Page Should Contain    Welcome
+    Capture Page Screenshot
+    [Return]    ${browser}
+
+Wait Until Page End
+    [Arguments]    @{main_windowhandle}
+    : FOR    ${count}    IN RANGE    10000
+    \    @{windowhandles}    Get Window Handles
+    \    Run Keyword If    @{windowhandles} == @{main_windowhandle}    Exit For Loop
+    \    Sleep    5s
+    \    Run Keyword If    ${count} ==10000    Log    exceed time!

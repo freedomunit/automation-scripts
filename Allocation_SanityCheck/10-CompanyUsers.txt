@@ -1,0 +1,14 @@
+*** Settings ***
+Force Tags        SC-G1-CU
+Resource          Setting/environment.txt
+Resource          Setting/performancekeyword.txt
+Resource          page/ZK.txt
+Resource          page/CompanyUsers.txt
+
+*** Test Cases ***
+editCU
+    enterCertainModel    Company Users    ${mainPage}    CompanyUsers
+    ${usersCount}    get matching xpath count    ${CompanyUsers_usersCount}
+    ${userNum}    evaluate    random.randint(2,${usersCount}+1)    random
+    ${userLink}    replace string    ${CompanyUsers_userLink_numPH}    [num]    [${userNum}]
+    enter Page By click    ${userLink}    ${mainPage}    UserProfile

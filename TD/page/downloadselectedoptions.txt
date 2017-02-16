@@ -1,0 +1,7 @@
+*** Variables ***
+${download_submit}    name=submit
+${download_window_title_WS}    Opening efsnPackage.do_orderWorksheetDownloadAll.xlsx
+${download_editflow%}    Xpath=//td[text()='Edit monthly flow%']/input
+${download_editunit}    Xpath=//td[text()='Edit monthly units']/input
+${download_seasonalandmonthly}    Xpath=//td[text()='Download seasonal and monthly tab(s).']/input
+${download_option_general}    Xpath=//td[text()='option']/input

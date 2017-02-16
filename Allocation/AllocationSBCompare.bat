@@ -1,0 +1,1 @@
+pybot -d ..\..\..\robot\Allocation\output --timestampoutputs --log AllocationStyleBankCompareLog.html --report AllocationStyleBankCompareReport.html --include SB-test   ..\..\..\robot\Allocation\interfacetest.txt 

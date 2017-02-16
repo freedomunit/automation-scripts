@@ -1,0 +1,87 @@
+*** Settings ***
+Library           String
+Resource          ../page/login.txt
+Library           Selenium2Library
+
+*** Variables ***
+${download_dir}    D:\\Robot\\Allocation_User_Behavior\\download\\
+${browser_type}    firefox
+${browser_profile}    C:\\Users\\pc\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\8hl9l980.default
+${users_setting}    d:\\Robot\\Allocation_User_Behavior\\Setting\\userCriteria.xlsx
+${AssortmentMix_setting_tab}    AssortmentMix setting
+${AssortmentMix_criteria_colNumber}    1
+${report_setting_tab}    Report setting
+${DailyTasks_setting_tab}    DailyTasks setting
+${companyprofile_setting_tab}    CompanyProfile setting
+${diff_dir}       d:\\Robot\\Allocation_User_Behavior\\diff\\
+${selenium_speed}    0.1
+${BrandProfile_setting_tab}    BrandProfile setting
+${BrandProfile_criteria_colNumber}    1
+${max_scrollPage_num}    1000
+${passwd}         wuhan02
+${expect_outcome_dir}    d:\\Robot\\Allocation_User_Behavior\\expect_outcome\\
+${js_dir}         d:\\Robot\\Allocation_User_Behavior\\js\\
+${maxTopPagesCount}    1000
+${maxLeftPagesCount}    1000
+${BPDownload_setting_tab}    BrandProfileDownload setting
+
+*** Keywords ***
+Environment Init
+    [Arguments]    ${URL}
+    #    Open Browser    ${URL}    ${browser}    ff_profile_dir=${browser_profile}
+    ${browser}    Open Browser    ${URL}    ${browser_type}    \    \    ${EMPTY}
+    ...    ${browser_profile}
+    Maximize Browser Window
+    Set Selenium Timeout    30
+    [Return]    ${browser}
+
+Logout Close Browser
+    [Arguments]    ${browser}
+    Switch Browser    ${browser}
+    Click Element    Xpath=//a[@class='logout']
+    Close Browser
+
+EnvironmentInit and Login
+    [Arguments]    ${URL}    ${userName}    ${browser_profile}
+    ${browser}    Open Browser    ${URL}    ${browser_type}    \    \    ${EMPTY}
+    ...    ${browser_profile}
+    Maximize Browser Window
+    Set Selenium Timeout    30
+    wait until page contains element    id=login1    100
+    Input Text    id=login1    ${userName}
+    Input Password    id=password    ${passwd}
+    #    ${map_status}    get element attribute    ${login_editable_form}@action
+    #    log    ${login_map_uncheck_action}
+    #    run keyword if    '${map_status}' == '${login_map_uncheck_action}'    Click Element    ${login_map}
+    Click Element    Xpath=//input[@class='sb']
+    Sleep    3S
+    ${message}    Get Text    Xpath=//body
+    ${line}    Get Lines Containing String    ${message}    Warning
+    ${count}    Get Line Count    ${line}
+    Run Keyword If    ${count}>0    Click Element    Xpath=//input[@name='answeryes']
+    Page Should Contain    Welcome    30
+    [Return]    ${browser}
+
+Wait Until Page End
+    [Arguments]    @{main_windowhandle}
+    : FOR    ${count}    IN RANGE    10000
+    \    @{windowhandles}    Get Window Handles
+    \    Run Keyword If    @{windowhandles} == @{main_windowhandle}    Exit For Loop
+    \    Sleep    5s
+    \    Run Keyword If    ${count} ==10000    Log    exceed time!
+
+Login
+    [Arguments]    ${userName}
+    wait until page contains element    id=login1    100
+    Input Text    id=login1    ${userName}
+    Input Password    id=password    ${passwd}
+    #    ${map_status}    get element attribute    ${login_editable_form}@action
+    #    log    ${login_map_uncheck_action}
+    #    run keyword if    '${map_status}' == '${login_map_uncheck_action}'    Click Element    ${login_map}
+    Click Element    Xpath=//input[@class='sb']
+    Sleep    3S
+    ${message}    Get Text    Xpath=//body
+    ${line}    Get Lines Containing String    ${message}    Warning
+    ${count}    Get Line Count    ${line}
+    Run Keyword If    ${count}>0    Click Element    Xpath=//input[@name='answeryes']
+    Page Should Contain    Welcome    30

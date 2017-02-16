@@ -1,0 +1,19 @@
+*** Variables ***
+${budgetBreakdown_list_topButton_createPlan}    Xpath=//table[@class='nav'][1]//input[@type='button' and @value='Create Plan']
+${budgetBreakdown_list_topButton_removeSelected}    Xpath=//table[@class='nav'][1]//input[@type='submit' and @value='Remove Selected']
+${budgetBreakdown_list_criteriaCount}    //td[@onclick]/img
+${budgetBreakdown_list_jquery_criteriaCount}    var count=0;$("[name='message'] .table5:visible").children("tbody:visible:contains('Edit')").each(function(){count++});return count;
+${budgetBreakdown_list_criteriaExpand_numPH}    Xpath=//form[@name='message']/table[@class='table5']/tbody[num+1]//td[@onclick]/img
+${budgetBreakdown_list_planLevelCount}    //form[@name='message']/table[@class='table5']/tbody[1+1]/tr[last()]//tr[not( @class)]
+${budgetBreakdown_list_planLevelLink_numCountPH}    Xpath=//form[@name='message']/table[@class='table5']/tbody[num+1]/tr[last()]//tr[not( @class)][count]//a
+${budgetBreakdown_planLevelDropdown}    Xpath=//select[@class="z-select"]
+${budgetBreakdown_timeRangeDropdown_optionsCount}    //li[@class="z-comboitem" or contains(@class,"z-comboitem-selected")]
+${budgetBreakdown_timeRangeDropdown}    Xpath=//input[@class="z-combobox-input" and @readonly]
+${budgetBreakdown_buttonViewPoint_valPH}    Xpath=//div[contains(@class, 'z-menubar-horizontal')]//li[not(@title)]/a/span[text()='val']
+${budgetBreakdown_enableViewPoint_jquery}    var val="";$(".z-menubar-horizontal li:not([title]) a:not([disabled])").children("span").each(function(){val+=$(this).text()+';'});return val;
+${budgetBreakdown_buttonViewPoint_selected}    Xpath=//div[contains(@class, 'z-menubar-horizontal')]//li[not(@title)]/a[@disabled]/span
+${budgetBreakdown_planLevelDropdown_selectedOption}    Xpath=//select[@class="z-select"]/option[@selected]
+${budgetBreakdown_timeRangeOptions_jquery}    var val="";$(".z-comboitem:not(.z-comboitem-disabled)").each(function(){val+=$(this).text()+';'});return val
+${budgetBreakdown_timeRangeOption_optionPH}    Xpath=//li[contains(@class,'z-comboitem') and not(contains(@class,'z-comboitem-disabled'))]/span[text()='option']
+${budgetBreakdown_button_view}    Xpath=//button[@class='sb z-button' and text()='View']
+${budgetBreakdown_buttonViewPoint_unselected}    Xpath=//div[contains(@class,'z-menubar-horizontal')]//li[not (@title)]/a[not(@disabled)]/span

@@ -1,0 +1,10 @@
+*** Settings ***
+Force Tags        FE-OUT    BP-OUT    AM-OUT    BB-OUT    OB-OUT    SS-OUT    SC-G1-OUT
+...               SC-G2-OUT
+Resource          Setting/environment.txt
+Resource          Setting/performancekeyword.txt
+Resource          page/ZK.txt
+
+*** Test Cases ***
+Logout
+    logout close browser    ${browser}

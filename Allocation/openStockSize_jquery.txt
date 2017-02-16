@@ -1,0 +1,54 @@
+var openStockSizeList = '';
+$(".zsblock").children("div:eq(0)").children("div:visible").each(function(){
+if($(this).text() && !$(this).text().match('Total')){
+var titleCol = $(this).index(); 
+var openStockReserver = $(".zsblock").children("div:eq(10)").children("div")[titleCol];
+var openStockReserverNum = $(openStockReserver).text();
+var openStock = $(".zsblock").children("div:eq(9)").children("div")[titleCol];  
+var openStockNum = $(openStock).text(); 
+openStockNum = parseInt(openStockNum); 
+var title = $(this).text();
+if (openStockReserverNum > 0 ){
+  $(".zsblock").children("div:eq(13)").children("div:visible:contains("+title+")").each(function() {
+    
+    if($(this).title == title) {
+    var titleSizeCol_Res=$(".zsblock").children("div:eq(13)").children("div:visible:contains("+title+")").index()-1; 
+    var openStockSizeCol_Res=$(".zsblock").children("div:eq(14)").children("div:gt("+titleSizeCol_Res+"):visible:contains('AdjOpen Stock'):first").index();
+    var openStockSize_Res=$(".zsblock").children("div:eq(16)").children("div:eq("+openStockSizeCol_Res+")"); 
+    var openStockSizeX_Res=$(openStockSize_Res).offset().left; 
+    var openStockSizeY_Res=$(openStockSize_Res).offset().top; 
+    if(!openStockSizeList) {
+    openStockSizeList = title+"/"+openStockSizeCol_Res+"/16/"+openStockReserverNum.toString()+"/"+openStockSizeX_Res+"/"+openStockSizeY_Res;
+    } else{ 
+    openStockSizeList += ";"+title+"/"+openStockSizeCol_Res+"/16/"+openStockReserverNum.toString()+"/"+openStockSizeX_Res+"/"+openStockSizeY_Res;
+    }
+    }
+  })}   
+
+else if(openStockNum > 0 ) {
+  $(".zsblock").children("div:eq(13)").children("div:visible:contains("+title+")").each(function() {
+    if($(this).title == title) {
+    var titleSizeCol=$(".zsblock").children("div:eq(13)").children("div:visible:contains("+title+")").index()-1; 
+    var openStockSizeCol=$(".zsblock").children("div:eq(14)").children("div:gt("+titleSizeCol+"):visible:contains('AdjOpen Stock'):first").index(); 
+    for (var openStockSizeRow = 16; openStockSizeRow<39; openStockSizeRow++) {  
+    var openStockSize=$(".zsblock").children("div:eq("+openStockSizeRow+")").children("div:eq("+openStockSizeCol+")"); 
+    var openStockSizeNum= parseInt($(openStockSize).text());
+    if(openStockSizeNum>0) { 
+    var openStockSizeX=$(openStockSize).offset().left; 
+    var openStockSizeY=$(openStockSize).offset().top; 
+    if(!openStockSizeList) {
+    openStockSizeList = title+"/"+openStockSizeCol+"/"+openStockSizeRow+"/"+openStockSizeNum.toString()+"/"+openStockSizeX+"/"+openStockSizeY;
+    } else{ 
+    openStockSizeList += ";"+title+"/"+openStockSizeCol+"/"+openStockSizeRow+"/"+openStockSizeNum.toString()+"/"+openStockSizeX+"/"+openStockSizeY;
+    } } } 
+  }})} 
+} }); 
+ 
+ 
+ return openStockSizeList;
+ 
+ 
+ 
+ 
+ 
+ var openStockSizeList = '';$(".zsblock").children("div:eq(0)").children("div:visible").each(function(){if($(this).text() && !$(this).text().match('Total')){var titleCol = $(this).index(); var openStock = $(".zsblock").children("div:eq(9)").children("div")[titleCol]; var openStockNum = $(openStock).text(); openStockNum = parseInt(openStockNum);var title = $(this).text(); if(openStockNum > 0 ) {var titleSizeCol=$(".zsblock").children("div:eq(13)").children("div:visible:contains("+title+")").index()-1; var openStockSizeCol=$(".zsblock").children("div:eq(14)").children("div:gt("+titleSizeCol+"):visible:contains('AdjOpen Stock'):first").index(); for (var openStockSizeRow = 16; openStockSizeRow<39; openStockSizeRow++) {    var openStockSize=$(".zsblock").children("div:eq("+openStockSizeRow+")").children("div:eq("+openStockSizeCol+")"); var openStockSizeNum= parseInt($(openStockSize).text());if(openStockSizeNum>0) { var openStockSizeX=$(openStockSize).offset().left; var openStockSizeY=$(openStockSize).offset().top; if(!openStockSizeList) {openStockSizeList = title+"/"+openStockSizeCol+"/"+openStockSizeRow+"/"+openStockSizeNum.toString()+"/"+openStockSizeX+"/"+openStockSizeY;} else{ openStockSizeList += ";"+title+"/"+openStockSizeCol+"/"+openStockSizeRow+"/"+openStockSizeNum.toString()+"/"+openStockSizeX+"/"+openStockSizeY;} } } } } }); return openStockSizeList;

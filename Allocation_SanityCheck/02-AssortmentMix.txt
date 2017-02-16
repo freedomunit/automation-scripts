@@ -1,0 +1,149 @@
+*** Settings ***
+Force Tags        SC-G1-AM
+Resource          page/AssortmentMix.txt
+Resource          Setting/performancekeyword.txt
+Resource          Setting/environment.txt
+
+*** Test Cases ***
+selectAMCriteria
+    [Tags]
+    enterCertainModel    Assortment Mix    ${mainPage}    AssortmentMix
+    run keyword if    '${AM_Style#}'    input text    ${AssortmentMix_criteria_text_style#}    ${AM_Style#}
+    run keyword if    '${AM_ColorCode}'    input text    ${AssortmentMix_criteria_text_colorCode}    ${AM_ColorCode}
+    ${removeFilter_count}    get matching xpath count    ${AssortmentMix_criteria_removeFilter_count}
+    run keyword if    ${removeFilter_count}>1    removeFilters    ${AssortmentMix_criteria_Button_removeFilter_rowPlaceHold}    ${removeFilter_count}    ${AssortmentMix_criteria_Dropdown_filterHierarchy1}
+    run keyword if    ${removeFilter_count}==1    Select From List by index    ${AssortmentMix_criteria_Dropdown_filterHierarchy1}    0
+    run keyword if    '@{AM_criteria}[0]' != '${EMPTY}'    selectCustomCriteria    ${AssortmentMix_criteria_Dropdown_filterHierarchy1}    ${AssortmentMix_criteria_Option_filterHierarachy1}    ${AssortmentMix_criteria_Options_filterHierarachy1}    ${AssortmentMix_criteria_filterHierarachy1_optionCount}
+    ...    Xpath=${AssortmentMix_criteria_filterHierarachy1_rowCount}//input[@title='Add Filter']    ${AssortmentMix_criteria_filterHierarachy1_rowCount}    @{AM_criteria}
+    enter page by click    ${AssortmentMix_criteria_topButton_addStyle/Colors}    ${mainPage}    AddStyles
+    ${checkBox_count}    get matching xpath count    ${AssortmentMix_addStyles_checkBox_rowCount}
+    click element    ${AssortmentMix_addStyles_checkBox_top}
+    : FOR    ${num}    IN RANGE    1    11
+    \    ${row}    evaluate    random.randint(1,int(${checkBox_count}))    random
+    \    click element    Xpath=//tr[${row}]${AssortmentMix_addStyles_checkBox_rowCount}
+
+loadAMandCustomize
+    [Tags]
+    enter page by click    ${AssortmentMix_addStyles_topButton_addStyleColors}    ${AssortmentMix_tab_AssortmentMix}    Assortment Mix
+    #    click element    Xpath=//div[@class='zsblock']//div[text()='Style #']
+    #    run keyword and continue on failure    click element    Xpath=//div[@class='zsblock']//div[text()='Style #']
+    enter page by click    ${AssortmentMix_Button_firstCustomize}    Xpath=//div[@class='z-hlayout-inner']/table/tbody/tr[1]/td[1]    Top Doors
+
+editCustomize_1
+    [Tags]
+    ${doorClusterCount}    get matching xpath count    ${AssortmentMix_Customize_doorClusterCount}
+    ${doorCluster}    evaluate    random.randint(1,${doorClusterCount})    random
+    click element    Xpath=${AssortmentMix_Customize_doorClusterCount}[${doorCluster}]//th${ZK_CheckBox_count}
+    page should not contain    error
+    ${doorCount}    get matching xpath count    ${AssortmentMix_Customize_doorClusterCount}[${doorCluster}]${ZK_checkBox_rowCount}
+    ${round}    set variable    1
+    : FOR    ${num}    IN RANGE    1    ${doorCount}/2
+    \    ${door}    evaluate    random.randint(1,${doorCount})    random
+    \    wait until page contains element    Xpath=${AssortmentMix_Customize_doorClusterCount}[${doorCluster}]//tr[${door}]${ZK_CheckBox_count}    10
+    \    click element    Xpath=${AssortmentMix_Customize_doorClusterCount}[${doorCluster}]//tr[${door}]${ZK_CheckBox_count}
+    \    page should not contain    error
+    \    exit for loop if    ${round}>=10
+    \    ${round}    evaluate    ${round}+1
+
+editCustomize_2
+    [Tags]
+    click element    ${AssortmentMix_Customize_button_reset}
+    page should not contain    error
+    wait until page does not contain element    Xpath=${AssortmentMix_checkedBox_count}    10
+    input text    ${AssortmentMix_Customize_text_topDoors}    ${AM_topDoors}
+    @{dropdownItems}    get list items    ${AssortmentMix_Customize_dropdown}
+    ${itemCount}    get length    ${dropdownItems}
+    ${item}    evaluate    random.randint(0,${itemCount}-1)    random
+    select from list by label    ${AssortmentMix_Customize_dropdown}    @{dropdownItems}[${item}]
+    #    list selection should be    ${AssortmentMix_Customize_dropdown}    @{dropdownItems}[${item}]
+    sleep    1S
+    ${selectedOption}    execute javascript    return $("select:visible [selected=selected]").text()
+    should be equal as strings    ${selectedOption}    @{dropdownItems}[${item}]
+    click element    ${AssortmentMix_Button_submit}
+    page should not contain    error
+    wait until page contains element    Xpath=${AssortmentMix_checkedBox_count}    10
+
+closeCustomizeAndDownload
+    [Tags]
+    enter page by click    ${ZK_Button_Close}    ${AssortmentMix_tab_AssortmentMix}    Assortment Mix
+    wait until page contains element    ${ZK_Title_Style#}    #    Xpath=//div[@class='zsblock']//div[text()='Style #']
+    click element    ${ZK_Title_Style#}    #    Xpath=//div[@class='zsblock']//div[text()='Style #']
+    click element    ${ZK_Button_FreezePanel}
+    Wait Until Page Does Not Contain    Processing...    600
+    ${freezeStatus}    get element attribute    ${ZK_Button_FreezePanel}@class
+    should contain    ${freezeStatus}    z-menuitem opened
+    wait until page contains element    ${ZK_selectedFreezeButton}    60
+    download excel    ${AssortmentMix_Button_Excel}    AM_Main
+
+editOptions
+    [Tags]
+    enter page by click    ${AssortmentMix_Button_Options}    ${ZK_Options_title}    Select Columns to Display
+    ${checkedOptionsCount}    get matching xpath count    ${AssortmentMix_checkedBox_count}
+    ${checkedOption}    evaluate    random.randint(1,${checkedOptionsCount})    random
+    click element    Xpath=${AssortmentMix_checkedBox_count}[${checkedOption}]${ZK_checkBox_count}
+    page should not contain    error
+    ${uncheckOptionsCount}    get matching xpath count    ${AssortmentMix_Options_uncheckBoxCount}
+    ${uncheckOption}    evaluate    random.randint(1,${uncheckOptionsCount})    random
+    click element    Xpath=${AssortmentMix_Options_uncheckBoxCount}[${uncheckOption}]${ZK_checkBox_count}
+    page should not contain    error
+    enter page by click    ${ZK_Button_Close}    ${AssortmentMix_tab_AssortmentMix}    Assortment Mix
+
+editTargetDoors
+    [Tags]
+    enter page by click    ${AssortmentMix_Button_TargetDoors}    ${AssortmentMix_tab_TargetDoors}    Target Doors
+    download excel    ${AssortmentMix_Button_Excel}    AM_TargetDoor
+    click element    ${ZK_Title_Style#}
+    run keyword and continue on failure    click element    ${ZK_Title_Style#}
+    click element    ${ZK_Button_FreezePanel}
+    Wait Until Page Does Not Contain    Processing...    600
+    ${freezeStatus}    get element attribute    ${ZK_Button_FreezePanel}@class
+    should contain    ${freezeStatus}    z-menuitem opened
+    wait until page contains element    ${ZK_selectedFreezeButton}    60
+    edit options    ${AssortmentMix_Button_Options}    Select Attribute Columns    Target Doors    Xpath=//div[@class='z-panel-body']//div[@class='z-hlayout-inner'][1]/div/div[1]/div[@class='z-window-header']
+
+editDoorInfo
+    [Tags]
+    ${doorlinkCount}    get matching xpath count    ${AssortmentMix_TargetDoor_doorLinkCount}
+    ${doorLink}    evaluate    random.randint(1,int(${doorlinkCount}/2))    random
+    ${doorLinkName}    get text    Xpath=${AssortmentMix_TargetDoor_doorLinkCount}[${doorLink}]//a
+    #    click element    ${ZK_Title_Style#}
+    enter page by click    Xpath=${AssortmentMix_TargetDoor_doorLinkCount}[${doorLink}]//a    ${ZK_selectedTab}    ${doorLinkName}
+    download excel    ${AssortmentMix_Button_Excel}    AM_DoorInfo
+    click element    Xpath=//div[@class='zsblock']//div[text()='Style #']
+    run keyword and continue on failure    click element    Xpath=//div[@class='zsblock']//div[text()='Style #']
+    click element    ${ZK_Button_FreezePanel}
+    Wait Until Page Does Not Contain    Processing...    600
+    ${freezeStatus}    get element attribute    ${ZK_Button_FreezePanel}@class
+    should contain    ${freezeStatus}    z-menuitem opened
+    wait until page contains element    ${ZK_selectedFreezeButton}    60
+    edit options    ${AssortmentMix_Button_Options}    Select Columns to Display    ${doorLinkName}    ${ZK_Options_title}
+    @{dropDown_doors}    get list Items    ${AssortmentMix_DoorInfo_dropDown_door}
+    ${doorsCount}    get length    ${dropDown_doors}
+    ${door}    evaluate    random.randint(0,${doorsCount}-1)    random
+    select from list by label    ${AssortmentMix_DoorInfo_dropDown_door}    @{dropDown_doors}[${door}]
+    list selection should be    ${AssortmentMix_DoorInfo_dropDown_door}    @{dropDown_doors}[${door}]
+    click element    ${AssortmentMix_Button_submit}
+    sleep    3S
+    wait until page does not contain    error
+    element should contain    ${AssortmentMix_DoorInfo_doorCell}    @{dropDown_doors}[${door}]
+    element should contain    ${ZK_selectedTab}    @{dropDown_doors}[${door}]
+    input text    ${AssortmentMix_DoorInfo_text_door}    ${AM_door#}
+    click element    ${AssortmentMix_Button_submit}
+    sleep    3S
+    page should not contain    error
+    wait until element contains    ${AssortmentMix_DoorInfo_doorCell}    ${AM_door#}    20
+    list selection should be    ${AssortmentMix_DoorInfo_dropDown_door}    ${AM_door#}
+    element should contain    ${ZK_selectedTab}    ${AM_door#}
+    click element    ${ZK_Button_Close}
+    #    run keyword and continue on failure    click element    ${ZK_Button_Close}
+    wait until element is visible    ${ZK_popPanel_button_NO}    30
+    enter page by click    ${ZK_popPanel_button_NO}    ${ZK_selectedTab}    Target Doors
+
+exitAM
+    [Tags]
+    click element    ${ZK_Button_Close}
+    wait until element is visible    ${ZK_popPanel_button_NO}    30
+    enter page by click    ${ZK_popPanel_button_NO}    ${ZK_selectedTab}    Assortment Mix
+    enter page by click    ${ZK_Button_Close}    ${ZK_popPanel}    Confirmation Needed
+    click element    ${ZK_popPanel_button_NO}
+    wait until page contains    Assortment Mix

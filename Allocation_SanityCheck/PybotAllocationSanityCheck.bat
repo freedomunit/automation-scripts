@@ -1,0 +1,2 @@
+pybot -d ..\..\..\Robot\Allocation_SanityCheck\output --timestampoutputs --log AllocationSanityCheckLog.html --report AllocationSanityCheckReport.html  -i SC-G2* ..\..\..\Robot\Allocation_SanityCheck\ 
+::pybot -d ..\..\..\Robot\Allocation_SanityCheck\output --timestampoutputs --log AllocationSanityCheckLog.html --report AllocationSanityCheckReport.html  -e SC-OB ..\..\..\Robot\Allocation_SanityCheck\ 

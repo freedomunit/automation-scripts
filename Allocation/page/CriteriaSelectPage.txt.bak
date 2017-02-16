@@ -1,0 +1,10 @@
+*** Variables ***
+${Filter_removeFilter_count}    //input[@title='Remove Filter']
+${Filter_Button_addFilter_rowPlaceHold}    Xpath=//tr[@id='rrow']//input[@title='Add Filter']
+${Filter_Button_removeFilter_rowPlaceHold}    Xpath=//tr[@id='rrow']//input[@title='Remove Filter']
+${Filter_Dropdown_filterHierarchy1}    Xpath=//select[@name='hierarchyattr1']
+${Filter_Options_filterHierarachy1}    Xpath=//tr[@id='r1']/td[3]/div
+${Filter_Option_filterHierarachy1}    Xpath=//tr[@id='r1']/td[3]//tr
+${Filter_filterHierarachy1_optionCount}    //tr[@id='r1']/td[3]//tr
+${Filter_filterHierarachy1_rowCount}    //tr[@id='r1']
+

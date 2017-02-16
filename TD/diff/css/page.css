@@ -1,0 +1,7 @@
+body{
+	font-size: 12px
+}
+
+div#stage {width:50%;float:left}
+
+div#prod {width:50%;float:left}

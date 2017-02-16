@@ -1,0 +1,22 @@
+*** Variables ***
+${ca_link_check_all}    Check All
+${ca_dropdown_action}    id=sl1
+${ca_submit}      name=actionsubmit
+${ca_link_set_viewing_criteria}    Set Viewing Criteria
+${ca_counts_path}    //tr[contains(@id, 'workid')]
+${ca_criteria_row}    Xpath=//table[@class='table5']/tbody    # Xpath=//table[@id='collaborative']/tbody
+${ca1_total_row}    Xpath=//table[@id='collaborative']/tbody[2]
+${ca_monthlydollsheet_counts_containsWSID}    //a[@title='Doll Sheet' and contains(@href, 'ssID')]
+${ca_allclusters_containsWSID}    Xpath=//a[@title='Doll Sheet with All Clusters' and contains(@href, 'ssID')]    # All Clusters
+${ca_editpo_containsWSID}    Xpath=//a[contains(@href,'POEdit') and contains(@href,'ssID')]    # Edit PO
+${ca_editinfo_containsWSID}    Xpath=//a[contains(@href,'MultiMonthInfo') and contains(@href,'ssID')]    # Edit Info
+${ca_addremovestyles_containsWSID}    Xpath=//a[contains(@href,'AddRemoveStyle') and contains(@href,'ssID')]    # Add/Remove Styles
+${ca_copyassortment_containsWSID}    Xpath=//a[contains(@href,'assortmentcopy') and contains(@href,'ssID')]    # Copy Assortment
+${ca_changeprices_containsWSID}    Xpath=//a[contains(@href,'ChangeStylePrice') and contains(@href,'ssID')]    # Change Prices
+${ca_expandbutton_containsWSID}    Xpath=//th[contains(@id,'ssID')]
+${ca_totalview_containsWSID}    Xpath=//a[@title='View Bulk Worksheet' and contains(@href, 'ssID')]
+${ca_totalhistory_containsWSID}    Xpath=//a[@title='View History' and contains(@href, 'ssID')]
+${ca_monthlyview_containsMonthlyID}    Xpath=//a[@title='View Bulk Worksheet' and contains(@href, 'ssID')]
+${ca_monthlydollsheet_containsWSID}    Xpath=//a[@title='View Bulk Worksheet' and contains(@href, 'ssID')]/following-sibling::a[1]
+${ca_monthlynotes_containsMonthlyID}    Xpath=//a[@title='View Notes' and contains(@href, 'ssID')]
+${ca_monthlyhistory_containsMonthlyID}    Xpath=//a[@title='View History' and contains(@href, 'ssID')]

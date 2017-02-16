@@ -1,0 +1,1 @@
+pybot -d ..\..\..\robot\Allocation\output --timestampoutputs --log AllocationLRParamLog.html --report AllocationLRParamReport.html --include DT-LR   ..\..\..\robot\Allocation\interfacetest.txt 

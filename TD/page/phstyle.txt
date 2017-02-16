@@ -1,0 +1,37 @@
+*** Variables ***
+${PHstyle_link_advancedsearch}    Advanced Search
+${PHstyle_link_advancedsearch_count}    //a[text()='Advanced Search']
+${PHstyle_advanced_top_search}    Xpath=//form[@name='message']/table[1]//input[@name='search']
+${PHstyle_advanced_bottom_search}    Xpath=//form[@name='message']/table[4]//input[@name='search']
+${PHstyle_advanced_top_dropdown}    id=sl1
+${PHstyle_advanced_bottom_dropdown}    id=sl2
+${PHstyle_searched_dropdown_option}    name=downloadtype
+${PHstyle_advanced_top_generateReport}    Xpath=//form[@name='message']/table[1]//input[@name='download']
+${PHstyle_advanced_bottom_generateReport}    Xpath=//form[@name='message']/table[4]//input[@name='download']
+${PHstyle_searched_generateReport}    Generate Report
+${PHstyle_advanced_top_reset}    Xpath=//form[@name='message']/table[1]//input[@value='Reset']
+${PHstyle_advanced_bottom_reset}    Xpath=//form[@name='message']/table[4]//input[@value='Reset']
+${PHstyle_advanced_filter1}    name=hierarchyattr1
+${PHstyle_advanced_flag_includePH}    Xpath=//form[@name='message']/table[4]//input[@name='is_include_ph_style']
+${PHstyle_advanced_filter1_options}    Xpath=//tr[@id='r1']/td[3]/div
+${PHstyle_advanced_filter1_option}    Xpath=//tr[@id='r1']/td[3]//tr
+${PHstyle_advanced_filter1_optionCount}    //tr[@id='r1']/td[3]//tr
+${PHstyle_advanced_filterKeyCount}    //table[@id='key']//tr
+${PHstyle_advanced_filterKeyTable}    id=key
+${PHstyle_advanced_filter1_addFilter}    Xpath=//tr[@id='r1']//input[@type='button' and @title='Add Filter']
+${PHstyle_advanced_filter1_row}    //tr[@id='r1']
+${PHstyle_advanced_filter1_input}    Xpath=//tr[@id='r1']/td[3]//input[@value='
+${PHstyle_dropdown_yearSeason}    name=seasonandyear
+${PHstyle_dropdown_viewoption}    name=phviewoption
+${PHstyle_dropdown_viewoption_count}    //select[@name='phviewoption']
+${PHstyle_button_view}    name=view
+${PHstyle_searched_button_view}    name=search
+${PHstyle_searched_button_wait}    Xpath=//input[@name='search' and @value='Wait']
+${PHstyle_firststyle_edit}    Xpath=//table[@class='table1']/tbody/tr[2]//a[text()='Edit']
+${PHstyle_firststyle_copy}    Xpath=//table[@class='table1']/tbody/tr[2]//a[text()='Copy']
+${PHstyle_firststyle_view}    Xpath=//table[@class='table1']/tbody/tr[2]//a[text()='View']
+${PHstyle_button_back}    Xpath=//input[@class='sb' and @value='Back']
+${PHstyle_styleinfo_section_count}    //table[@class='table1']/tbody
+${PHstyle_download_page_count}    //big[contains(text(),'Downloading')]
+${PHstyle_searched_error_count}    //big[text()='Error']
+${PHstyle_searched_button_wait_count}    //input[@name='search' and @value='Wait']

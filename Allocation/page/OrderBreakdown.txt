@@ -1,0 +1,34 @@
+*** Variables ***
+${OrderBreakdown_criteria_top_submit}    Xpath=//form[@name='message']/input[@type='submit'][1]
+${OrderBreakdown_Sheet}    Xpath=//div[@class='zssheet']
+${OrderBreakdown_Button_Save}    Xpath=//li[@title='Save']
+${OrderBreakdown_Button_SaveClose}    Xpath=//li[@title='Save & Close']
+${OrderBreakdown_Button_Excel}    Xpath=//li[@title='Excel']
+${OrderBreakdown_Button_Options}    Xpath=//li[@title='Options']
+${OrderBreakdown_Button_Close}    Xpath=//li[@title='Close']
+${OrderBreakdown_criteria_Dropdown_TaskType}    Xpath=//select[@id='databreakdownviewtype']
+${OrderBreakdown_criteria_Dropdown_DataSourceType}    Xpath=//select[@id='datasourcetype']
+${OrderBreakdown_criteria_Text_FromDate}    Xpath=//input[@name='fromorderdate']
+${OrderBreakdown_criteria_Text_ToDate}    Xpath=//input[@name='toorderdate']
+${OrderBreakdown_criteria_Radio_ShopDate}    Xpath=//input[@name='timerangeselection' and @value='0']
+${OrderBreakdown_criteria_Radio_InDCDate}    Xpath=//input[@name='timerangeselection' and @value='1']
+${OrderBreakdown_criteria_removeFilter_count}    //input[@title='Remove Filter']
+${OrderBreakdown_criteria_Button_addFilter_rowPlaceHold}    Xpath=//tr[@id='rrow']//input[@title='Add Filter']
+${OrderBreakdown_criteria_Button_removeFilter_rowPlaceHold}    Xpath=//tr[@id='rrow']//input[@title='Remove Filter']
+${OrderBreakdown_criteria_Dropdown_filterHierarchy1}    Xpath=//select[@name='hierarchyattr1']
+${OrderBreakdown_criteria_Options_filterHierarachy1}    Xpath=//tr[@id='r1']/td[3]/div
+${OrderBreakdown_criteria_Option_filterHierarachy1}    Xpath=//tr[@id='r1']/td[3]//tr
+${OrderBreakdown_criteria_filterHierarachy1_optionCount}    //tr[@id='r1']/td[3]//tr
+${OrderBreakdown_criteria_filterHierarachy1_rowCount}    //tr[@id='r1']
+${OrderBreakdown_popPanel_button_yes}    Xpath=//button[text()='Yes']
+${OrderBreakdown_popPanel_button_no}    Xpath=//button[text()='No']
+${OrderBreakdown_scrollPanel}    Xpath=//div[@class='zsscroll']
+${OrderBreakdown_cellButtonToDropDown}    Xpath=//div[@class='zsbtn zsdropdown']
+${OrderBreakdown_cellDropDown}    Xpath=//div[@class='zscellpopup']
+${OrderBreakdown_cellHeight_px}    20    # page=700px
+${OrderBreakdown_cellButton}    Xpath=//a[@class='btn']
+${OrderBreakdown_Button_FreezePanel}    Xpath=//li[@title='Freeze Pane']
+${OrderBreakdown_freezePanel_position}    Xpath=//div[@class='zsblock']/div[row+1]/div[10]
+${OrderBreakdown_tabsCount}    //ul[@class="z-tabs-content"]/li
+${OrderBreakdown_freezePanel_position_prefix}    Xpath=//div[@class='zsblock']/div[
+${OrderBreakdown_freezePanel_position_suffix}    +1]/div[10]

@@ -1,0 +1,21 @@
+*** Settings ***
+Force Tags        SC-G1-PL
+Resource          Setting/environment.txt
+Resource          Setting/performancekeyword.txt
+Resource          page/ZK.txt
+Resource          page/PlanningLevels.txt
+
+*** Test Cases ***
+editPlanningLevels
+    enterCertainModel    Planning Levels    ${mainPage}    PlanningLevels
+    select from list by label    ${PlanningLevels_Dropdown_planType}    Budget Breakdown Plan
+    wait until page contains element    ${PlanningLevels_Button_topSubmit}    60
+    ${num}    set variable    1
+    : FOR    ${item}    IN    @{PlanningLevels_attri}
+    \    ${currentDropdown}    replace string    ${PlanningLevels_Dropdown_attributes_numPH}    [num]    [${num}]
+    \    select from list by label    ${currentDropdown}    ${item}
+    \    list selection should be    ${currentDropdown}    ${item}
+    \    ${num}    evaluate    ${num}+1
+    \    #    ${nextDropdown}    replace string    ${PlanningLevels_Dropdown_attributes_numPH}    [num]    [${num}]
+    \    sleep    1S
+    \    page should not contain    error

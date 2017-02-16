@@ -1,0 +1,21 @@
+*** Variables ***
+${WS_top_viewselected}    Xpath=//form[@name='message']/table[1]//input[@name='viewselected']
+${WS_bottom_viewselected}    Xpath=//form[@name='message']/table[3]//input[@name='viewselected']
+${WS_filter1}     name=hierarchyattr1
+${WS_flag_viewfolder}    Xpath=//input[@name='view_worksheet_by_month']
+${WS_filter1_options}    Xpath=//tr[@id='r1']/td[3]/div
+${WS_filter1_option}    Xpath=//tr[@id='r1']/td[3]//tr
+${WS_filter1_optionCount}    //tr[@id='r1']/td[3]//tr
+${WS_filterKeyCount}    //table[@id='key']//tr
+${WS_filterKeyTable}    id=key
+${WS_filter1_addFilter}    Xpath=//tr[@id='r1']//input[@type='button' and @title='Add Filter']
+${WS_filter1_row}    //tr[@id='r1']
+${WS_option_suffix_path}    //input
+${WS_filter1_input}    Xpath=//tr[@id='r1']/td[3]//input[@value='
+${WS_link_clear_all}    Clear All
+${WS_minusFilter_suffix}    ']//input[@value='-']
+${WS_minusFilter_Count}    //input[@value='-']
+${WS_Filter_row}    Xpath=//tr[@id='r
+${WS_link_check_all}    Check All
+${WS_error_noWS}    [ER-80039] You have no Collaborative Assortments for the criteria you selected. Please select different criteria to view.
+${WS_error_exceedMax}    [ER-80213] Your selected viewing criteria has exceeded the maximum number of assortments that can be displayed. Please select additional criteria to narrow your selection and shorten the list.

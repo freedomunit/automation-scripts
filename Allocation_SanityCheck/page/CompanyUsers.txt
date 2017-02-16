@@ -1,0 +1,3 @@
+*** Variables ***
+${CompanyUsers_usersCount}    //table[@class='table1']//tr/td/a
+${CompanyUsers_userLink_numPH}    Xpath=//table[@class='table1']//tr[num]/td/a

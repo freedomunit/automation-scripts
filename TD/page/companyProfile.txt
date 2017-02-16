@@ -1,0 +1,11 @@
+*** Variables ***
+${CP_link_openAll}    Open All
+${CP_link_closeAll}    Close All
+${CP_link_setFlatFileFormat}    Xpath=//a[text()='Set Flat File Format']
+${CP_link_styleAttributeSelection}    Xpath=//a[text()='Style Attribute Selection']
+${CP_button_top_setCriteria}    Xpath=//form[@id='form1']/table[1]//input[@name='savecompanyprofile']
+${CP_button_bottom_setCriteria}    Xpath=//form[@id='form1']/table[3]//input[@name='savecompanyprofile']
+${CP_button_top_refreshPOS}    Xpath=//form[@id='form1']/table[1]//input[@value='Refresh POS']
+${CP_button_bottom_refreshPOS}    Xpath=//form[@id='form1']/table[3]//input[@value='Refresh POS']
+${CP_dropdown}    name=setActions
+${CP_button_go}    Xpath=//input[@name='goButton']

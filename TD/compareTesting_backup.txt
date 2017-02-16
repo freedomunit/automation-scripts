@@ -1,0 +1,2049 @@
+*** Settings ***
+Suite Setup
+Suite Teardown
+Library           String
+Resource          Setting/environment.txt
+Resource          page/navigation.txt
+Resource          page/collaborativeAssortments.txt
+Resource          page/downloadselectedoptions.txt
+Resource          page/stylebank.txt
+Resource          page/setWSviewingcriteria_ca.txt
+Resource          page/setWSviewingcriteria_ca.txt
+Resource          page/downloadwindow.txt
+Resource          page/dollsheet.txt
+Resource          page/wsEditpo.txt
+Resource          page/wsaddremovestyles.txt
+Resource          page/wsEditInfo.txt
+Resource          page/wschangeprices.txt
+Resource          page/wstotalview.txt
+Resource          page/wshistory.txt
+Resource          page/menu.txt
+Library           MyUtil
+Resource          page/phstyle.txt
+Resource          page/sizeScales.txt
+Resource          page/assortmentProfile.txt
+Resource          page/storeGroup.txt
+Resource          page/accountGroupAssignment.txt
+Resource          page/clusterSequence.txt
+Resource          page/companyProfile.txt
+Resource          page/customerDirectory.txt
+Library           AutoItLibrary
+Library           Selenium2Library
+Library           MyHtmlUtil
+
+*** Variables ***
+${checkbox_selected_path}    //input[@type='checkbox' and @checked]
+${radio_selected_path}    //input[@type='radio' and @checked]
+${input_path}     //input[@type='text' and @value and not (@value='')]
+${dropdown_selected_path}    //select[not (contains(@style,'display:none')) and not (contains(@style,'display: none;'))]
+${input_jquery}    var txt = ""; $(":text[value !='']").each(function(){txt+=$(this).attr("value")+","}); return txt    # ee();function ee(){var txt = ""; $(":text[value !='']").each(function(){txt+=$(this).attr("value")}); return txt}
+${checkbox_checked_@name_jquery}    var txt = ""; $(":checkbox:checked").each(function(){txt+=$(this).attr("name")+","}); return txt
+${radio_checked_jquery}    var txt = ""; $(":radio:checked").each(function(){txt+=$(this).attr("value")+","}); return txt
+${dropdown_selected_jquery}    var txt = ""; $("option[selected]").each(function(){txt+=$(this).text()+","}); return txt
+${checkbox_checked_@value_jquery}    var txt = ""; $(":checkbox:checked").each(function(){txt+=$(this).attr("value")+","}); return txt
+${page_text_jquery}    var txt =$("#maincontent #wrapper").children().last().text();$("#maincontent #wrapper").children().last().find("script").each(function(){ txt = txt.replace($(this).text(),"")}); return(txt)    # var txt =$("body").text(); $("body").find("script").each(function(){ txt = txt.replace($(this).text(),"")}); return(txt)
+${page_html_jquery}    var uurl=location.href;$("#maincontent #wrapper").children().last().find("a").each(function(){$(this).attr("href","")});$("#maincontent #wrapper").children().last().find("input[type='hidden']").each(function(){$(this).attr("value","")});var txt =$("#maincontent #wrapper").children().last().html();$("#maincontent #wrapper").children().last().find("script").each(function(){ txt = txt.replace($(this).html(),"")});location.href=uurl;return(txt)    # static
+${option_expand_jquery}    $($(".filtertablerow").last()).find("div.multiCwrap div").last().attr("class","multiC on");
+${option_collapse_jquery}    $($(".filtertablerow").last()).find("div.multiCwrap div").last().attr("class","multiC");
+${option_getValues}    $("#filtertable tr.filtertablerow div.multiCwrap").each(function() {varchanged = 'n';thisis = $(this);getValues()});
+${page_html_nochange_jquery}    var txt =$("#maincontent #wrapper").children().last().html(); return(txt)    # No Change
+${page_html_noreload_jquery}    $("#maincontent #wrapper").children().last().find("a").each(function(){$(this).attr("href","")});$("#maincontent #wrapper").children().last().find("input[type='hidden']").each(function(){$(this).attr("value","")});var txt =$("#maincontent #wrapper").children().last().html();$("#maincontent #wrapper").children().last().find("script").each(function(){ txt = txt.replace($(this).html(),"")}); return(txt)    #No Reload
+
+*** Test Cases ***
+compareDownloadWS
+    [Tags]
+    ${user_count}    get users count    ${users_setting}    ${ws_setting_tab}
+    @{envs}    get environment setting    ${users_setting}    ${ws_setting_tab}
+    ${prod}    set variable    @{envs}[0]
+    ${stage}    set variable    @{envs}[1]
+    : FOR    ${rr}    IN RANGE    0    ${user_count}
+    \    ${error_flag}    set variable    ${false}
+    \    ${userName}    get user    ${users_setting}    ${ws_setting_tab}    ${rr}
+    \    @{company}    get company info    ${users_setting}    ${ws_setting_tab}    ${rr}
+    \    @{years}    get years    ${users_setting}    ${ws_setting_tab}    ${rr}
+    \    @{months}    get months    ${users_setting}    ${ws_setting_tab}    ${rr}
+    \    ${download_type}    get download type    ${users_setting}    ${ws_setting_tab}    ${rr}
+    \    ${download_option}    get download option    ${users_setting}    ${ws_setting_tab}    ${rr}
+    \    @{user_criteria}    get user criteria    ${users_setting}    ${ws_setting_tab}    ${rr}    ${ws_criteria_colNumber}
+    \    ${user_criteria_count}    get length    '@{user_criteria}'
+    \    ${prod_browser}    enterModel    @{envs}[0]    Collaborative Assortments    ${userName}    ${browser_profile_1}
+    \    ...    @{company}
+    \    ${prod_page}    get text    xpath=//body
+    \    ${stage_browser}    enterModel    @{envs}[1]    Collaborative Assortments    ${userName}    ${browser_profile_2}
+    \    ...    @{company}
+    \    ${stage_page}    get text    xpath=//body
+    \    Run Keyword And Continue On Failure    Should Be Equal    ${stage_page}    ${prod_page}
+    \    ${ca_flag}    get lines containing string    ${stage_page}    CollaborativeAssortments
+    \    run keyword if    '${ca_flag}'    standardCAprocess
+    \    click link    ${WS_link_clear_all}
+    \    ${filter_count}    get matching xpath count    ${WS_minusFilter_Count}
+    \    run keyword if    ${filter_count}>1    removeFilters    ${WS_Filter_row}    ${filter_count}    ${WS_minusFilter_suffix}
+    \    ...    ${WS_filter1}
+    \    run keyword if    ${filter_count}==1    Select From List by index    ${WS_filter1}    0
+    \    run keyword if    '@{months}[0]'    checkYearMonths    xpath=//input[@value='    ']    @{months}
+    \    run keyword if    '@{years}[0]' and not '@{months}[0]'    checkYearMonths    id=    months    @{years}
+    \    run keyword if    ${user_criteria_count} >0    selectCustomCriteria    ${WS_filter1}    ${WS_filter1_option}    ${WS_filter1_options}
+    \    ...    ${WS_filter1_optionCount}    ${WS_filter1_addFilter}    ${WS_filter1_row}    @{user_criteria}
+    \    sleep    3S
+    \    click element    ${WS_top_viewselected}
+    \    sleep    5s
+    \    ${view_criteria}    get text    xpath=//body
+    \    ${error}    get lines containing string    ${view_criteria}    ${WS_error_noWS}
+    \    ${error_flag}    run keyword if    '${error}'    errorHandle    ${error}    ${error_flag}
+    \    run keyword if    ${error_flag}    logout close browser    ${prod_browser}
+    \    continue for loop if    ${error_flag}
+    \    ${error}    get lines containing string    ${view_criteria}    ${WS_error_exceedMax}
+    \    ${error_flag}    run keyword if    '${error}'    errorHandle    ${error}    ${error_flag}
+    \    run keyword if    ${error_flag}    logout close browser    ${prod_browser}
+    \    continue for loop if    ${error_flag}
+    \    wait until page contains    CollaborativeAssortments
+    \    ${stage_text}    get text    xpath=//body
+    \    switch browser    ${prod_browser}
+    \    ${ca_flag}    get lines containing string    ${prod_page}    CollaborativeAssortments
+    \    run keyword if    '${ca_flag}'    standardCAprocess
+    \    click link    ${WS_link_clear_all}
+    \    ${filter_count}    get matching xpath count    ${WS_minusFilter_Count}
+    \    run keyword if    ${filter_count}>1    removeFilters    ${WS_Filter_row}    ${filter_count}    ${WS_minusFilter_suffix}
+    \    ...    ${WS_filter1}
+    \    run keyword if    ${filter_count}==1    Select From List by index    ${WS_filter1}    0
+    \    run keyword if    '@{months}[0]'    checkYearMonths    xpath=//input[@value='    ']    @{months}
+    \    run keyword if    '@{years}[0]' and not '@{months}[0]'    checkYearMonths    id=    months    @{years}
+    \    run keyword if    ${user_criteria_count} >0    selectCustomCriteria    ${WS_filter1}    ${WS_filter1_option}    ${WS_filter1_options}
+    \    ...    ${WS_filter1_optionCount}    ${WS_filter1_addFilter}    ${WS_filter1_row}    @{user_criteria}
+    \    sleep    3S
+    \    click element    ${WS_top_viewselected}
+    \    sleep    5s
+    \    ${view_criteria}    get text    xpath=//body
+    \    ${error}    get lines containing string    ${view_criteria}    ${WS_error_noWS}
+    \    ${error_flag}    run keyword if    '${error}'    errorHandle    ${error}    ${error_flag}
+    \    run keyword if    ${error_flag}    logout close browser    ${stage_browser}
+    \    continue for loop if    ${error_flag}
+    \    ${error}    get lines containing string    ${view_criteria}    ${WS_error_exceedMax}
+    \    ${error_flag}    run keyword if    '${error}'    errorHandle    ${error}    ${error_flag}
+    \    run keyword if    ${error_flag}    logout close browser    ${stage_browser}
+    \    continue for loop if    ${error_flag}
+    \    wait until page contains    CollaborativeAssortments
+    \    ${prod_text}    get text    xpath=//body
+    \    Run Keyword And Continue On Failure    Should Be Equal    ${stage_text}    ${prod_text}
+    \    click link    ${ca_link_check_all}
+    \    ${download_type}    get download type    ${users_setting}    ${ws_setting_tab}    ${rr}
+    \    select from list    ${ca_dropdown_action}    ${download_type}
+    \    @{main_window}    list windows
+    \    ${current_time}    get time    epoch
+    \    click element    ${ca_submit}
+    \    sleep    3s
+    \    @{current_window}    list windows
+    \    selectDownloadOption    @{current_window}[1]    ${download_option}
+    \    ${prod_excel}    saveExcelWindow    ${prod_download_dir}    @{current_window}[0]    ${current_time}
+    \    switch browser    ${stage_browser}
+    \    click link    ${ca_link_check_all}
+    \    ${download_type}    get download type    ${users_setting}    ${ws_setting_tab}    ${rr}
+    \    select from list    ${ca_dropdown_action}    ${download_type}
+    \    @{main_window}    list windows
+    \    ${current_time}    get time    epoch
+    \    click element    ${ca_submit}
+    \    sleep    3s
+    \    @{current_window}    list windows
+    \    selectDownloadOption    @{current_window}[1]    ${download_option}
+    \    ${stage_excel}    saveExcelWindow    ${stage_download_dir}    @{current_window}[0]    ${current_time}
+    \    Run Keyword And Continue On Failure    compare excel    ${stage_excel}    ${prod_excel}
+    \    logout close browser    ${stage_browser}
+    \    logout close browser    ${prod_browser}
+
+compareFullWS
+    [Tags]
+    ${user_count}    get users count    ${users_setting}    ${ws_setting_tab}
+    @{envs}    get environment setting    ${users_setting}    ${ws_setting_tab}
+    ${prod}    set variable    @{envs}[0]
+    ${stage}    set variable    @{envs}[1]
+    : FOR    ${rr}    IN RANGE    0    ${user_count}
+    \    ${error_flag}    set variable    ${false}
+    \    ${userName}    get user    ${users_setting}    ${ws_setting_tab}    ${rr}
+    \    @{company}    get company info    ${users_setting}    ${ws_setting_tab}    ${rr}
+    \    @{years}    get years    ${users_setting}    ${ws_setting_tab}    ${rr}
+    \    @{months}    get months    ${users_setting}    ${ws_setting_tab}    ${rr}
+    \    ${download_type}    get download type    ${users_setting}    ${ws_setting_tab}    ${rr}
+    \    @{user_criteria}    get user criteria    ${users_setting}    ${ws_setting_tab}    ${rr}    ${ws_criteria_colNumber}
+    \    ${user_criteria_count}    get length    '@{user_criteria}'
+    \    ${prod_browser}    enterModel    @{envs}[0]    Collaborative Assortments    ${userName}    ${browser_profile_1}
+    \    ...    @{company}
+    \    set suite variable    ${prod_browser}
+    \    ${prod_page}    get text    xpath=//body
+    \    ${stage_browser}    enterModel    @{envs}[1]    Collaborative Assortments    ${userName}    ${browser_profile_2}
+    \    ...    @{company}
+    \    ${stage_page}    get text    xpath=//body
+    \    set suite variable    ${stage_browser}
+    \    Run Keyword And Continue On Failure    Should Be Equal    ${stage_page}    ${prod_page}
+    \    ${ca_flag}    get lines containing string    ${stage_page}    CollaborativeAssortments
+    \    run keyword if    '${ca_flag}'    standardCAprocess
+    \    click link    ${WS_link_clear_all}
+    \    ${filter_count}    get matching xpath count    ${WS_minusFilter_Count}
+    \    run keyword if    ${filter_count}>1    removeFilters    ${WS_Filter_row}    ${filter_count}    ${WS_minusFilter_suffix}
+    \    ...    ${WS_filter1}
+    \    run keyword if    ${filter_count}==1    Select From List by index    ${WS_filter1}    0
+    \    run keyword if    '@{months}[0]'    checkYearMonths    xpath=//input[@value='    ']    @{months}
+    \    run keyword if    '@{years}[0]' and not '@{months}[0]'    checkYearMonths    id=    months    @{years}
+    \    run keyword if    ${user_criteria_count}    selectCustomCriteria    ${WS_filter1}    ${WS_filter1_option}    ${WS_filter1_options}
+    \    ...    ${WS_filter1_optionCount}    ${WS_filter1_addFilter}    ${WS_filter1_row}    @{user_criteria}
+    \    sleep    3S
+    \    click element    ${WS_top_viewselected}
+    \    sleep    5s
+    \    ${view_criteria}    get text    xpath=//body
+    \    ${error}    get lines containing string    ${view_criteria}    ${WS_error_noWS}
+    \    ${error_flag}    run keyword if    '${error}'    errorHandle    ${error}    ${error_flag}
+    \    run keyword if    ${error_flag}    logout close browser    ${prod_browser}
+    \    continue for loop if    ${error_flag}
+    \    ${error}    get lines containing string    ${view_criteria}    ${WS_error_exceedMax}
+    \    ${error_flag}    run keyword if    '${error}'    errorHandle    ${error}    ${error_flag}
+    \    run keyword if    ${error_flag}    logout close browser    ${prod_browser}
+    \    continue for loop if    ${error_flag}
+    \    wait until page contains    CollaborativeAssortments
+    \    ${stage_text}    get text    xpath=//body
+    \    ${stage_WS_counts}    get matching xpath count    ${ca_counts_path}
+    \    ${stage_WS_id_string}    getWSID    ${stage_WS_counts}
+    \    switch browser    ${prod_browser}
+    \    ${ca_flag}    get lines containing string    ${prod_page}    CollaborativeAssortments
+    \    run keyword if    '${ca_flag}'    standardCAprocess
+    \    click link    ${WS_link_clear_all}
+    \    ${filter_count}    get matching xpath count    ${WS_minusFilter_Count}
+    \    run keyword if    ${filter_count}>1    removeFilters    ${WS_Filter_row}    ${filter_count}    ${WS_minusFilter_suffix}
+    \    ...    ${WS_filter1}
+    \    run keyword if    ${filter_count}==1    Select From List by index    ${WS_filter1}    0
+    \    run keyword if    '@{months}[0]'    checkYearMonths    xpath=//input[@value='    ']    @{months}
+    \    run keyword if    '@{years}[0]' and not '@{months}[0]'    checkYearMonths    id=    months    @{years}
+    \    run keyword if    ${user_criteria_count}    selectCustomCriteria    ${WS_filter1}    ${WS_filter1_option}    ${WS_filter1_options}
+    \    ...    ${WS_filter1_optionCount}    ${WS_filter1_addFilter}    ${WS_filter1_row}    @{user_criteria}
+    \    sleep    3S
+    \    click element    ${WS_top_viewselected}
+    \    sleep    5s
+    \    ${view_criteria}    get text    xpath=//body
+    \    ${error}    get lines containing string    ${view_criteria}    ${WS_error_noWS}
+    \    ${error_flag}    run keyword if    '${error}'    errorHandle    ${error}    ${error_flag}
+    \    run keyword if    ${error_flag}    logout close browser    ${stage_browser}
+    \    continue for loop if    ${error_flag}
+    \    ${error}    get lines containing string    ${view_criteria}    ${WS_error_exceedMax}
+    \    ${error_flag}    run keyword if    '${error}'    errorHandle    ${error}    ${error_flag}
+    \    run keyword if    ${error_flag}    logout close browser    ${stage_browser}
+    \    continue for loop if    ${error_flag}
+    \    wait until page contains    CollaborativeAssortments
+    \    ${prod_text}    get text    xpath=//body
+    \    Run Keyword And Continue On Failure    Should Be Equal    ${stage_text}    ${prod_text}
+    \    ${prod_WS_counts}    get matching xpath count    ${ca_counts_path}
+    \    ${prod_WS_id_string}    getWSID    ${prod_WS_counts}
+    \    Run Keyword And Continue On Failure    Should Be Equal    ${stage_WS_id_string}    ${prod_WS_id_string}
+    \    continue for loop if    '${stage_WS_id_string}' !='${prod_WS_id_string}'
+    \    @{WS_ID}    get WS ID List    ${stage_WS_id_string}    workid
+    \    set suite variable    @{WS_ID}
+    \    compareCAPage    ${prod_browser}    ${stage_browser}    @{WS_ID}
+    \    logout close browser    ${stage_browser}
+    \    logout close browser    ${prod_browser}
+
+compareWS
+    [Tags]
+    ${user_count}    get users count    ${users_setting}    ${ws_setting_tab}
+    @{envs}    get environment setting    ${users_setting}    ${ws_setting_tab}
+    ${prod}    set variable    @{envs}[0]
+    ${stage}    set variable    @{envs}[1]
+    : FOR    ${rr}    IN RANGE    0    ${user_count}
+    \    ${error_flag}    set variable    False
+    \    ${userName}    get user    ${users_setting}    ${ws_setting_tab}    ${rr}
+    \    @{company}    get company info    ${users_setting}    ${ws_setting_tab}    ${rr}
+    \    @{years}    get years    ${users_setting}    ${ws_setting_tab}    ${rr}
+    \    @{months}    get months    ${users_setting}    ${ws_setting_tab}    ${rr}
+    \    ${download_type}    get download type    ${users_setting}    ${ws_setting_tab}    ${rr}
+    \    ${download_option}    get download option    ${users_setting}    ${ws_setting_tab}    ${rr}
+    \    @{user_criteria}    get user criteria    ${users_setting}    ${ws_setting_tab}    ${rr}    ${ws_criteria_colNumber}
+    \    ${user_criteria_count}    get length    '@{user_criteria}'
+    \    ${prod_browser}    enterModel    @{envs}[0]    Collaborative Assortments    ${userName}    ${browser_profile_1}
+    \    ...    @{company}
+    \    ${prod_page}    get text    xpath=//body
+    \    ${stage_browser}    enterModel    @{envs}[1]    Collaborative Assortments    ${userName}    ${browser_profile_2}
+    \    ...    @{company}
+    \    ${stage_page}    get text    xpath=//body
+    \    Run Keyword And Continue On Failure    Should Be Equal    ${stage_page}    ${prod_page}
+    \    ${ca_flag}    get lines containing string    ${stage_page}    CollaborativeAssortments
+    \    run keyword if    '${ca_flag}'    standardCAprocess
+    \    click link    ${WS_link_clear_all}
+    \    ${filter_count}    get matching xpath count    ${WS_minusFilter_Count}
+    \    run keyword if    ${filter_count}>1    removeFilters    ${WS_Filter_row}    ${filter_count}    ${WS_minusFilter_suffix}
+    \    ...    ${WS_filter1}
+    \    run keyword if    ${filter_count}==1    Select From List by index    ${WS_filter1}    0
+    \    run keyword if    '@{months}[0]'    checkYearMonths    xpath=//input[@value='    ']    @{months}
+    \    run keyword if    '@{years}[0]' and not '@{months}[0]'    checkYearMonths    id=    months    @{years}
+    \    run keyword if    ${user_criteria_count} >0    selectCustomCriteria    ${WS_filter1}    ${WS_filter1_option}    ${WS_filter1_options}
+    \    ...    ${WS_filter1_optionCount}    ${WS_filter1_addFilter}    ${WS_filter1_row}    @{user_criteria}
+    \    sleep    3S
+    \    click element    ${WS_top_viewselected}
+    \    sleep    5s
+    \    ${view_criteria}    get text    xpath=//body
+    \    ${error}    get lines containing string    ${view_criteria}    ${WS_error_noWS}
+    \    ${error_flag}    run keyword if    '${error}'    errorHandle    ${error}    ${error_flag}
+    \    run keyword if    ${error_flag}    logout close browser    ${prod_browser}
+    \    continue for loop if    ${error_flag}
+    \    ${error}    get lines containing string    ${view_criteria}    ${WS_error_exceedMax}
+    \    ${error_flag}    run keyword if    '${error}'    errorHandle    ${error}    ${error_flag}
+    \    run keyword if    ${error_flag}    logout close browser    ${prod_browser}
+    \    continue for loop if    ${error_flag}
+    \    wait until page contains    CollaborativeAssortments
+    \    ${stage_text}    get text    xpath=//body
+    \    switch browser    ${prod_browser}
+    \    ${ca_flag}    get lines containing string    ${prod_page}    CollaborativeAssortments
+    \    run keyword if    '${ca_flag}'    standardCAprocess
+    \    click link    ${WS_link_clear_all}
+    \    ${filter_count}    get matching xpath count    ${WS_minusFilter_Count}
+    \    run keyword if    ${filter_count}>1    removeFilters    ${WS_Filter_row}    ${filter_count}    ${WS_minusFilter_suffix}
+    \    ...    ${WS_filter1}
+    \    run keyword if    ${filter_count}==1    Select From List by index    ${WS_filter1}    0
+    \    run keyword if    '@{months}[0]'    checkYearMonths    xpath=//input[@value='    ']    @{months}
+    \    run keyword if    '@{years}[0]' and not '@{months}[0]'    checkYearMonths    id=    months    @{years}
+    \    run keyword if    ${user_criteria_count} >0    selectCustomCriteria    ${WS_filter1}    ${WS_filter1_option}    ${WS_filter1_options}
+    \    ...    ${WS_filter1_optionCount}    ${WS_filter1_addFilter}    ${WS_filter1_row}    @{user_criteria}
+    \    sleep    3S
+    \    click element    ${WS_top_viewselected}
+    \    sleep    5s
+    \    ${view_criteria}    get text    xpath=//body
+    \    ${error}    get lines containing string    ${view_criteria}    ${WS_error_noWS}
+    \    ${error_flag}    run keyword if    '${error}'    errorHandle    ${error}    ${error_flag}
+    \    run keyword if    ${error_flag}    logout close browser    ${stage_browser}
+    \    continue for loop if    ${error_flag}
+    \    ${error}    get lines containing string    ${view_criteria}    ${WS_error_exceedMax}
+    \    ${error_flag}    run keyword if    '${error}'    errorHandle    ${error}    ${error_flag}
+    \    run keyword if    ${error_flag}    logout close browser    ${stage_browser}
+    \    continue for loop if    ${error_flag}
+    \    wait until page contains    CollaborativeAssortments
+    \    ${prod_text}    get text    xpath=//body
+    \    Run Keyword And Continue On Failure    Should Be Equal    ${stage_text}    ${prod_text}
+    \    click link    ${ca_link_check_all}
+    \    ${download_type}    get download type    ${users_setting}    ${ws_setting_tab}    ${rr}
+    \    select from list    ${ca_dropdown_action}    ${download_type}
+    \    @{main_window}    list windows
+    \    ${current_time}    get time    epoch
+    \    click element    ${ca_submit}
+    \    sleep    3s
+    \    @{current_window}    list windows
+    \    selectDownloadOption    @{current_window}[1]    ${download_option}
+    \    ${prod_excel}    saveExcelWindow    ${prod_download_dir}    @{current_window}[0]    ${current_time}
+    \    switch browser    ${stage_browser}
+    \    click link    ${ca_link_check_all}
+    \    ${download_type}    get download type    ${users_setting}    ${ws_setting_tab}    ${rr}
+    \    select from list    ${ca_dropdown_action}    ${download_type}
+    \    @{main_window}    list windows
+    \    ${current_time}    get time    epoch
+    \    click element    ${ca_submit}
+    \    sleep    3s
+    \    @{current_window}    list windows
+    \    selectDownloadOption    @{current_window}[1]    ${download_option}
+    \    ${stage_excel}    saveExcelWindow    ${stage_download_dir}    @{current_window}[0]    ${current_time}
+    \    Run Keyword And Continue On Failure    compare excel    ${stage_excel}    ${prod_excel}
+    \    @{WS_ID}    compareSeasonalWS    ${prod_browser}    ${stage_browser}
+    \    compareFirstMonthlyWS    ${prod_browser}    ${stage_browser}
+    \    logout close browser    ${stage_browser}
+    \    logout close browser    ${prod_browser}
+
+selectWSCriteria
+    [Tags]    WS-1
+    ${user_count}    get users count    ${users_setting}    ${ws_setting_tab}
+    @{envs}    get environment setting    ${users_setting}    ${ws_setting_tab}
+    ${prod}    set variable    @{envs}[0]
+    ${stage}    set variable    @{envs}[1]
+    : FOR    ${user_num}    IN RANGE    0    ${user_count}
+    \    ${error_flag}    set variable    False
+    \    ${userName}    get user    ${users_setting}    ${ws_setting_tab}    ${user_num}
+    \    @{company}    get company info    ${users_setting}    ${ws_setting_tab}    ${user_num}
+    \    @{years}    get years    ${users_setting}    ${ws_setting_tab}    ${user_num}
+    \    @{months}    get months    ${users_setting}    ${ws_setting_tab}    ${user_num}
+    \    @{user_criteria}    get user criteria    ${users_setting}    ${ws_setting_tab}    ${user_num}    ${ws_criteria_colNumber}
+    \    ${user_criteria_count}    get length    '@{user_criteria}'
+    \    ${prod_browser}    enterModel    @{envs}[0]    Collaborative Assortments    ${userName}    ${browser_profile_1}
+    \    ...    @{company}
+    \    ${prod_page}    execute javascript    ${page_text_jquery}
+    \    ${stage_browser}    enterModel    @{envs}[1]    Collaborative Assortments    ${userName}    ${browser_profile_2}
+    \    ...    @{company}
+    \    ${stage_page}    execute javascript    ${page_text_jquery}
+    \    Run Keyword And Continue On Failure    Should Be Equal    ${stage_page}    ${prod_page}
+    \    ${ca_flag}    get lines containing string    ${stage_page}    CollaborativeAssortments
+    \    run keyword if    '${ca_flag}'    standardCAprocess
+    \    click link    ${WS_link_clear_all}
+    \    ${filter_count}    get matching xpath count    ${WS_minusFilter_Count}
+    \    run keyword if    ${filter_count}>1    removeFilters    ${WS_Filter_row}    ${filter_count}    ${WS_minusFilter_suffix}
+    \    ...    ${WS_filter1}
+    \    run keyword if    ${filter_count}==1    Select From List by index    ${WS_filter1}    0
+    \    run keyword if    '@{months}[0]'    checkYearMonths    xpath=//input[@value='    ']    @{months}
+    \    run keyword if    '@{years}[0]' and not '@{months}[0]'    checkYearMonths    id=    months    @{years}
+    \    run keyword if    ${user_criteria_count} >0    selectCustomCriteria    ${WS_filter1}    ${WS_filter1_option}    ${WS_filter1_options}
+    \    ...    ${WS_filter1_optionCount}    ${WS_filter1_addFilter}    ${WS_filter1_row}    @{user_criteria}
+    \    sleep    3S
+    \    ${stage_input}    execute javascript    ${input_jquery}
+    \    ${stage_dropdown}    execute javascript    ${dropdown_selected_jquery}
+    \    ${stage_checkbox}    execute javascript    ${checkbox_checked_@name_jquery}
+    \    click element    ${WS_top_viewselected}
+    \    sleep    5s
+    \    ${view_criteria}    execute javascript    ${page_text_jquery}
+    \    ${error}    get lines containing string    ${view_criteria}    ${WS_error_noWS}
+    \    ${error_flag}    run keyword if    '${error}'    errorHandle    ${error}    ${error_flag}
+    \    run keyword if    ${error_flag}    logout close browser    ${prod_browser}
+    \    continue for loop if    ${error_flag}
+    \    ${error}    get lines containing string    ${view_criteria}    ${WS_error_exceedMax}
+    \    ${error_flag}    run keyword if    '${error}'    errorHandle    ${error}    ${error_flag}
+    \    run keyword if    ${error_flag}    logout close browser    ${prod_browser}
+    \    continue for loop if    ${error_flag}
+    \    wait until page contains    CollaborativeAssortments
+    \    ${stage_text}    execute javascript    ${page_text_jquery}
+    \    switch browser    ${prod_browser}
+    \    ${ca_flag}    get lines containing string    ${prod_page}    CollaborativeAssortments
+    \    run keyword if    '${ca_flag}'    standardCAprocess
+    \    click link    ${WS_link_clear_all}
+    \    ${filter_count}    get matching xpath count    ${WS_minusFilter_Count}
+    \    run keyword if    ${filter_count}>1    removeFilters    ${WS_Filter_row}    ${filter_count}    ${WS_minusFilter_suffix}
+    \    ...    ${WS_filter1}
+    \    run keyword if    ${filter_count}==1    Select From List by index    ${WS_filter1}    0
+    \    run keyword if    '@{months}[0]'    checkYearMonths    xpath=//input[@value='    ']    @{months}
+    \    run keyword if    '@{years}[0]' and not '@{months}[0]'    checkYearMonths    id=    months    @{years}
+    \    run keyword if    ${user_criteria_count} >0    selectCustomCriteria    ${WS_filter1}    ${WS_filter1_option}    ${WS_filter1_options}
+    \    ...    ${WS_filter1_optionCount}    ${WS_filter1_addFilter}    ${WS_filter1_row}    @{user_criteria}
+    \    sleep    3S
+    \    ${prod_input}    execute javascript    ${input_jquery}
+    \    ${prod_dropdown}    execute javascript    ${dropdown_selected_jquery}
+    \    ${prod_checkbox}    execute javascript    ${checkbox_checked_@name_jquery}
+    \    click element    ${WS_top_viewselected}
+    \    sleep    5s
+    \    ${view_criteria}    execute javascript    ${page_text_jquery}
+    \    ${error}    get lines containing string    ${view_criteria}    ${WS_error_noWS}
+    \    ${error_flag}    run keyword if    '${error}'    errorHandle    ${error}    ${error_flag}
+    \    run keyword if    ${error_flag}    logout close browser    ${stage_browser}
+    \    continue for loop if    ${error_flag}
+    \    ${error}    get lines containing string    ${view_criteria}    ${WS_error_exceedMax}
+    \    ${error_flag}    run keyword if    '${error}'    errorHandle    ${error}    ${error_flag}
+    \    run keyword if    ${error_flag}    logout close browser    ${stage_browser}
+    \    continue for loop if    ${error_flag}
+    \    wait until page contains    CollaborativeAssortments
+    \    ${prod_text}    execute javascript    ${page_text_jquery}
+    \    Run Keyword And Continue On Failure    Should Be Equal    ${stage_text}    ${prod_text}
+    \    Run Keyword And Continue On Failure    Should Be Equal    ${stage_input}    ${prod_input}
+    \    Run Keyword And Continue On Failure    Should Be Equal    ${stage_dropdown}    ${prod_dropdown}
+    \    Run Keyword And Continue On Failure    Should Be Equal    ${stage_checkbox}    ${prod_checkbox}
+    \    logout close browser    ${stage_browser}
+    \    logout close browser    ${prod_browser}
+    close all browsers
+
+compareWSDownload
+    [Tags]    WS-2
+    ${user_count}    get users count    ${users_setting}    ${ws_setting_tab}
+    @{envs}    get environment setting    ${users_setting}    ${ws_setting_tab}
+    ${prod}    set variable    @{envs}[0]
+    ${stage}    set variable    @{envs}[1]
+    : FOR    ${user_num}    IN RANGE    0    ${user_count}
+    \    ${userName}    get user    ${users_setting}    ${ws_setting_tab}    ${user_num}
+    \    @{company}    get company info    ${users_setting}    ${ws_setting_tab}    ${user_num}
+    \    ${download_type}    get download type    ${users_setting}    ${ws_setting_tab}    ${user_num}
+    \    ${download_option}    get download option    ${users_setting}    ${ws_setting_tab}    ${user_num}
+    \    continue for loop if    '${download_type}' and '${download_option}'
+    \    ${prod_browser}    enterModel    @{envs}[0]    Collaborative Assortments    ${userName}    ${browser_profile_1}
+    \    ...    @{company}
+    \    wait until page contains    CollaborativeAssortments
+    \    ${prod_page}    execute javascript    ${page_text_jquery}
+    \    ${prod_html}    execute javascript    ${page_html_jquery}
+    \    ${stage_browser}    enterModel    @{envs}[1]    Collaborative Assortments    ${userName}    ${browser_profile_2}
+    \    ...    @{company}
+    \    wait until page contains    CollaborativeAssortments
+    \    ${stage_page}    execute javascript    ${page_text_jquery}
+    \    ${stage_html}    execute javascript    ${page_html_jquery}
+    \    ${text_flag}    diff text    ${stage_page}    ${prod_page}
+    \    Run Keyword And Continue On Failure    run keyword if    ${text_flag} or ${checkedbox_flag} or ${checkedradio_flag} or ${input_flag} or ${checkedoption_flag}    fail    CollaborativeAssortments Diff
+    \    click link    ${ca_link_check_all}
+    \    select from list    ${ca_dropdown_action}    ${download_type}
+    \    @{main_window}    list windows
+    \    ${current_time}    get time    epoch
+    \    click element    ${ca_submit}
+    \    sleep    3s
+    \    @{current_window}    list windows
+    \    selectDownloadOption    @{current_window}[1]    ${download_option}
+    \    ${stage_excel}    run keyword if    '${download_option}' == 'Edit monthly flow%' or '${download_option}' == 'Edit monthly units'    saveExcelWindow    ${stage_download_dir}    @{current_window}[0]
+    \    ...    ELSE    saveZipToExcelWindow    ${stage_download_dir}    @{current_window}[0]
+    \    #    ${stage_excel_name}    convert to string    ${stage_excel}
+    \    ${stage_excel_name}    replace string    ${stage_excel}    ${stage_download_dir}\\    \\
+    \    switch browser    ${prod_browser}
+    \    click link    ${ca_link_check_all}
+    \    select from list    ${ca_dropdown_action}    ${download_type}
+    \    @{main_window}    list windows
+    \    ${current_time}    get time    epoch
+    \    click element    ${ca_submit}
+    \    sleep    3s
+    \    @{current_window}    list windows
+    \    selectDownloadOption    @{current_window}[1]    ${download_option}
+    \    ${prod_excel}    run keyword if    '${download_option}' == 'Edit monthly flow%' or '${download_option}' == 'Edit monthly units'    saveExcelWindow    ${prod_download_dir}    @{current_window}[0]
+    \    ...    ELSE    saveZipToExcelWindow    ${prod_download_dir}    @{current_window}[0]
+    \    #    ${prod_excel_name}    convert to string    ${prod_excel}
+    \    ${prod_excel_name}    replace string    ${prod_excel}    ${prod_download_dir}\\    \\
+    \    Run Keyword And Continue On Failure    Should Be Equal    ${stage_excel_name}    ${prod_excel_name}
+    \    continue for loop if    '${prod_excel_name}' != '${stage_excel_name}'
+    \    #    Run Keyword And Continue On Failure    compare excel    ${stage_excel}    ${prod_excel}
+    \    #    ${excel_name_list}    split string    ${stage_excel_name}    ,
+    \    compareExcelList    ${stage_excel_name}    ${prod_download_dir}\\    ${stage_download_dir}\\
+    \    logout close browser    ${stage_browser}
+    \    logout close browser    ${prod_browser}
+    close all browsers
+
+compareWSSeasonal
+    [Tags]    WS-3
+    ${user_count}    get users count    ${users_setting}    ${ws_setting_tab}
+    @{envs}    get environment setting    ${users_setting}    ${ws_setting_tab}
+    ${prod}    set variable    @{envs}[0]
+    ${stage}    set variable    @{envs}[1]
+    : FOR    ${user_num}    IN RANGE    0    ${user_count}
+    \    ${userName}    get user    ${users_setting}    ${ws_setting_tab}    ${user_num}
+    \    @{company}    get company info    ${users_setting}    ${ws_setting_tab}    ${user_num}
+    \    ${prod_browser}    enterModel    @{envs}[0]    Collaborative Assortments    ${userName}    ${browser_profile_1}
+    \    ...    @{company}
+    \    wait until page contains    CollaborativeAssortments
+    \    ${prod_page}    execute javascript    ${page_text_jquery}
+    \    ${prod_html}    execute javascript    ${page_html_jquery}
+    \    ${stage_browser}    enterModel    @{envs}[1]    Collaborative Assortments    ${userName}    ${browser_profile_2}
+    \    ...    @{company}
+    \    wait until page contains    CollaborativeAssortments
+    \    ${stage_page}    execute javascript    ${page_text_jquery}
+    \    ${stage_html}    execute javascript    ${page_html_jquery}
+    \    ${text_flag}    diff text    ${stage_page}    ${prod_page}
+    \    Run Keyword And Continue On Failure    run keyword if    ${text_flag} or ${checkedbox_flag} or ${checkedradio_flag} or ${input_flag} or ${checkedoption_flag}    fail    CollaborativeAssortments Diff
+    \    Run Keyword And Continue On Failure    compareSeasonalWS    ${prod_browser}    ${stage_browser}    ${user_num}
+    \    logout close browser    ${stage_browser}
+    \    logout close browser    ${prod_browser}
+    close all browsers
+
+compareWSMonthly
+    [Tags]
+    ${user_count}    get users count    ${users_setting}    ${ws_setting_tab}
+    @{envs}    get environment setting    ${users_setting}    ${ws_setting_tab}
+    ${prod}    set variable    @{envs}[0]
+    ${stage}    set variable    @{envs}[1]
+    : FOR    ${rr}    IN RANGE    0    ${user_count}
+    \    ${userName}    get user    ${users_setting}    ${ws_setting_tab}    ${rr}
+    \    @{company}    get company info    ${users_setting}    ${ws_setting_tab}    ${rr}
+    \    ${prod_browser}    enterModel    @{envs}[0]    Collaborative Assortments    ${userName}    ${browser_profile_1}
+    \    ...    @{company}
+    \    wait until page contains    CollaborativeAssortments
+    \    ${prod_page}    get text    xpath=//body
+    \    ${prod_WS_counts}    get matching xpath count    ${ca_counts_path}
+    \    ${prod_WS_id_string}    getWSID    ${prod_WS_counts}
+    \    ${stage_browser}    enterModel    @{envs}[1]    Collaborative Assortments    ${userName}    ${browser_profile_2}
+    \    ...    @{company}
+    \    wait until page contains    CollaborativeAssortments
+    \    ${stage_page}    get text    xpath=//body
+    \    ${stage_WS_counts}    get matching xpath count    ${ca_counts_path}
+    \    ${stage_WS_id_string}    getWSID    ${stage_WS_counts}
+    \    Run Keyword And Continue On Failure    Should Be Equal    ${stage_WS_id_string}    ${prod_WS_id_string}
+    \    continue for loop if    '${stage_WS_id_string}' !='${prod_WS_id_string}'
+    \    @{WS_ID}    get WS ID List    ${stage_WS_id_string}    workid
+    \    Run Keyword And Continue On Failure    Should Be Equal    ${stage_page}    ${prod_page}
+    \    Run Keyword And Continue On Failure    compareFirstMonthlyWS    ${prod_browser}    ${stage_browser}    @{WS_ID}
+    \    logout close browser    ${stage_browser}
+    \    logout close browser    ${prod_browser}
+    close all browsers
+
+compareStyleBank
+    [Tags]    TD-SB
+    ${user_count}    get users count    ${users_setting}    ${stylebank_setting_tab}
+    @{envs}    get environment setting    ${users_setting}    ${stylebank_setting_tab}
+    ${prod}    set variable    @{envs}[0]
+    ${stage}    set variable    @{envs}[1]
+    : FOR    ${user_num}    IN RANGE    0    ${user_count}
+    \    ${userName}    get user    ${users_setting}    ${stylebank_setting_tab}    ${user_num}
+    \    @{company}    get company info    ${users_setting}    ${stylebank_setting_tab}    ${user_num}
+    \    @{user_criteria}    get user criteria    ${users_setting}    ${stylebank_setting_tab}    ${user_num}    ${stylebank_criteria_colNumber}
+    \    ${user_criteria_count}    get length    '@{user_criteria}'
+    \    @{style_report_type}    get cell values    ${users_setting}    ${stylebank_setting_tab}    ${user_num}    3
+    \    @{default_recent_season}    get cell values    ${users_setting}    ${stylebank_setting_tab}    ${user_num}    4
+    \    ${prod_browser}    enterModel    @{envs}[0]    Style Bank    ${userName}    ${browser_profile_1}
+    \    ...    @{company}
+    \    ${prod_page}    execute javascript    ${page_html_jquery}
+    \    #    reload page
+    \    sleep    3S
+    \    @{prod_dropdown_yearseason}    get list items    ${stylebank_dropdown_yearSeason}
+    \    ${prod_styleinfo_count}    get matching xpath count    ${stylebank_styleinfo_section_count}
+    \    ${stage_browser}    enterModel    @{envs}[1]    Style Bank    ${userName}    ${browser_profile_2}
+    \    ...    @{company}
+    \    ${stage_page}    execute javascript    ${page_html_jquery}
+    \    #    reload page
+    \    sleep    3S
+    \    @{stage_dropdown_yearseason}    get list items    ${stylebank_dropdown_yearSeason}
+    \    ${stage_styleinfo_count}    get matching xpath count    ${stylebank_styleinfo_section_count}
+    \    Run Keyword And Continue On Failure    Should Be Equal    ${stage_page}    ${prod_page}    ${userName}_${user_num} StyleBankFirstPage DIFF    False
+    \    Run Keyword if    @{prod_dropdown_yearseason} == @{stage_dropdown_yearseason} and '@{default_recent_season}[0]'    compareStyleBankInfo    ${prod_browser}    ${stage_browser}    ${stylebank_styleinfo_section_count}
+    \    ...    @{stage_dropdown_yearseason}
+    \    switch browser    ${prod_browser}
+    \    #    click link    ${stylebank_link_advancedsearch}
+    \    #    focus    Xpath=//a[text()='Advanced Search']
+    \    press key    Xpath=//a[text()='Advanced Search']    \\13
+    \    wait until page contains    Enter the search criteria for styles you would like to view, and click the Search button.    100
+    \    selectCustomCriteria    ${stylebank_advanced_filter1}    ${stylebank_advanced_filter1_option}    ${stylebank_advanced_filter1_options}    ${stylebank_advanced_filter1_optionCount}    ${stylebank_advanced_filter1_addFilter}
+    \    ...    ${stylebank_advanced_filter1_row}    @{user_criteria}
+    \    click element    ${stylebank_advanced_top_search}
+    \    wait until page contains    Search Criteria    100
+    \    click button    ${stylebank_button_view}
+    \    wait until page does not contain element    ${stylebank_searched_button_wait}    100
+    \    ${prod_search}    execute javascript    ${page_html_jquery}
+    \    #    reload page
+    \    sleep    3S
+    \    @{prod_searched_yearseason}    get list items    ${stylebank_dropdown_yearSeason}
+    \    switch browser    ${stage_browser}
+    \    #    click link    ${stylebank_link_advancedsearch}
+    \    press key    Xpath=//a[text()='Advanced Search']    \\13
+    \    wait until page contains    Enter the search criteria for styles you would like to view, and click the Search button.    100
+    \    selectCustomCriteria    ${stylebank_advanced_filter1}    ${stylebank_advanced_filter1_option}    ${stylebank_advanced_filter1_options}    ${stylebank_advanced_filter1_optionCount}    ${stylebank_advanced_filter1_addFilter}
+    \    ...    ${stylebank_advanced_filter1_row}    @{user_criteria}
+    \    click element    ${stylebank_advanced_top_search}
+    \    wait until page contains    Search Criteria    100
+    \    click button    ${stylebank_button_view}
+    \    wait until page does not contain element    ${stylebank_searched_button_wait}    100
+    \    ${stage_search}    execute javascript    ${page_html_jquery}
+    \    #    reload page
+    \    sleep    3S
+    \    @{stage_searched_yearseason}    get list items    ${stylebank_dropdown_yearSeason}
+    \    ${searched_diff}    diff text    ${stage_search}    ${prod_search}
+    \    Run Keyword And Continue On Failure    run keyword if    ${searched_diff}    fail    ${userName}_${user_num} Advanced Search style bank Diff
+    \    run keyword if    ${searched_diff}    write html file with inner html    ${stage_search}    ${prod_search}    ${diff_dir}\\${userName}_${User_num}_searched style bank_diff.html
+    \    ...    V
+    \    continue for loop if    @{stage_searched_yearseason} != @{prod_searched_yearseason}
+    \    compareSearchedStyleBank    ${prod_browser}    ${stage_browser}    @{style_report_type}
+    \    logout close browser    ${stage_browser}
+    \    logout close browser    ${prod_browser}
+    close all browsers
+
+comparePHStyleBank
+    [Tags]    SB-PH
+    ${user_count}    get users count    ${users_setting}    ${stylebank_setting_tab}
+    @{envs}    get environment setting    ${users_setting}    ${stylebank_setting_tab}
+    ${prod}    set variable    @{envs}[0]
+    ${stage}    set variable    @{envs}[1]
+    #    set selenium speed    1
+    : FOR    ${rr}    IN RANGE    0    ${user_count}
+    \    ${userName}    get user    ${users_setting}    ${stylebank_setting_tab}    ${rr}
+    \    @{company}    get company info    ${users_setting}    ${stylebank_setting_tab}    ${rr}
+    \    @{user_criteria}    get user criteria    ${users_setting}    ${stylebank_setting_tab}    ${rr}    ${stylebank_criteria_colNumber}
+    \    ${user_criteria_count}    get length    '@{user_criteria}'
+    \    @{PHstyle_report_type}    get cell values    ${users_setting}    ${stylebank_setting_tab}    ${rr}    3
+    \    ${prod_browser}    enterModel    @{envs}[0]    PH Styles    ${userName}    ${browser_profile_1}
+    \    ...    @{company}
+    \    ${prod_page}    get text    xpath=//body
+    \    @{prod_dropdown_yearseason}    get list items    ${PHstyle_dropdown_yearSeason}
+    \    ${prod_styleinfo_count}    get matching xpath count    ${PHstyle_styleinfo_section_count}
+    \    ${stage_browser}    enterModel    @{envs}[1]    PH Styles    ${userName}    ${browser_profile_2}
+    \    ...    @{company}
+    \    ${stage_page}    get text    xpath=//body
+    \    @{stage_dropdown_yearseason}    get list items    ${PHstyle_dropdown_yearSeason}
+    \    ${stage_styleinfo_count}    get matching xpath count    ${PHstyle_styleinfo_section_count}
+    \    Run Keyword And Continue On Failure    Should Be Equal    ${stage_page}    ${prod_page}
+    \    continue for loop if    ${prod_styleinfo_count} == 0 or ${stage_styleinfo_count} == 0
+    \    Run Keyword if    @{prod_dropdown_yearseason} == @{stage_dropdown_yearseason}    comparePHStyleBankInfo    ${prod_browser}    ${stage_browser}    @{stage_dropdown_yearseason}
+    \    switch browser    ${prod_browser}
+    \    click link    ${PHstyle_link_advancedsearch}
+    \    wait until page contains    Enter the search criteria for placeholder styles you would like to view, and click the Search button.    30
+    \    selectCustomCriteria    ${PHstyle_advanced_filter1}    ${PHstyle_advanced_filter1_option}    ${PHstyle_advanced_filter1_options}    ${PHstyle_advanced_filter1_optionCount}    ${PHstyle_advanced_filter1_addFilter}
+    \    ...    ${PHstyle_advanced_filter1_row}    @{user_criteria}
+    \    click element    ${stylebank_advanced_top_search}
+    \    #    wait until page contains    Search Criteria    100
+    \    sleep    5S
+    \    ${prod_search}    get text    xpath=//body
+    \    @{prod_searched_yearseason}    get list items    ${PHstyle_dropdown_yearSeason}
+    \    switch browser    ${stage_browser}
+    \    click link    ${PHstyle_link_advancedsearch}
+    \    wait until page contains    Enter the search criteria for placeholder styles you would like to view, and click the Search button.    30
+    \    selectCustomCriteria    ${PHstyle_advanced_filter1}    ${PHstyle_advanced_filter1_option}    ${PHstyle_advanced_filter1_options}    ${PHstyle_advanced_filter1_optionCount}    ${PHstyle_advanced_filter1_addFilter}
+    \    ...    ${PHstyle_advanced_filter1_row}    @{user_criteria}
+    \    click element    ${PHstyle_advanced_top_search}
+    \    #    wait until page contains    Search Criteria    100
+    \    sleep    5S
+    \    ${stage_search}    get text    xpath=//body
+    \    @{stage_searched_yearseason}    get list items    ${PHstyle_dropdown_yearSeason}
+    \    Run Keyword And Continue On Failure    Should Be Equal    ${stage_search}    ${prod_search}
+    \    continue for loop if    @{stage_searched_yearseason} != @{prod_searched_yearseason}
+    \    compareSearchedPH    ${prod_browser}    ${stage_browser}    @{stage_searched_yearseason}
+    \    logout close browser    ${stage_browser}
+    \    logout close browser    ${prod_browser}
+    close all browsers
+
+compareSIzeScales
+    [Tags]    SS
+    ${user_count}    get users count    ${users_setting}    ${sizescales_setting_tab}
+    @{envs}    get environment setting    ${users_setting}    ${sizescales_setting_tab}
+    ${prod}    set variable    @{envs}[0]
+    ${stage}    set variable    @{envs}[1]
+    : FOR    ${rr}    IN RANGE    0    ${user_count}
+    \    ${userName}    get user    ${users_setting}    ${sizescales_setting_tab}    ${rr}
+    \    @{company}    get company info    ${users_setting}    ${sizescales_setting_tab}    ${rr}
+    \    @{user_criteria}    get user criteria    ${users_setting}    ${sizescales_setting_tab}    ${rr}    ${sizescales_criteria_colNumber}
+    \    ${user_criteria_count}    get length    '@{user_criteria}'
+    \    @{size_scale_type}    get cell values    ${users_setting}    ${sizescales_setting_tab}    ${rr}    3
+    \    ${prod_browser}    enterModel    @{envs}[0]    Size Scales    ${userName}    ${browser_profile_1}
+    \    ...    @{company}
+    \    wait until page contains    Scales    20
+    \    ${prod_page}    execute javascript    ${page_text_jquery}
+    \    ${prod_sizescales_count}    get matching xpath count    ${sizescales_count}
+    \    ${stage_browser}    enterModel    @{envs}[1]    Size Scales    ${userName}    ${browser_profile_2}
+    \    ...    @{company}
+    \    wait until page contains    Scales    20
+    \    ${stage_page}    execute javascript    ${page_text_jquery}
+    \    ${stage_sizescales_count}    get matching xpath count    ${sizescales_count}
+    \    Run Keyword And Continue On Failure    Should Be Equal    ${stage_page}    ${prod_page}
+    \    continue for loop if    ${prod_sizescales_count} == 0 or ${stage_sizescales_count} == 0 or ${prod_sizescales_count} != ${stage_sizescales_count}
+    \    Run Keyword if    ${prod_sizescales_count} == ${stage_sizescales_count}    compareSizeScaleInfo    ${prod_browser}    ${stage_browser}    ${stage_sizescales_count}
+    \    Run Keyword if    ${prod_sizescales_count} == ${stage_sizescales_count}    compareDownloadSizeScales    ${prod_browser}    ${stage_browser}
+    \    #    compareDownloadTemplate
+    \    logout close browser    ${stage_browser}
+    \    logout close browser    ${prod_browser}
+    close all browsers
+
+compareCustomerDirectory
+    [Tags]    TD-CD
+    ${user_count}    get users count    ${users_setting}    ${ws_setting_tab}
+    @{envs}    get environment setting    ${users_setting}    ${ws_setting_tab}
+    ${prod}    set variable    @{envs}[0]
+    ${stage}    set variable    @{envs}[1]
+    : FOR    ${user_num}    IN RANGE    0    ${user_count}
+    \    ${userName}    get user    ${users_setting}    ${ws_setting_tab}    ${user_num}
+    \    @{company}    get company info    ${users_setting}    ${ws_setting_tab}    ${user_num}
+    \    ${prod_browser}    enterModel    @{envs}[0]    Customer Directory    ${userName}    ${browser_profile_1}
+    \    ...    @{company}
+    \    wait until page contains    Customer Directory    20
+    \    ${prod_page}    execute javascript    ${page_html_jquery}
+    \    ${prod_retailer_count}    get matching xpath count    ${customerDirectory_retailer_count}
+    \    ${prod_next_page}    get matching xpath count    ${customerDirectory_link_next_count}
+    \    ${stage_browser}    enterModel    @{envs}[1]    Customer Directory    ${userName}    ${browser_profile_2}
+    \    ...    @{company}
+    \    wait until page contains    Customer Directory    20
+    \    ${stage_page}    execute javascript    ${page_html_jquery}
+    \    ${stage_retailer_count}    get matching xpath count    ${customerDirectory_retailer_count}
+    \    ${stage_next_page}    get matching xpath count    ${customerDirectory_link_next_count}
+    \    ${page_diff}    diff text    ${stage_page}    ${prod_page}
+    \    Run Keyword And Continue On Failure    run keyword if    ${page_diff}    fail    ${userName}_${user_num} Customer Directory Diff
+    \    ${current_time}    get time    epoch
+    \    run keyword if    ${page_diff}    write html file with inner html    ${stage_page}    ${prod_page}    ${diff_dir}\\${userName}_${User_num}_Customer Directory_diff_${current_time}.html
+    \    ...    V
+    \    run keyword if    ${prod_retailer_count} == ${stage_retailer_count} and ${stage_retailer_count} >0    compareRetailers    ${prod_browser}    ${stage_browser}    ${stage_retailer_count}
+    \    ...    ${checkbox_checked_@name_jquery}
+    \    run keyword if    ${prod_next_page} == ${stage_next_page} and ${stage_next_page} > 0    compareCustomerDirectoryPage    ${prod_browser}    ${stage_browser}
+    \    logout close browser    ${stage_browser}
+    \    logout close browser    ${prod_browser}
+    close all browsers
+
+compareWSprocess
+    [Tags]    TD-WS
+    ${user_count}    get users count    ${users_setting}    ${ws_setting_tab}
+    @{envs}    get environment setting    ${users_setting}    ${ws_setting_tab}
+    ${prod}    set variable    @{envs}[0]
+    ${stage}    set variable    @{envs}[1]
+    : FOR    ${user_num}    IN RANGE    0    ${user_count}
+    \    ${error_flag}    set variable    False
+    \    ${userName}    get user    ${users_setting}    ${ws_setting_tab}    ${user_num}
+    \    @{company}    get company info    ${users_setting}    ${ws_setting_tab}    ${user_num}
+    \    @{years}    get years    ${users_setting}    ${ws_setting_tab}    ${user_num}
+    \    @{months}    get months    ${users_setting}    ${ws_setting_tab}    ${user_num}
+    \    @{user_criteria}    get user criteria    ${users_setting}    ${ws_setting_tab}    ${user_num}    ${ws_criteria_colNumber}
+    \    ${user_criteria_count}    get length    '@{user_criteria}'
+    \    ${prod_browser}    enterModel    @{envs}[0]    Collaborative Assortments    ${userName}    ${browser_profile_1}
+    \    ...    @{company}
+    \    ${prod_page}    execute javascript    ${page_text_jquery}
+    \    ${stage_browser}    enterModel    @{envs}[1]    Collaborative Assortments    ${userName}    ${browser_profile_2}
+    \    ...    @{company}
+    \    ${stage_page}    execute javascript    ${page_text_jquery}
+    \    Run Keyword And Continue On Failure    Should Be Equal    ${stage_page}    ${prod_page}    ${userName}_${user_num} First Collaborative Assortments diff    false
+    \    ${ca_flag}    get lines containing string    ${stage_page}    CollaborativeAssortments
+    \    run keyword if    '${ca_flag}'    standardCAprocess
+    \    click link    ${WS_link_clear_all}
+    \    ${filter_count}    get matching xpath count    ${WS_minusFilter_Count}
+    \    run keyword if    ${filter_count}>1    removeFilters    ${WS_Filter_row}    ${filter_count}    ${WS_minusFilter_suffix}
+    \    ...    ${WS_filter1}
+    \    run keyword if    ${filter_count}==1    Select From List by index    ${WS_filter1}    0
+    \    run keyword if    '@{months}[0]'    checkYearMonths    xpath=//input[@value='    ']    @{months}
+    \    run keyword if    '@{years}[0]' and not '@{months}[0]'    checkYearMonths    id=    months    @{years}
+    \    run keyword if    ${user_criteria_count} >0    selectCustomCriteria    ${WS_filter1}    ${WS_filter1_option}    ${WS_filter1_options}
+    \    ...    ${WS_filter1_optionCount}    ${WS_filter1_addFilter}    ${WS_filter1_row}    @{user_criteria}
+    \    sleep    3S
+    \    ${year_class}    get element attribute    Xpath=/html/body/div[1]/div[2]/div/div/form/table[2]/tbody/tr/td[1]/table/tbody/tr[2]/td/table/tbody/tr/td/table/tbody/tr/td[7]/table/tbody/tr[1]@class
+    \    ${stage_criteria_page}    execute javascript    ${page_html_nochange_jquery}
+    \    ${year_class_1}    get element attribute    Xpath=/html/body/div[1]/div[2]/div/div/form/table[2]/tbody/tr/td[1]/table/tbody/tr[2]/td/table/tbody/tr/td/table/tbody/tr/td[7]/table/tbody/tr[1]@class
+    \    click element    ${WS_top_viewselected}
+    \    sleep    5s
+    \    ${view_criteria}    execute javascript    ${page_text_jquery}
+    \    ${error}    get lines containing string    ${view_criteria}    ${WS_error_noWS}
+    \    ${error_flag}    run keyword if    '${error}'    errorHandle    ${error}    ${error_flag}
+    \    run keyword if    ${error_flag}    logout close browser    ${prod_browser}
+    \    continue for loop if    ${error_flag}
+    \    ${error}    get lines containing string    ${view_criteria}    ${WS_error_exceedMax}
+    \    ${error_flag}    run keyword if    '${error}'    errorHandle    ${error}    ${error_flag}
+    \    run keyword if    ${error_flag}    logout close browser    ${prod_browser}
+    \    continue for loop if    ${error_flag}
+    \    wait until page contains    CollaborativeAssortments    20
+    \    ${stage_selected_page}    execute javascript    ${page_html_jquery}
+    \    switch browser    ${prod_browser}
+    \    ${ca_flag}    get lines containing string    ${prod_page}    CollaborativeAssortments
+    \    run keyword if    '${ca_flag}'    standardCAprocess
+    \    click link    ${WS_link_clear_all}
+    \    ${filter_count}    get matching xpath count    ${WS_minusFilter_Count}
+    \    run keyword if    ${filter_count}>1    removeFilters    ${WS_Filter_row}    ${filter_count}    ${WS_minusFilter_suffix}
+    \    ...    ${WS_filter1}
+    \    run keyword if    ${filter_count}==1    Select From List by index    ${WS_filter1}    0
+    \    run keyword if    '@{months}[0]'    checkYearMonths    xpath=//input[@value='    ']    @{months}
+    \    run keyword if    '@{years}[0]' and not '@{months}[0]'    checkYearMonths    id=    months    @{years}
+    \    run keyword if    ${user_criteria_count} >0    selectCustomCriteria    ${WS_filter1}    ${WS_filter1_option}    ${WS_filter1_options}
+    \    ...    ${WS_filter1_optionCount}    ${WS_filter1_addFilter}    ${WS_filter1_row}    @{user_criteria}
+    \    sleep    3S
+    \    ${prod_criteria_page}    execute javascript    ${page_html_nochange_jquery}
+    \    click element    ${WS_top_viewselected}
+    \    sleep    5s
+    \    ${view_criteria}    execute javascript    ${page_text_jquery}
+    \    ${error}    get lines containing string    ${view_criteria}    ${WS_error_noWS}
+    \    ${error_flag}    run keyword if    '${error}'    errorHandle    ${error}    ${error_flag}
+    \    run keyword if    ${error_flag}    logout close browser    ${stage_browser}
+    \    continue for loop if    ${error_flag}
+    \    ${error}    get lines containing string    ${view_criteria}    ${WS_error_exceedMax}
+    \    ${error_flag}    run keyword if    '${error}'    errorHandle    ${error}    ${error_flag}
+    \    run keyword if    ${error_flag}    logout close browser    ${stage_browser}
+    \    continue for loop if    ${error_flag}
+    \    wait until page contains    CollaborativeAssortments    20
+    \    ${prod_selected_page}    execute javascript    ${page_html_jquery}
+    \    ${selected_criteria_diff}    diff text    ${stage_criteria_page}    ${prod_criteria_page}
+    \    ${selected_diff}    diff text    ${stage_selected_page}    ${prod_selected_page}
+    \    Run Keyword And Continue On Failure    run keyword if    ${selected_diff}    fail    ${userName}_${user_num} Collaborative Assortments Criteria Diff
+    \    run keyword if    ${selected_criteria_diff}    write html file with inner html    ${stage_criteria_page}    ${prod_criteria_page}    ${diff_dir}\\${userName}_${User_num}_Collaborative Assortments Criteria diff.html
+    \    ...    V
+    \    Run Keyword And Continue On Failure    run keyword if    ${selected_diff}    fail    ${userName}_${user_num} Collaborative Assortments Selected Diff
+    \    run keyword if    ${selected_diff}    write html file with inner html    ${stage_selected_page}    ${prod_selected_page}    ${diff_dir}\\${userName}_${User_num}_Collaborative Assortments Selected_diff.html
+    \    ...    V
+    \    ${download_type}    get download type    ${users_setting}    ${ws_setting_tab}    ${user_num}
+    \    ${download_option}    get download option    ${users_setting}    ${ws_setting_tab}    ${user_num}
+    \    Run Keyword And Continue On Failure    compareSeasonalWS    ${prod_browser}    ${stage_browser}    ${user_num}    ${userName}
+    \    #    run keyword if    '${download_type}' and '${download_option}'    compareWSExcel    ${prod_browser}    ${stage_browser}
+    \    ...    # ${download_type}    ${download_option}    ${userName}    ${user_num}
+    \    logout close browser    ${stage_browser}
+    \    logout close browser    ${prod_browser}
+    close all browsers
+
+compareAssortmentProfile
+    [Tags]    TD-AP
+    ${user_count}    get users count    ${users_setting}    ${ws_setting_tab}
+    @{envs}    get environment setting    ${users_setting}    ${ws_setting_tab}
+    ${prod}    set variable    @{envs}[0]
+    ${stage}    set variable    @{envs}[1]
+    : FOR    ${user_num}    IN RANGE    0    ${user_count}
+    \    ${userName}    get user    ${users_setting}    ${ws_setting_tab}    ${user_num}
+    \    @{company}    get company info    ${users_setting}    ${ws_setting_tab}    ${user_num}
+    \    ${prod_browser}    enterModel    @{envs}[0]    Assortment Profile    ${userName}    ${browser_profile_1}
+    \    ...    @{company}
+    \    wait until page contains    Assortment Profile    20
+    \    click link    ${AP_link_openAll}
+    \    ${prod_page}    execute javascript    ${page_html_jquery}
+    \    ${stage_browser}    enterModel    @{envs}[1]    Assortment Profile    ${userName}    ${browser_profile_2}
+    \    ...    @{company}
+    \    wait until page contains    Assortment Profile    20
+    \    click link    ${AP_link_openAll}
+    \    ${stage_page}    execute javascript    ${page_html_jquery}
+    \    ${page_diff}    diff text    ${stage_page}    ${prod_page}
+    \    Run Keyword And Continue On Failure    run keyword if    ${page_diff}    fail    ${userName}_${user_num} AP Diff
+    \    run keyword if    ${page_diff}    write html file with inner html    ${stage_page}    ${prod_page}    ${diff_dir}\\${userName}_${User_num}_AP_diff.html
+    \    ...    V
+    \    compareTextFlagAndBack    ${prod_browser}    ${stage_browser}    ${AP_link_setAssortmentPermissions}    Permission    1
+    \    ...    ${checkbox_checked_@name_jquery}    V
+    \    comparePageAndItems    ${prod_browser}    ${stage_browser}    ${clusterSequence_info_rowPlaceHold}    Cluster    ${AP_link_setClusterSequence}
+    \    ...    ${clusterSequence_info_count}    ${checkbox_checked_@name_jquery}    V
+    \    goBackCompareEnvs    ${prod_browser}    ${stage_browser}
+    \    comparePageAndItems    ${prod_browser}    ${stage_browser}    ${storeGroup_info_rowPlaceHold}    Store    ${AP_link_storeGroups}
+    \    ...    ${storeGroup_info_count}    ${checkbox_checked_@value_jquery}    V
+    \    goBackCompareEnvs    ${prod_browser}    ${stage_browser}
+    \    comparePageAndItems    ${prod_browser}    ${stage_browser}    ${accountGroupAssignment_info_rowPlaceHold}    Assignment    ${AP_link_accountGroupAssignments}
+    \    ...    ${accountGroupAssignment_info_count}    ${checkbox_checked_@value_jquery}    V
+    \    logout close browser    ${stage_browser}
+    \    logout close browser    ${prod_browser}
+    close all browsers
+
+compareCompanyProfile
+    [Tags]    TD-CP
+    ${user_count}    get users count    ${users_setting}    ${companyprofile_setting_tab}
+    @{envs}    get environment setting    ${users_setting}    ${companyprofile_setting_tab}
+    ${prod}    set variable    @{envs}[0]
+    ${stage}    set variable    @{envs}[1]
+    : FOR    ${user_num}    IN RANGE    0    ${user_count}
+    \    ${userName}    get user    ${users_setting}    ${companyprofile_setting_tab}    ${user_num}
+    \    @{company}    get company info    ${users_setting}    ${companyprofile_setting_tab}    ${user_num}
+    \    ${prod_browser}    enterModel    @{envs}[0]    Company Profile    ${userName}    ${browser_profile_1}
+    \    ...    @{company}
+    \    wait until page contains    Company Profile    20
+    \    click link    ${CP_link_openAll}
+    \    ${prod_page}    execute javascript    ${page_html_jquery}
+    \    #    @{prod_dropdown_itmes}    get list items    ${CP_dropdown}
+    \    ${stage_browser}    enterModel    @{envs}[1]    Company Profile    ${userName}    ${browser_profile_2}
+    \    ...    @{company}
+    \    wait until page contains    Company Profile    20
+    \    click link    ${CP_link_openAll}
+    \    ${stage_page}    execute javascript    ${page_html_jquery}
+    \    #    @{stage_dropdown_itmes}    get list items    ${CP_dropdown}
+    \    ${page_diff}    diff text    ${stage_page}    ${prod_page}
+    \    Run Keyword And Continue On Failure    run keyword if    ${page_diff}    fail    ${userName}_${user_num} CP Diff
+    \    run keyword if    ${page_diff}    write html file with inner html    ${stage_page}    ${prod_page}    ${diff_dir}\\${userName}_${User_num}_CP_diff.html
+    \    ...    V
+    \    #    continue for loop if    @{prod_dropdown_itmes} != @{stage_dropdown_itmes}
+    \    compareDropdownItems    ${prod_browser}    ${stage_browser}    ${CP_dropdown}    ${CP_button_go}    V
+    \    logout close browser    ${stage_browser}
+    \    logout close browser    ${prod_browser}
+    close all browsers
+
+*** Keywords ***
+checkAllInDropdown
+    [Arguments]    ${path}    ${count}    ${suffix_path}
+    : FOR    ${ot}    IN RANGE    2    ${count}+1
+    \    click element    ${path}[${ot}]${suffix_path}
+
+selectDropdown
+    [Arguments]    ${dropdown}    ${select}    ${option}
+    wait until element is visible    ${dropdown}    20
+    click element    ${dropdown}
+    wait until element is visible    ${select}    20
+    ${items}    get list items    ${select}
+    Select From List by label    ${select}    ${option}
+    sleep    5S
+
+selectCustomCriteria
+    [Arguments]    ${advanced_filter}    ${advanced_filter_option}    ${advanced_filter_options}    ${advanced_filter_optionCount}    ${advanced_addFilter}    ${advanced_filter_row}
+    ...    @{criteria}
+    ${temp}    set variable    1
+    : FOR    ${st}    IN    @{criteria}
+    \    @{st_key}    split string    ${st}    /
+    \    ${key_name}    set variable    @{st_key}[0]
+    \    @{key_values}    split string    @{st_key}[1]    ,
+    \    ${key_values_string}    convert to string    @{st_key}[1]
+    \    Select From List by label    ${advanced_filter}    ${key_name}
+    \    wait until page contains element    ${advanced_filter_option}[1]    100
+    \    click element    ${advanced_filter_options}
+    \    checkCustomInDropdown    ${advanced_filter_option}    ${advanced_filter_options}    ${advanced_filter_optionCount}    @{key_values}
+    \    execute javascript    ${option_getValues}
+    \    ${selected_criteria_item}    get text    ${advanced_filter_options}/div[1]
+    \    ${selected_criteria_item}    replace string    ${selected_criteria_item}    ,\ \    ,
+    \    Run Keyword And Continue On Failure    Should Be Equal    ${selected_criteria_item}    ${key_values_string}
+    \    click element    ${advanced_addFilter}
+    \    ${temp+1}    Evaluate    ${temp}+1
+    \    ${temp+1_string}    convert to string    ${temp+1}
+    \    ${temp_string}    convert to string    ${temp}
+    \    ${tt_id}    replace string    ${advanced_filter_row}    ${temp_string}    ${temp+1_string}
+    \    ${tt}    replace string    ${advanced_filter}    ${temp_string}    ${temp+1_string}
+    \    ${advanced_filter}    set variable    ${tt}
+    \    ${tt}    replace string    ${advanced_filter_options}    ${advanced_filter_row}    ${tt_id}
+    \    ${advanced_filter_options}    set variable    ${tt}
+    \    ${tt}    replace string    ${advanced_filter_option}    ${advanced_filter_row}    ${tt_id}
+    \    ${advanced_filter_option}    set variable    ${tt}
+    \    ${tt}    replace string    ${advanced_filter_optionCount}    ${advanced_filter_row}    ${tt_id}
+    \    ${advanced_filter_optionCount}    set variable    ${tt}
+    \    ${tt}    replace string    ${advanced_addFilter}    ${advanced_filter_row}    ${tt_id}
+    \    ${advanced_addFilter}    set variable    ${tt}
+    \    ${advanced_filter_row}    set variable    ${tt_id}
+    \    ${temp}    Evaluate    ${temp}+1
+
+saveExcelWindow
+    [Arguments]    ${downloadfile_dir}    ${main_window}    ${userName}    ${user_num}    #    run keyword if
+    ...    # '${browser_type}'=='firefox'    win wait    ${download_save_title_firefox}    4000    #    run keyword if
+    ...    # '${browser_type}'=='firefox'    win active    ${download_save_title_firefox}    #    run keyword if    '${browser_type}'=='firefox'
+    ...    # win set on top    ${download_save_title_firefox}    1    #    run keyword if    '${browser_type}'=='firefox'
+    ...    # sleep    5S    #    run keyword if    '${browser_type}'=='firefox'    control set text
+    ...    # ${download_save_title_firefox}    ${download_save_filename}    # ${downloadfile_dir}\\${userName}_${user_num}.xlsx    #    run keyword if    '${browser_type}'=='firefox'
+    ...    # control click    ${download_save_title_firefox}    ${download_save_save}    #    run keyword if    '${browser_type}'=='firefox'
+    ...    # sleep    40S    #    run keyword if    '${browser_type}'=='chrome'    win wait
+    ...    # ${download_save_title_chrome}    4000    #    run keyword if    '${browser_type}'=='chrome'    win active
+    ...    # ${download_save_title_chrome}    #    run keyword if    '${browser_type}'=='chrome'    win set on top    ${download_save_title_chrome}
+    ...    # 1    #    run keyword if    '${browser_type}'=='chrome'    sleep    5S
+    ...    #    run keyword if    '${browser_type}'=='chrome'    control set text    ${download_save_title_chrome}    ${download_save_filename}
+    ...    # ${downloadfile_dir}\\${userName}_${user_num}.xlsx
+    #    run keyword if    '${browser_type}'=='chrome'    control click    ${download_save_title_chrome}    ${download_save_save}
+    #    run keyword if    '${browser_type}'=='chrome'    sleep    40S
+    win wait    ${download_save_title_firefox}    \    4000
+    win active    ${download_save_title_firefox}
+    win set on top    ${download_save_title_firefox}    \    1
+    sleep    5S
+    control set text    ${download_save_title_firefox}    \    ${download_save_filename}    ${downloadfile_dir}\\${userName}_${user_num}.xlsx
+    control click    ${download_save_title_firefox}    \    ${download_save_save}
+    sleep    40S
+    ${downloadfile_name}    set variable    ${downloadfile_dir}\\${userName}_${user_num}.xlsx
+    select window    ${main_window}
+    [Return]    ${downloadfile_name}
+
+enterModel
+    [Arguments]    ${environment_URL}    ${model}    ${user}    ${browser_profile}    @{corporate}
+    ${browser}    environmentInit and login    ${environment_URL}    ${user}    ${browser_profile}
+    #    Set browser Implicit Wait    10
+    log    @{corporate}[0]
+    log    @{corporate}[1]
+    run keyword if    '@{corporate}[1]'    Wait until page contains element    ${corporate_dropdown}
+    run keyword if    '@{corporate}[0]'    selectDropdown    ${parent_dropdown_area}    ${parent_company_select}    @{corporate}[0]
+    run keyword if    '@{corporate}[1]'    selectDropdown    ${corporate_dropdown_area}    ${corporate_select}    @{corporate}[1]
+    : FOR    ${round}    IN RANGE    0    1000
+    \    click element    ${navigation_menu}
+    \    sleep    5S
+    \    ${menu_display}    get element attribute    ${navigation_menu_open}@class
+    \    #    ${menu_display}    get element attribute    ${menu_section}@style
+    \    #    exit for loop if    '${menu_display}' == 'display: block;'
+    \    exit for loop if    '${menu_display}' == 'open'
+    #    run keyword if    '${menu_display}' == 'display: block;'    click link    ${model}
+    #    run keyword if    '${menu_display}' =='display: none;'    fail
+    run keyword if    '${menu_display}' == 'open'    click link    ${model}
+    run keyword if    '${menu_display}' !='open'    fail
+    capture page screenshot
+    [Return]    ${browser}
+
+checkYearMonths
+    [Arguments]    ${path}    ${suffix}    @{key_values}
+    : FOR    ${ot}    IN    @{key_values}
+    \    log    ${suffix}
+    \    click element    ${path}${ot}${suffix}
+
+removeFilters
+    [Arguments]    ${path}    ${count}    ${suffix}    ${filter1_dropdown}
+    : FOR    ${ot}    IN RANGE    1    ${count}
+    \    ${temp}    evaluate    ${count}-${ot}+1
+    \    click element    ${path}${temp}${suffix}
+    Select From List by index    ${filter1_dropdown}    0
+
+checkCertainOption
+    [Arguments]    ${path}    ${path_options}    ${key_counts}    ${key_name}    ${suffix}
+    : FOR    ${ott}    IN RANGE    2    ${key_counts}+1
+    \    ${path_temp}    set variable    ${path}[${ott}]
+    \    ${path_checked}    set variable    ${path}[${ott}]${suffix}
+    \    ${options_visiable}    get element attribute    ${path_options}[1]/div[2]@class
+    \    run keyword if    '${options_visiable}' != 'multiC on'    execute javascript    ${option_expand_jquery}
+    \    #    run key word if    '${options_visiable}' == 'multiC'    click element    ${path_options}[1]/div[1]
+    \    ${temp_name}    get text    ${path_temp}
+    \    ${temp_name}    replace string    ${temp_name}    '    _
+    \    ${key_name}    replace string    ${key_name}    '    _
+    \    #    ${options_visiable}    get element attribute    ${path_options}[1]/div[2]@class
+    \    #    run key word if    '${options_visiable}' == 'multiC'    click element    ${path_options}[1]/div[1]
+    \    run keyword if    '${temp_name}' and '${key_name}' =='${temp_name}'    click element    ${path_checked}
+    \    #    run keyword if    '${temp_name}' and '${key_name}' =='${temp_name}'    click element    ${path_options}
+    \    #    ${checked_target}    get element attribute    ${path_temp}@class
+    \    #    run keyword if    '${temp_name}' and '${key_name}' =='${temp_name}' and '${checked_target}' != 'checkedrowcolor'    click element    ${path_checked}
+    \    #    run keyword if    '${temp_name}' and '${key_name}' =='${temp_name}' and '${checked_target}' == 'checkedrowcolor'    click element    ${path_options}[1]/div[1]
+    \    exit for loop if    '${temp_name}' and '${key_name}' =='${temp_name}'
+    \    #    ${temp}    run keyword if    not '${temp_name}'    redoGetText    ${path_temp}
+    \    ...    #${path_options}
+    \    #    run keyword if    '${temp}' and '${temp}' == '${key_name}' and not '${temp_name}'    reloadDropdown    ${path_temp}    ${path_options}
+    \    ...    #${path_checked}
+
+errorHandle
+    [Arguments]    ${message}    ${error_flag}
+    run keyword and continue on failure    fail    ${message}
+    ${error_flag}    set variable    ${true}
+    Capture Page Screenshot
+    Click Element    Xpath=//a[@class='logout' ]
+    close browser
+    [Return]    ${error_flag}
+
+selectDownloadOption
+    [Arguments]    ${window_handle}    ${option}
+    select window    ${window_handle}
+    ${option_temp_path}    replace string    ${download_option_general}    'option'    '${option}'
+    ${option_temp_subtotal_path}    run keyword if    '${option}' == 'Edit monthly flow%' or '${option}' == 'Edit monthly units'    replace string    ${download_option_general}    'option'    'Download seasonal tab(s) only.'
+    run keyword if    '${option}' == 'Edit monthly flow%' or '${option}' == 'Edit monthly units'    click element    ${option_temp_subtotal_path}
+    run keyword if    '${option}'    click element    ${option_temp_path}
+    click element    ${download_submit}
+
+redoGetText
+    [Arguments]    ${path}    ${path_options}
+    #    set browser implicit wait    10S
+    ${options_visiable}    get element attribute    ${path_options}[1]/div[2]@class
+    run key word if    '${options_visiable}' == 'multiC'    click element    ${path_options}[1]/div[1]
+    ${temp}    get text    ${path}
+    [Return]    ${temp}
+
+reloadDropdown
+    [Arguments]    ${path}    ${path_options}    ${path_input}
+    ${temp_text}    get text    ${path}
+    run keyword if    not '${temp_text}'    click element    ${path_options}/div[1]
+    click element    ${path_input}
+    ${checked_flag}    get element attribute    ${path}@class
+    run keyword if    '${checked_flag}' != 'checkedrowcolor'    click element    ${path_input}
+    [Return]    ${temp_name}
+
+getWSID
+    [Arguments]    ${counts}
+    ${step}    set variable    1
+    ${WSID_string}    set variable
+    : FOR    ${item}    IN RANGE    1    ${counts}+1
+    \    ${WSID}    get element attribute    ${ca_criteria_row}[${step}]/tr@id
+    \    ${WSID_string}    set variable    ${WSID_String},${WSID}
+    \    ${step} =    evaluate    ${step}+5
+    [Return]    ${WSID_string}
+
+compareSpecialPage
+    [Arguments]    ${prod_browser}    ${stage_browser}    ${expand}    ${special_page_path}    ${target_page}    ${WSID}
+    ...    ${ID}    ${checkbox_jquery}    ${go_back_path}    ${diff_sort}    ${user_num}    ${userName}
+    Switch browser    ${prod_browser}
+    wait until page contains    CollaborativeAssortments    20
+    ${expand}    replace string    ${expand}    'ssID'    '${WSID}'
+    click element    ${expand}
+    ${special_page_path}    replace string    ${special_page_path}    'ssID'    '${ID}'
+    wait until page contains Element    ${special_page_path}    20
+    click element    ${special_page_path}
+    sleep    5S
+    ${prod_page}    execute javascript    ${page_html_jquery}
+    #    wait until page contains Element    ${navigation_menu}    20
+    #    click element    ${navigation_menu}
+    #    wait until page contains    ${collaborativeAssortments}    20
+    #    click link    ${collaborativeAssortments}
+    go back
+    sleep    5S
+    switch browser    ${stage_browser}
+    wait until page contains    CollaborativeAssortments    20
+    ${expand}    replace string    ${expand}    'ssID'    '${WSID}'
+    click element    ${expand}
+    ${special_page_path}    replace string    ${special_page_path}    'ssID'    '${ID}'
+    wait until page contains element    ${special_page_path}    20
+    click element    ${special_page_path}
+    sleep    5S
+    ${stage_page}    execute javascript    ${page_html_jquery}
+    #    run keyword if    ${stage_target_button1_count} == 1    click element    ${go_back_path}
+    #    run keyword if    ${stage_target_button2_count} == 1    click element    ${wstotalview_back}
+    #    wait until page contains Element    ${navigation_menu}    20
+    #    click element    ${navigation_menu}
+    #    wait until page contains    ${collaborativeAssortments}    20
+    #    click link    ${collaborativeAssortments}
+    go back
+    sleep    5S
+    ${page_diff}    diff text    ${stage_page}    ${prod_page}
+    Run Keyword And Continue On Failure    run keyword if    ${page_diff}    fail    ${userName}_${user_num} ${WSID}_${target_page}_ Diff
+    run keyword if    ${page_diff}    write html file with inner html    ${stage_page}    ${prod_page}    ${diff_dir}\\${userName}_${User_num}_${WSID}_${target_page}_diff.html    ${diff_sort}
+
+compareCAPage
+    [Arguments]    ${prod_browser}    ${stage_browser}    @{WS_ID}
+    : FOR    ${item}    IN    @{WS_ID}
+    \    compareSpecialPage    ${prod_browser}    ${stage_browser}    ${ca_expandbutton_containsWSID}    ${ca_allclusters_containsWSID}    DollSheet
+    \    ...    ${item}    ${item}
+    \    compareSpecialPage    ${prod_browser}    ${stage_browser}    ${ca_expandbutton_containsWSID}    ${ca_editpo_containsWSID}    EditPO
+    \    ...    ${item}    ${item}
+    \    compareSpecialPage    ${prod_browser}    ${stage_browser}    ${ca_expandbutton_containsWSID}    ${ca_editinfo_containsWSID}    EditInfo
+    \    ...    ${item}    ${item}
+    \    compareSpecialPage    ${prod_browser}    ${stage_browser}    ${ca_expandbutton_containsWSID}    ${ca_addremovestyles_containsWSID}    Add/RemoveStyles
+    \    ...    ${item}    ${item}
+    \    compareSpecialPage    ${prod_browser}    ${stage_browser}    ${ca_expandbutton_containsWSID}    ${ca_changeprices_containsWSID}    Change
+    \    ...    ${item}    ${item}
+    \    compareSpecialPage    ${prod_browser}    ${stage_browser}    ${ca_expandbutton_containsWSID}    ${ca_totalview_containsWSID}    Worksheet
+    \    ...    ${item}    ${item}
+    \    compareSpecialPage    ${prod_browser}    ${stage_browser}    ${ca_expandbutton_containsWSID}    ${ca_totalhistory_containsWSID}    WorksheetHistory
+    \    ...    ${item}    ${item}
+    \    ${path_temp}    replace string    ${ca_monthlydollsheet_counts_containsWSID}    'ssID'    '${item}'
+    \    ${button_temp}    replace string    ${ca_expandbutton_containsWSID}    'ssID'    '${item}'
+    \    click element    ${button_temp}
+    \    ${monthly_counts}    get matching xpath count    ${path_temp}
+    \    click element    ${button_temp}
+    \    compareMonthlySection    ${prod_browser}    ${stage_browser}    ${monthly_counts}    ${item}
+
+compareMonthlySection
+    [Arguments]    ${prod_browser}    ${stage_browser}    ${monthlyCounts}    ${WSID}
+    : FOR    ${month_item}    IN RANGE    1    ${monthlyCounts}+1
+    \    ${monthly_ID}    evaluate    ${WSID}+${month_item}
+    \    compareWSView    ${prod_browser}    ${stage_browser}    ${ca_expandbutton_containsWSID}    ${ca_monthlyview_containsMonthlyID}    Worksheet
+    \    ...    ${WSID}    ${monthly_ID}
+    \    compareSpecialPage    ${prod_browser}    ${stage_browser}    ${ca_expandbutton_containsWSID}    ${ca_monthlydollsheet_containsWSID}    DollSheet
+    \    ...    ${WSID}    ${monthly_ID}
+    \    compareSpecialPage    ${prod_browser}    ${stage_browser}    ${ca_expandbutton_containsWSID}    ${ca_monthlynotes_containsMonthlyID}    Notes
+    \    ...    ${WSID}    ${monthly_ID}
+    \    compareSpecialPage    ${prod_browser}    ${stage_browser}    ${ca_expandbutton_containsWSID}    ${ca_monthlyhistory_containsMonthlyID}    WorksheetHistory
+    \    ...    ${WSID}    ${monthly_ID}
+
+standardCAprocess
+    click link    ${ca_link_set_viewing_criteria}
+    wait until page contains    ViewingCriteria
+
+checkCustomInDropdown
+    [Arguments]    ${path}    ${path_options}    ${path_option_count}    @{key_values}
+    ${all_checked}    get text    ${path_options}[1]/div[1]
+    #    click element    ${path_options}[1]/div[1]
+    execute javascript    ${option_expand_jquery}
+    run keyword if    '${all_checked}' != 'All Selected'    click element    ${path}[1]//input
+    #    run keyword if    '${all_checked}' != 'All Selected'    click element    ${path_options}[1]/div[1]
+    execute javascript    ${option_getValues}
+    : FOR    ${ot}    IN    @{key_values}
+    \    #    ${options_visiable}    get element attribute    ${path_options}[1]/div[2]@class
+    \    #    run key word if    '${options_visiable}' == 'multiC'    click element    ${path_options}[1]/div[1]
+    \    execute javascript    ${option_expand_jquery}
+    \    ${option_count}    get matching xpath count    ${path_option_count}
+    \    checkCertainOption    ${path}    ${path_options}    ${option_count}    ${ot}    //input
+    \    #    click element    ${path_options}/div[1]
+    execute javascript    ${option_collapse_jquery}
+
+compareSeasonalWS
+    [Arguments]    ${prod_browser}    ${stage_browser}    ${user_num}    ${userName}
+    @{WS_monthlyCompare_flag}    get cell values    ${users_setting}    ${ws_setting_tab}    ${user_num}    ${ws_monthlyFlag_colNumber}
+    ${WS_monthly_flag}    convert to string    @{WS_monthlyCompare_flag}[0]
+    switch browser    ${stage_browser}
+    ${stage_WS_counts}    get matching xpath count    ${ca_counts_path}
+    ${stage_WS_id_string}    getWSID    ${stage_WS_counts}
+    switch browser    ${prod_browser}
+    ${prod_WS_counts}    get matching xpath count    ${ca_counts_path}
+    ${prod_WS_id_string}    getWSID    ${prod_WS_counts}
+    Run Keyword And Continue On Failure    Should Be Equal    ${stage_WS_id_string}    ${prod_WS_id_string}
+    continue for loop if    '${stage_WS_id_string}' !='${prod_WS_id_string}'
+    @{WS_ID}    get WS ID List    ${stage_WS_id_string}    workid
+    : FOR    ${item}    IN    @{WS_ID}
+    \    compareSpecialPage    ${prod_browser}    ${stage_browser}    ${ca_expandbutton_containsWSID}    ${ca_allclusters_containsWSID}    DollSheet
+    \    ...    ${item}    ${item}    ${checkbox_checked_@name_jquery}    ${dollsheet_button_top_finish}    V
+    \    ...    ${user_num}    ${userName}
+    \    compareSpecialPage    ${prod_browser}    ${stage_browser}    ${ca_expandbutton_containsWSID}    ${ca_editpo_containsWSID}    EditPO
+    \    ...    ${item}    ${item}    ${checkbox_checked_@name_jquery}    ${po_top_submit}    V
+    \    ...    ${user_num}    ${userName}
+    \    compareSpecialPage    ${prod_browser}    ${stage_browser}    ${ca_expandbutton_containsWSID}    ${ca_editinfo_containsWSID}    EditInfo
+    \    ...    ${item}    ${item}    ${checkbox_checked_@name_jquery}    ${editinfo_top_save}    V
+    \    ...    ${user_num}    ${userName}
+    \    compareSpecialPage    ${prod_browser}    ${stage_browser}    ${ca_expandbutton_containsWSID}    ${ca_addremovestyles_containsWSID}    Add/RemoveStyles
+    \    ...    ${item}    ${item}    ${checkbox_checked_@name_jquery}    ${WSAddRemoveStyle_top_cancel}    V
+    \    ...    ${user_num}    ${userName}
+    \    compareSpecialPage    ${prod_browser}    ${stage_browser}    ${ca_expandbutton_containsWSID}    ${ca_changeprices_containsWSID}    Change
+    \    ...    ${item}    ${item}    ${checkbox_checked_@name_jquery}    ${WSChangePrices_top_save}    V
+    \    ...    ${user_num}    ${userName}
+    \    compareWSView    ${prod_browser}    ${stage_browser}    ${ca_expandbutton_containsWSID}    ${ca_totalview_containsWSID}    Worksheet
+    \    ...    ${item}    ${item}    1    ${WS_monthly_flag}    ${user_num}
+    \    ...    ${userName}
+    \    compareSeasonalWSHistory    ${prod_browser}    ${stage_browser}    ${ca_expandbutton_containsWSID}    ${ca_totalhistory_containsWSID}    WorksheetHistory
+    \    ...    ${item}    ${item}    ${user_num}    ${userName}
+    [Return]    @{WS_ID}
+
+compareWSView
+    [Arguments]    ${prod_browser}    ${stage_browser}    ${expand}    ${special_page_path}    ${taget_page}    ${WSID}
+    ...    ${ID}    ${select_groupby_flag}    ${select_timeRange_flag}    ${user_num}    ${userName}
+    Switch browser    ${prod_browser}
+    wait until page contains    CollaborativeAssortments    20
+    ${expand}    replace string    ${expand}    'ssID'    '${WSID}'
+    click element    ${expand}
+    ${special_page_path}    replace string    ${special_page_path}    'ssID'    '${ID}'
+    wait until page contains Element    ${special_page_path}    20
+    click element    ${special_page_path}
+    wait until page contains    ${taget_page}    20
+    sleep    5S
+    ${prod_page}    execute javascript    ${page_html_jquery}
+    sleep    5S
+    ${prod_dropdown_timeRange_options}    get list items    ${wstotalview_dropdown_worksheetid}
+    ${prod_dropdown_timeRange_selectedoption}    get selected list label    ${wstotalview_dropdown_worksheetid}
+    ${prod_dropdown_groupby_options}    get list items    ${wstotalview_dropdown_groupby}
+    ${prod_dropdown_groupby_selectedoption}    get selected list label    ${wstotalview_dropdown_groupby}
+    ${prod_dropdown_selectedoption}    execute javascript    ${dropdown_selected_jquery}
+    switch browser    ${stage_browser}
+    wait until page contains    CollaborativeAssortments    20
+    ${expand}    replace string    ${expand}    'ssID'    '${WSID}'
+    click element    ${expand}
+    ${special_page_path}    replace string    ${special_page_path}    'ssID'    '${ID}'
+    wait until page contains element    ${special_page_path}
+    click element    ${special_page_path}
+    wait until page contains    ${taget_page}    20
+    sleep    5S
+    ${stage_page}    execute javascript    ${page_html_jquery}
+    sleep    10S
+    ${stage_dropdown_timeRange_options}    get list items    ${wstotalview_dropdown_worksheetid}
+    ${stage_dropdown_timeRange_selectedoption}    get selected list label    ${wstotalview_dropdown_worksheetid}
+    ${stage_dropdown_groupby_options}    get list items    ${wstotalview_dropdown_groupby}
+    ${stage_dropdown_groupby_selectedoption}    get selected list label    ${wstotalview_dropdown_groupby}
+    ${stage_dropdown_selectedoption}    execute javascript    ${dropdown_selected_jquery}
+    Run Keyword And Continue On Failure    Should Be Equal    ${stage_page}    ${prod_page}    ${userName}_${user_num} WS_${WSID} Diff    false
+    #    Run Keyword And Continue On Failure    Should Be Equal    ${stage_dropdown_groupby_options}    ${prod_dropdown_groupby_options}
+    #    Run Keyword And Continue On Failure    Should Be Equal    ${stage_dropdown_selectedoption}    ${prod_dropdown_selectedoption}
+    #    Run Keyword And Continue On Failure    Should Be Equal    ${stage_dropdown_timeRange_options}    ${prod_dropdown_timeRange_options}
+    #    Run Keyword And Continue On Failure    Should Be Equal    ${stage_dropdown_timeRange_selectedoption}    ${prod_dropdown_timeRange_selectedoption}
+    ${diff_flag}    Diff text    ${stage_page}    ${prod_page}
+    ${stage_html}    run keyword if    ${diff_flag}    execute javascript    ${wstotalview_js}
+    run keyword if    ${diff_flag}    Switch browser    ${prod_browser}
+    ${prod_html}    run keyword if    ${diff_flag}    execute javascript    ${wstotalview_js}
+    run keyword if    ${diff_flag}    write html ws with inner html    ${stage_html}    ${prod_html}    ${diff_dir}\\${userName}_${User_num}_${WSID}_${stage_dropdown_groupby_selectedoption}_diff.html
+    run keyword if    ${stage_dropdown_timeRange_options} == ${prod_dropdown_timeRange_options} and ('${select_timeRange_flag}' == '1' or '${select_timeRange_flag}' == '1.0')    compareWSViewByOptions    ${prod_browser}    ${stage_browser}    ${stage_dropdown_timeRange_selectedoption}    ${wstotalview_dropdown_worksheetid}
+    ...    ${wstotalview_monthly_js}    ${user_num}    ${userName}    ${WSID}    @{stage_dropdown_timeRange_options}
+    run keyword if    ${stage_dropdown_groupby_options} == ${prod_dropdown_groupby_options} and ${select_groupby_flag} == 1    compareWSViewByOptions    ${prod_browser}    ${stage_browser}    ${stage_dropdown_groupby_selectedoption}    ${wstotalview_dropdown_groupby}
+    ...    ${wstotalview_js}    ${user_num}    ${userName}    ${WSID}    @{stage_dropdown_groupby_options}
+    switch browser    ${prod_browser}
+    wait until page contains Element    ${navigation_menu}    20
+    click element    ${navigation_menu}
+    wait until page contains    ${collaborativeAssortments}    20
+    click link    ${collaborativeAssortments}
+    switch browser    ${stage_browser}
+    wait until page contains Element    ${navigation_menu}    20
+    click element    ${navigation_menu}
+    wait until page contains    ${collaborativeAssortments}    20
+    click link    ${collaborativeAssortments}
+    #    switch browser    ${prod_browser}
+    #    click element    ${wstotalview_back}
+    #    wait until page contains    CollaborativeAssortments    20
+    #    switch browser    ${stage_browser}
+    #    click element    ${wstotalview_back}
+    #    wait until page contains    CollaborativeAssortments    20
+
+generateDiffReport
+    ${ws_section_counts_path}    replace string    ${wstotalview_table_sections}    Xpath=//    //
+    ${ws_section_counts}    get matching xpath count    ${ws_section_counts_path}
+    ${ws}    set variable
+    : FOR    ${i}    IN RANGE    1    ${ws_section_counts}+1
+    \    ${ws_section_rows_path}    set variable    ${ws_section_counts_path}[${i}]/tr
+    \    ${ws_section_row_counts}    get matching xpath count    ${ws_section_rows_path}
+    \    ${ws_section}    getTableSection    ${ws_section_row_counts}    ${ws_section_rows_path}
+    \    ${ws}    set variable    ${ws}-/-${ws_section}
+    [Return]    ${ws}
+
+getTableSection
+    [Arguments]    ${row_counts}    ${row_path}
+    ${section}    set variable
+    : FOR    ${r}    IN RANGE    1    ${row_counts}+1
+    \    ${ws_section_cols_path}    set variable    ${row_path}[${r}]/
+    \    ${cols_tag}    run keyword if    '${ws_section_cols_path}' != '${wstotalview_table_title1}' and '${ws_section_cols_path}' != '${wstotalview_table_title2}'    set variable    td
+    \    ...    ELSE IF    '${ws_section_cols_path}' == '${wstotalview_table_title1}' or '${ws_section_cols_path}' == '${wstotalview_table_title2}'    set variable    th
+    \    ${ws_section_col_counts}    get matching xpath count    ${ws_section_cols_path}${cols_tag}
+    \    ${ws_section_cols_xpath}    replace string    ${ws_section_cols_path}${cols_tag}    //    Xpath=//    1
+    \    ${row}    getTableRow    ${ws_section_col_counts}    ${ws_section_cols_xpath}
+    \    ${section}    set variable    ${section}-/-${row}
+    [Return]    ${section}
+
+getTableRow
+    [Arguments]    ${col_counts}    ${col_xpath}
+    ${row}    set variable
+    : FOR    ${c}    IN RANGE    1    ${col_counts}+1
+    \    ${col_xpath_temp}    set variable    ${col_xpath}[${c}]
+    \    ${colspan}    get element attribute    ${col_xpath_temp}@colspan
+    \    ${rowspan}    get element attribute    ${col_xpath_temp}@rowspan
+    \    ${cell_text}    get text    ${col_xpath_temp}
+    \    ${cell}    set variable    ${colspan},${rowspan},${cell_text}
+    \    ${cell}    encode string to bytes    ${cell}    UTF-8
+    \    ${row}    set variable    ${row};${cell}
+    [Return]    ${row}
+
+compareFirstMonthlyWS
+    [Arguments]    ${prod_browser}    ${stage_browser}    @{WS_ID}
+    : FOR    ${item}    IN    @{WS_ID}
+    \    ${monthly_ID}    evaluate    ${item}+1
+    \    #    compareWSView    ${prod_browser}    ${stage_browser}    ${ca_expandbutton_containsWSID}    ${ca_monthlyview_containsMonthlyID}
+    \    ...    #Worksheet    ${item}    ${monthly_ID}
+    \    #    compareSpecialPage    ${prod_browser}    ${stage_browser}    ${ca_expandbutton_containsWSID}    ${ca_monthlydollsheet_containsWSID}
+    \    ...    #DollSheet    ${item}    ${monthly_ID}    name
+    \    #    compareSpecialPage    ${prod_browser}    ${stage_browser}    ${ca_expandbutton_containsWSID}    ${ca_monthlynotes_containsMonthlyID}
+    \    ...    #Notes    ${item}    ${monthly_ID}    name
+    \    compareMonthlyWSHistory    ${prod_browser}    ${stage_browser}    ${ca_expandbutton_containsWSID}    ${ca_monthlyhistory_containsMonthlyID}    WorksheetHistory
+    \    ...    ${item}    ${monthly_ID}
+
+compareSeasonalWSHistory
+    [Arguments]    ${prod_browser}    ${stage_browser}    ${expand}    ${special_page_path}    ${taget_page}    ${WSID}
+    ...    ${ID}    ${user_num}    ${userName}
+    Switch browser    ${prod_browser}
+    wait until page contains    CollaborativeAssortments    20
+    ${expand}    replace string    ${expand}    'ssID'    '${WSID}'
+    click element    ${expand}
+    ${special_page_path}    replace string    ${special_page_path}    'ssID'    '${ID}'
+    wait until page contains Element    ${special_page_path}    20
+    click element    ${special_page_path}
+    wait until page contains    ${taget_page}    20
+    ${prod_page}    execute javascript    ${page_html_jquery}
+    sleep    5S
+    click element    ${wshistory_seasonal_first_compareToCurrentVersion}
+    wait until page contains    CompareWorksheet    20
+    sleep    5S
+    ${prod_history}    execute javascript    ${page_html_jquery}
+    switch browser    ${stage_browser}
+    wait until page contains    CollaborativeAssortments    20
+    ${expand}    replace string    ${expand}    'ssID'    '${WSID}'
+    click element    ${expand}
+    ${special_page_path}    replace string    ${special_page_path}    'ssID'    '${ID}'
+    wait until page contains element    ${special_page_path}
+    click element    ${special_page_path}
+    wait until page contains    ${taget_page}    20
+    ${stage_page}    execute javascript    ${page_html_jquery}
+    sleep    5S
+    click element    ${wshistory_seasonal_first_compareToCurrentVersion}
+    wait until page contains    CompareWorksheet    20
+    sleep    5S
+    ${stage_history}    execute javascript    ${page_html_jquery}
+    ${text_flag}    Diff text    ${stage_page}    ${prod_page}
+    Run Keyword And Continue On Failure    Should Be Equal    ${stage_history}    ${prod_history}    ${userName}_${user_num} WS_${WSID} ${taget_page} Diff    false
+    Run Keyword And Continue On Failure    run keyword if    ${text_flag}    fail    ${userName}_${user_num} WS_${WSID} ${taget_page} Diff
+    run keyword if    ${text_flag}    write html file with inner html    ${stage_page}    ${prod_page}    ${diff_dir}\\${userName}_${User_num}_${WSID}_${taget_page}_diff.html    V
+    ${diff_flag}    Diff text    ${stage_history}    ${prod_history}
+    ${stage_html}    run keyword if    ${diff_flag}    execute javascript    ${wstotalview_js}
+    run keyword if    ${diff_flag}    Switch browser    ${prod_browser}
+    ${prod_html}    run keyword if    ${diff_flag}    execute javascript    ${wstotalview_js}
+    run keyword if    ${diff_flag}    write html ws with inner html    ${stage_html}    ${prod_html}    ${diff_dir}\\${userName}_${user_num}_${WSID}_history_diff.html
+    Switch browser    ${prod_browser}
+    wait until page contains Element    ${navigation_menu}    20
+    click element    ${navigation_menu}
+    wait until page contains    ${collaborativeAssortments}    20
+    click link    ${collaborativeAssortments}
+    Switch browser    ${stage_browser}
+    wait until page contains Element    ${navigation_menu}    20
+    click element    ${navigation_menu}
+    wait until page contains    ${collaborativeAssortments}    20
+    click link    ${collaborativeAssortments}
+    #    switch browser    ${prod_browser}
+    #    go back
+    #    sleep    5S
+    #    switch browser    ${stage_browser}
+    #    go back
+    #    sleep    5S
+    #    switch browser    ${prod_browser}
+    #    click element    ${wstotalview_back}
+    #    wait until page contains    CollaborativeAssortments    20
+    #    switch browser    ${stage_browser}
+    #    click element    ${wstotalview_back}
+    #    wait until page contains    CollaborativeAssortments    20
+
+compareMonthlyWSHistory
+    [Arguments]    ${prod_browser}    ${stage_browser}    ${expand}    ${special_page_path}    ${taget_page}    ${WSID}
+    ...    ${ID}
+    ${PDF_count_path}    replace string    ${wshistory_monthly_first_PDFComparison}    Xpath=//    //
+    Switch browser    ${prod_browser}
+    wait until page contains    CollaborativeAssortments
+    ${expand}    replace string    ${expand}    'ssID'    '${WSID}'
+    click element    ${expand}
+    ${special_page_path}    replace string    ${special_page_path}    'ssID'    '${ID}'
+    wait until page contains Element    ${special_page_path}    20
+    click element    ${special_page_path}
+    wait until page contains    ${taget_page}    20
+    ${prod_page_text}    get text    xpath=//body
+    capture page screenshot
+    ${PDF_count}    get matching xpath count    ${PDF_count_path}
+    run keyword if    ${PDF_count} > 0    click element    ${wshistory_monthly_first_PDFComparison}
+    ${current_time}    run keyword if    ${PDF_count} > 0    get time    epoch
+    @{prod_windows}    run keyword if    ${PDF_count} > 0    list windows
+    ${prod_PDF}    run keyword if    ${PDF_count} > 0    savePDFWindow    ${prod_download_dir}    @{prod_windows}[0]    ${current_time}
+    ...    ${ID}
+    run keyword if    ${PDF_count} > 0    click element    ${wshistory_monthly_first_compareToCurrentVersion}
+    run keyword if    ${PDF_count} > 0    wait until page contains    CompareWorksheet
+    ${prod_history}    run keyword if    ${PDF_count} > 0    get text    xpath=//body
+    run keyword if    ${PDF_count} > 0    capture page screenshot
+    sleep    3s
+    click element    ${navigation_menu}
+    wait until page contains    ${collaborativeAssortments}    20
+    click link    ${collaborativeAssortments}
+    switch browser    ${stage_browser}
+    wait until page contains    CollaborativeAssortments
+    ${expand}    replace string    ${expand}    'ssID'    '${WSID}'
+    click element    ${expand}
+    ${special_page_path}    replace string    ${special_page_path}    'ssID'    '${ID}'
+    wait until page contains element    ${special_page_path}    20
+    click element    ${special_page_path}
+    wait until page contains    ${taget_page}    20
+    ${stage_page_text}    get text    xpath=//body
+    capture page screenshot
+    ${PDF_count}    get matching xpath count    ${PDF_count_path}
+    run keyword if    ${PDF_count} > 0    click element    ${wshistory_monthly_first_PDFComparison}
+    @{stage_windows}    run keyword if    ${PDF_count} > 0    list windows
+    ${stage_PDF}    run keyword if    ${PDF_count} > 0    savePDFWindow    ${stage_download_dir}    @{stage_windows}[0]    ${current_time}
+    ...    ${ID}
+    run keyword if    ${PDF_count} > 0    click element    ${wshistory_monthly_first_compareToCurrentVersion}
+    run keyword if    ${PDF_count} > 0    wait until page contains    CompareWorksheet
+    ${stage_history}    run keyword if    ${PDF_count} > 0    get text    xpath=//body
+    run keyword if    ${PDF_count} > 0    capture page screenshot
+    Run Keyword And Continue On Failure    Should Be Equal    ${stage_page_text}    ${prod_page_text}
+    Run Keyword And Continue On Failure    Should Be Equal    ${stage_history}    ${prod_history}
+    Run Keyword And Continue On Failure    compare PDF    ${prod_PDF}    ${stage_PDF}
+    sleep    3s
+    click element    ${navigation_menu}
+    wait until page contains    ${collaborativeAssortments}    20
+    click link    ${collaborativeAssortments}
+
+savePDFWindow
+    [Arguments]    ${downloadfile_dir}    ${main_window}    ${current_time}    ${monthly_id}
+    win wait    ${download_save_title}    \    4000
+    win active    ${download_save_title}
+    win set on top    ${download_save_title}    \    1
+    sleep    5S
+    control set text    ${download_save_title}    \    ${download_save_filename}    ${downloadfile_dir}\\${userName}_${user_num}_${monthly_id}_${current_time}.pdf
+    control click    ${download_save_title}    \    ${download_save_save}
+    sleep    40S
+    ${downloadfile_name}    set variable    ${downloadfile_dir}\\${userName}_${user_num}_${monthly_id}_${current_time}.pdf
+    select window    ${main_window}
+    [Return]    ${downloadfile_name}
+
+compareStyleBankInfo
+    [Arguments]    ${prod_browser}    ${stage_browser}    ${style_count_path}    @{options}
+    ${dropdown_options}    get list items    ${stylebank_dropdown_yearSeason}
+    ${options_count}    get list size    ${dropdown_options}
+    ${rounds}    run keyword if    ${options_count} > 8    set variable    8
+    ...    ELSE    set variable    ${options_count}
+    : FOR    ${index}    IN RANGE    0    ${rounds}
+    \    Switch browser    ${prod_browser}
+    \    select from list by label    ${stylebank_dropdown_yearSeason}    @{options}[${index}]
+    \    click button    ${stylebank_button_view}
+    \    wait until page does not contain    ${stylebank_searched_button_wait}    20
+    \    sleep    3S
+    \    ${prod_selected_year_season}    get selected list label    ${stylebank_dropdown_yearSeason}
+    \    Should Be Equal    ${prod_selected_year_season}    @{options}[${index}]
+    \    ${prod_styleinfo_count}    get matching xpath count    ${style_count_path}
+    \    ${prod_page}    execute javascript    ${page_html_jquery}
+    \    Switch browser    ${stage_browser}
+    \    select from list by label    ${stylebank_dropdown_yearSeason}    @{options}[${index}]
+    \    click button    ${stylebank_button_view}
+    \    wait until page does not contain    ${stylebank_searched_button_wait}    20
+    \    sleep    3S
+    \    ${stage_selected_year_season}    get selected list label    ${stylebank_dropdown_yearSeason}
+    \    Should Be Equal    ${stage_selected_year_season}    @{options}[${index}]
+    \    ${stage_styleinfo_count}    get matching xpath count    ${style_count_path}
+    \    ${stage_page}    execute javascript    ${page_html_jquery}
+    \    ${page_diff}    diff text    ${stage_page}    ${prod_page}
+    \    Run Keyword And Continue On Failure    run keyword if    ${page_diff}    fail    ${userName}_${user_num} @{options}[${index}] style bank Diff
+    \    run keyword if    ${page_diff}    write html file with inner html    ${stage_page}    ${prod_page}    ${diff_dir}\\${userName}_${User_num}_@{options}[${index}] style bank_diff.html
+    \    ...    V
+    \    run keyword if    ${prod_styleinfo_count} > 0 and ${stage_styleinfo_count} > 0    compareTextFlagAndBack    ${prod_browser}    ${stage_browser}    ${stylebank_firststyle_image}
+    \    ...    ImageViews    1    ${checkbox_checked_@name_jquery}    V
+    \    run keyword if    ${prod_styleinfo_count} > 0 and ${stage_styleinfo_count} > 0    compareTextFlagAndBack    ${prod_browser}    ${stage_browser}    ${stylebank_firststyle_styleinfo}
+    \    ...    StyleInfo    1    ${checkbox_checked_@name_jquery}    V
+    \    run keyword if    ${prod_styleinfo_count} > 0 and ${stage_styleinfo_count} > 0    compareTextFlagAndBack    ${prod_browser}    ${stage_browser}    ${stylebank_firststyle_colors}
+    \    ...    ColorInfo    1    ${checkbox_checked_@name_jquery}    H
+    \    run keyword if    ${prod_styleinfo_count} > 0 and ${stage_styleinfo_count} > 0    compareTextFlagAndBack    ${prod_browser}    ${stage_browser}    ${stylebank_firststyle_size}
+    \    ...    SizingInfo    1    ${checkbox_checked_@name_jquery}    V
+    \    run keyword if    ${prod_styleinfo_count} > 0 and ${stage_styleinfo_count} > 0    compareTextFlagAndBack    ${prod_browser}    ${stage_browser}    ${stylebank_firststyle_UPC}
+    \    ...    UPC    1    ${checkbox_checked_@name_jquery}    V
+
+getPageTextAndBack
+    [Arguments]    ${element_path}    ${target_page}
+    click element    ${element_path}
+    sleep    3S
+    wait until page contains    ${target_page}    30
+    ${page_text}    get text    Xpath=//body
+    go back
+    [Return]    ${page_text}
+
+compareStyleBankReport
+    [Arguments]    ${prod_browser}    ${stage_browser}    ${dropdown_option}    ${button_generateReport}    @{style_report_type}
+    @{report_type}    run keyword if    '@{style_report_type}[0]' == 'all'    get list items    ${dropdown_option}
+    ...    ELSE    create list    @{style_report_type}
+    : FOR    ${ot}    IN    @{report_type}
+    \    switch browser    ${prod_browser}
+    \    @{prod_main_window}    list windows
+    \    ${prod_report}    saveStyleBankReport    ${dropdown_option}    ${button_generateReport}    ${ot}    ${prod_download_dir}
+    \    ...    ${stylebank_searched_error_count}    @{prod_main_window}[0]
+    \    switch browser    ${stage_browser}
+    \    @{stage_main_window}    list windows
+    \    ${stage_report}    saveStyleBankReport    ${dropdown_option}    ${button_generateReport}    ${ot}    ${stage_download_dir}
+    \    ...    ${stylebank_searched_error_count}    @{stage_main_window}[0]
+    \    ${linesheet_type}    replace string    ${ot}    /    _
+    \    Run Keyword And Continue On Failure    compare excel    ${stage_report}    ${prod_report}    ${diff_dir}\\${userName}_${user_num}_style bank_${linesheet_type}_diff.txt
+
+saveStyleBankReportWindow
+    [Arguments]    ${downloadfile_dir}    ${main_window}    ${current_time}    ${monthly_id}
+    #    @{win_list}    win list    ${download_stylebank_title}
+    #    @{win_tag}    set variable    @{win_list}[0]
+    #    run keyword if    not '@{win_tag}[0]' or @{win_tag}[0]==0 and '${browser_type}'=='firefox'    win wait    ${download_save_title_firefox}    100
+    run keyword if    '${browser_type}'=='firefox'    win wait    ${download_save_title_firefox}    \    4000
+    run keyword if    '${browser_type}'=='firefox'    win activate    ${download_save_title_firefox}
+    run keyword if    '${browser_type}'=='firefox'    win set on top    ${download_save_title_firefox}    \    1
+    run keyword if    '${browser_type}'=='firefox'    sleep    5S
+    run keyword if    '${browser_type}'=='firefox'    control set text    ${download_save_title_firefox}    \    ${download_save_filename}    ${downloadfile_dir}\\${userName}_${user_num}_${monthly_id}_${current_time}.xls
+    run keyword if    '${browser_type}'=='firefox'    control click    ${download_save_title_firefox}    \    ${download_save_save}
+    run keyword if    '${browser_type}'=='chrome'    win wait    ${download_save_title_chrome}    \    4000
+    run keyword if    '${browser_type}'=='chrome'    win activate    ${download_save_title_chrome}
+    run keyword if    '${browser_type}'=='chrome'    win set on top    ${download_save_title_chrome}    \    1
+    run keyword if    '${browser_type}'=='chrome'    sleep    5S
+    run keyword if    '${browser_type}'=='chrome'    control set text    ${download_save_title_chrome}    \    ${download_save_filename}    ${downloadfile_dir}\\${userName}_${user_num}_${monthly_id}_${current_time}.xls
+    run keyword if    '${browser_type}'=='chrome'    control click    ${download_save_title_chrome}    \    ${download_save_save}
+    sleep    40S
+    ${downloadfile_name}    set variable    ${downloadfile_dir}\\${userName}_${user_num}_${monthly_id}_${current_time}.xls
+    select window    ${main_window}
+    [Return]    ${downloadfile_name}
+
+comparePHStyleBankInfo
+    [Arguments]    ${prod_browser}    ${stage_browser}    @{yearseason}
+    ${dropdown_yearseason}    get list items    ${PHstyle_dropdown_yearSeason}
+    @{dropdown_options}    get list items    ${PHstyle_dropdown_viewoption}
+    ${options_count}    get list size    ${dropdown_yearseason}
+    ${rounds}    run keyword if    ${options_count} > 8    set variable    8
+    ...    ELSE    set variable    ${options_count}
+    : FOR    ${index}    IN RANGE    0    ${rounds}
+    \    ${PHstyle_edit_count_path}    replace string    ${PHstyle_firststyle_edit}    Xpath=//    //
+    \    ${PHstyle_view_count_path}    replace string    ${PHstyle_firststyle_view}    Xpath=//    //
+    \    Switch browser    ${prod_browser}
+    \    click element    ${PHstyle_dropdown_yearSeason}
+    \    select from list by label    ${PHstyle_dropdown_yearSeason}    @{yearseason}[${index}]
+    \    click button    ${PHstyle_button_view}
+    \    sleep    5S
+    \    ${prod_style_page}    get text    Xpath=//body
+    \    ${prod_style_count}    get matching xpath count    ${PHstyle_styleinfo_section_count}
+    \    ${prod_style_edit}    get matching xpath count    ${PHstyle_edit_count_path}
+    \    ${prod_style_view}    get matching xpath count    ${PHstyle_view_count_path}
+    \    ${prod_phstyle_info}    run keyword if    ${prod_style_count} > 0 and ${prod_style_edit} >0    getPageTextAndBack    ${PHstyle_firststyle_edit}    PlaceHolderInfo
+    \    ...    ELSE IF    ${prod_style_count} > 0 and ${prod_style_view} >0    getPageTextAndBack    ${PHstyle_firststyle_view}    PlaceHolderInfo
+    \    select from list by label    ${PHstyle_dropdown_viewoption}    @{dropdown_options}[1]
+    \    click button    ${PHstyle_button_view}
+    \    sleep    5S
+    \    ${prod_color_page}    get text    Xpath=//body
+    \    ${prod_color_count}    get matching xpath count    ${PHstyle_styleinfo_section_count}
+    \    ${prod_style_edit}    get matching xpath count    ${PHstyle_edit_count_path}
+    \    ${prod_style_view}    get matching xpath count    ${PHstyle_view_count_path}
+    \    ${prod_phcolor_info}    run keyword if    ${prod_color_count} > 0 and ${prod_style_edit} >0    getPageTextAndBack    ${PHstyle_firststyle_edit}    PlaceHolderColorInfo
+    \    ...    ELSE IF    ${prod_color_count} > 0 and ${prod_style_view} >0    getPageTextAndBack    ${PHstyle_firststyle_view}    PlaceHolderColorInfo
+    \    select from list by label    ${PHstyle_dropdown_viewoption}    @{dropdown_options}[2]
+    \    click button    ${PHstyle_button_view}
+    \    sleep    5S
+    \    ${prod_size_page}    get text    Xpath=//body
+    \    Switch browser    ${stage_browser}
+    \    click element    ${PHstyle_dropdown_yearSeason}
+    \    select from list by label    ${PHstyle_dropdown_yearSeason}    @{yearseason}[${index}]
+    \    click button    ${PHstyle_button_view}
+    \    sleep    5S
+    \    ${stage_style_page}    get text    Xpath=//body
+    \    ${stage_style_count}    get matching xpath count    ${PHstyle_styleinfo_section_count}
+    \    ${stage_style_edit}    get matching xpath count    ${PHstyle_edit_count_path}
+    \    ${stage_style_view}    get matching xpath count    ${PHstyle_view_count_path}
+    \    ${stage_phstyle_info}    run keyword if    ${stage_style_count} > 0 and ${stage_style_edit} >0    getPageTextAndBack    ${PHstyle_firststyle_edit}    PlaceHolderInfo
+    \    ...    ELSE IF    ${stage_style_count} > 0 and ${stage_style_view} >0    getPageTextAndBack    ${PHstyle_firststyle_view}    PlaceHolderInfo
+    \    select from list by label    ${PHstyle_dropdown_viewoption}    @{dropdown_options}[1]
+    \    click button    ${PHstyle_button_view}
+    \    sleep    5S
+    \    ${stage_color_page}    get text    Xpath=//body
+    \    ${stage_color_count}    get matching xpath count    ${PHstyle_styleinfo_section_count}
+    \    ${stage_style_edit}    get matching xpath count    ${PHstyle_edit_count_path}
+    \    ${stage_style_view}    get matching xpath count    ${PHstyle_view_count_path}
+    \    ${stage_phcolor_info}    run keyword if    ${stage_color_count} > 0 and ${stage_style_edit} >0    getPageTextAndBack    ${PHstyle_firststyle_edit}    PlaceHolderColorInfo
+    \    ...    ELSE IF    ${stage_color_count} > 0 and ${stage_style_view} >0    getPageTextAndBack    ${PHstyle_firststyle_view}    PlaceHolderColorInfo
+    \    select from list by label    ${PHstyle_dropdown_viewoption}    @{dropdown_options}[2]
+    \    click button    ${PHstyle_button_view}
+    \    sleep    5S
+    \    ${stage_size_page}    get text    Xpath=//body
+    \    Run Keyword And Continue On Failure    Should Be Equal    ${prod_style_page}    ${stage_style_page}
+    \    Run Keyword And Continue On Failure    Should Be Equal    ${prod_phstyle_info}    ${stage_phstyle_info}
+    \    Run Keyword And Continue On Failure    Should Be Equal    ${prod_color_page}    ${stage_color_page}
+    \    Run Keyword And Continue On Failure    Should Be Equal    ${prod_phcolor_info}    ${stage_phcolor_info}
+    \    Run Keyword And Continue On Failure    Should Be Equal    ${prod_size_page}    ${stage_size_page}
+
+compareSearchedStyleBank
+    [Arguments]    ${prod_browser}    ${stage_browser}    @{style_report_type}
+    @{yearseason}    get list items    ${stylebank_dropdown_yearSeason}
+    : FOR    ${index}    IN    @{yearseason}
+    \    Switch browser    ${prod_browser}
+    \    select from list by label    ${stylebank_dropdown_yearSeason}    ${index}
+    \    click button    ${stylebank_button_view}
+    \    wait until page does not contain element    ${stylebank_searched_button_wait}    100
+    \    ${prod_style_page}    execute javascript    ${page_html_jquery}
+    \    #    reload page
+    \    sleep    3S
+    \    ${prod_style_count}    get matching xpath count    ${stylebank_styleinfo_section_count}
+    \    Switch browser    ${stage_browser}
+    \    select from list by label    ${stylebank_dropdown_yearSeason}    ${index}
+    \    click button    ${stylebank_button_view}
+    \    wait until page does not contain element    ${stylebank_searched_button_wait}    100
+    \    ${stage_style_page}    execute javascript    ${page_html_jquery}
+    \    #    reload page
+    \    sleep    3S
+    \    ${stage_style_count}    get matching xpath count    ${stylebank_styleinfo_section_count}
+    \    ${style_page_diff}    diff text    ${stage_style_page}    ${prod_style_page}
+    \    Run Keyword And Continue On Failure    run keyword if    ${style_page_diff}    fail    ${userName}_${user_num} Advanced search ${index} style bank diff
+    \    run keyword if    ${style_page_diff}    write html file with inner html    ${stage_style_page}    ${prod_style_page}    ${diff_dir}\\${userName}_${User_num}_Advanced search ${index} style bank_diff.html
+    \    ...    V
+    \    run keyword if    ${prod_style_count} > 0 and ${stage_style_count} > 0    compareTextFlagAndBack    ${prod_browser}    ${stage_browser}    ${stylebank_firststyle_image}
+    \    ...    ImageViews    1    ${checkbox_checked_@name_jquery}    V
+    \    run keyword if    ${prod_style_count} > 0 and ${stage_style_count} > 0    compareTextFlagAndBack    ${prod_browser}    ${stage_browser}    ${stylebank_firststyle_styleinfo}
+    \    ...    StyleInfo    1    ${checkbox_checked_@name_jquery}    V
+    \    run keyword if    ${prod_style_count} > 0 and ${stage_style_count} > 0    compareTextFlagAndBack    ${prod_browser}    ${stage_browser}    ${stylebank_firststyle_colors}
+    \    ...    ColorInfo    1    ${checkbox_checked_@name_jquery}    H
+    \    run keyword if    ${prod_style_count} > 0 and ${stage_style_count} > 0    compareTextFlagAndBack    ${prod_browser}    ${stage_browser}    ${stylebank_firststyle_size}
+    \    ...    SizingInfo    1    ${checkbox_checked_@name_jquery}    V
+    \    run keyword if    ${prod_style_count} > 0 and ${stage_style_count} > 0    compareTextFlagAndBack    ${prod_browser}    ${stage_browser}    ${stylebank_firststyle_UPC}
+    \    ...    UPC    1    ${checkbox_checked_@name_jquery}    V
+    \    run keyword if    ${stage_style_count} >0 and ${prod_style_count} >0    compareStyleBankReport    ${prod_browser}    ${stage_browser}    ${stylebank_searched_dropdown_option}
+    \    ...    ${stylebank_searched_generateReport}    @{style_report_type}
+
+savePHStyleBankReport
+    [Arguments]    ${dropdown_option}    ${button_generateReport}    ${style_report_type}    ${download_dir}    ${error_count_path}    ${switch_window}
+    #    run keyword if    '${main_window} '== '${current_window}'    select from list by label    ${PHstyle_dropdown_yearSeason}    ${year_season}
+    #    run keyword if    '${main_window}' == '${current_window}'    click button    ${PHstyle_searched_button_view}
+    #    run keyword if    '${main_window}' == '${current_window}'    switchLastWindow
+    ${type_name}    replace string    ${style_report_type}    /    _
+    select from list by label    ${dropdown_option}    ${style_report_type}
+    click button    ${button_generateReport}
+    ${current_time}    get time    epoch
+    switchLastWindow
+    sleep    10S
+    ${error_count}    get matching xpath count    ${error_count_path}
+    ${report}    run keyword if    ${error_count} == 0    saveStyleBankReportWindow    ${download_dir}    ${switch_window}    ${current_time}
+    ...    ${type_name}
+    run keyword if    ${error_count} > 0    click element    ${stylebank_searched_error_closewindow}
+    [Return]    ${report}
+
+compareSearchedPH
+    [Arguments]    ${prod_browser}    ${stage_browser}    @{yearseason}
+    @{report_type}    get list items    ${PHstyle_searched_dropdown_option}
+    : FOR    ${index}    IN    @{yearseason}
+    \    Switch browser    ${prod_browser}
+    \    @{windows}    list windows
+    \    ${prod_main_window}    set variable    @{windows}[0]
+    \    #    click element    ${PHstyle_dropdown_yearSeason}
+    \    select from list by label    ${PHstyle_dropdown_yearSeason}    ${index}
+    \    click button    ${PHstyle_searched_button_view}
+    \    ${prod_current_window}    switchLastWindow
+    \    wait until page does not contain element    ${PHstyle_searched_button_wait}    100
+    \    ${prod_style_page}    get text    Xpath=//body
+    \    ${prod_style_count}    get matching xpath count    ${PHstyle_styleinfo_section_count}
+    \    ${prod_phstyle_info}    run keyword if    ${prod_style_count} > 0    getPageTextAndBack    ${PHstyle_firststyle_edit}    Info
+    \    ${prod_phstylecolor_report}    run keyword if    ${prod_style_count} > 0    savePHStyleBankReport    ${PHstyle_searched_dropdown_option}    ${PHstyle_searched_generateReport}
+    \    ...    @{report_type}[0]    ${prod_download_dir}    ${PHstyle_searched_error_count}    ${prod_current_window}
+    \    ${prod_phstyle_report}    run keyword if    ${prod_style_count} > 0    savePHStyleBankReport    ${PHstyle_searched_dropdown_option}    ${PHstyle_searched_generateReport}
+    \    ...    @{report_type}[1]    ${prod_download_dir}    ${PHstyle_searched_error_count}    ${prod_main_window}
+    \    Switch browser    ${stage_browser}
+    \    @{windows}    list windows
+    \    ${stage_main_window}    set variable    @{windows}[0]
+    \    #    click element    ${PHstyle_dropdown_yearSeason}
+    \    select from list by label    ${PHstyle_dropdown_yearSeason}    ${index}
+    \    click button    ${PHstyle_searched_button_view}
+    \    ${stage_current_window}    switchLastWindow
+    \    wait until page does not contain element    ${PHstyle_searched_button_wait}    100
+    \    ${stage_style_page}    get text    Xpath=//body
+    \    ${stage_style_count}    get matching xpath count    ${PHstyle_styleinfo_section_count}
+    \    ${stage_phstyle_info}    run keyword if    ${stage_style_count} > 0    getPageTextAndBack    ${PHstyle_firststyle_edit}    Info
+    \    ${stage_phstylecolor_report}    run keyword if    ${stage_style_count} > 0    saveStyleBankReport    ${PHstyle_searched_dropdown_option}    ${PHstyle_searched_generateReport}
+    \    ...    @{report_type}[0]    ${stage_download_dir}    ${PHstyle_searched_error_count}    ${stage_current_window}
+    \    ${stage_phstyle_report}    run keyword if    ${stage_style_count} > 0    saveStyleBankReport    ${PHstyle_searched_dropdown_option}    ${PHstyle_searched_generateReport}
+    \    ...    @{report_type}[1]    ${stage_download_dir}    ${PHstyle_searched_error_count}    ${stage_main_window}
+    \    Run Keyword And Continue On Failure    Should Be Equal    ${prod_style_page}    ${stage_style_page}
+    \    Run Keyword And Continue On Failure    Should Be Equal    ${prod_phstyle_info}    ${stage_phstyle_info}
+    \    Run Keyword And Continue On Failure    compare excel    ${prod_phstyle_report}    ${stage_phstyle_report}
+    \    Run Keyword And Continue On Failure    compare excel    ${prod_phstylecolor_report}    ${stage_phstylecolor_report}
+
+switchLastWindow
+    sleep    5S
+    #    capture page screenshot
+    @{windows}    list windows
+    ${windows_str}    list windows
+    ${wttile}    get window titles
+    ${window_count}    get length    ${windows_str}
+    ${last_window_count}    evaluate    ${window_count}-1
+    ${curren_window}    set variable    @{windows}[${last_window_count}]
+    select window    ${curren_window}
+    [Return]    ${curren_window}
+
+countWindows
+    ${window_list}    list windows
+    ${window_count}    get list size    ${window_list}
+    [Return]    ${window_count}
+
+compareSizeScaleInfo
+    [Arguments]    ${prod_browser}    ${stage_browser}    ${sizescales_count}
+    : FOR    ${index}    IN RANGE    1    ${sizescales_count}+1
+    \    ${row}    convert to string    ${index}
+    \    ${current_info_path}    replace string    ${sizescales_infoLink_rowPlaceHold}    row    ${row}
+    \    ${current_default_path}    replace string    ${sizescales_defaultLink_rowPlaceHold}    row    ${row}
+    \    ${current_default_count_path}    replace string    ${current_default_path}    Xpath=//    //
+    \    Switch browser    ${prod_browser}
+    \    ${prod_current_info}    getPageTextAndBack    ${current_info_path}    View
+    \    ${prod_default_count}    get matching xpath count    ${current_default_count_path}
+    \    ${prod_current_default}    run keyword if    ${prod_default_count}== 1    getPageTextAndBack    ${current_default_path}    Default
+    \    Switch browser    ${stage_browser}
+    \    ${stage_current_info}    getPageTextAndBack    ${current_info_path}    View
+    \    ${stage_default_count}    get matching xpath count    ${current_default_count_path}
+    \    ${stage_current_default}    run keyword if    ${stage_default_count}== 1    getPageTextAndBack    ${current_default_path}    Default
+    \    Run Keyword And Continue On Failure    Should Be Equal    ${prod_current_info}    ${stage_current_info}
+    \    Run Keyword And Continue On Failure    Should Be Equal    ${prod_current_default}    ${stage_current_default}
+
+saveStyleBankReport
+    [Arguments]    ${dropdown_option}    ${button_generateReport}    ${style_report_type}    ${download_dir}    ${error_count_path}    ${switch_window}
+    ${type_name}    replace string    ${style_report_type}    /    _
+    select from list by label    ${dropdown_option}    ${style_report_type}
+    click element    ${button_generateReport}
+    ${current_time}    get time    epoch
+    #    @{window_list}    list windows
+    #    select window    @{window_list}[1]
+    switchLastWindow
+    capture page screenshot
+    ${error_count}    get matching xpath count    ${error_count_path}
+    run keyword if    ${error_count} > 0    click element    ${stylebank_searched_error_closewindow}
+    run keyword if    ${error_count} > 0    select window    ${switch_window}
+    ${report}    run keyword if    '${browser_profile_1}' and ${error_count} ==0    saveStyleBankReportWindow    ${download_dir}    ${switch_window}    ${current_time}
+    ...    ${type_name}
+    ...    ELSE IF    not '${browser_profile_1}' ${error_count} ==0    saveStyleBankReportWindowInIE    ${download_dir}    ${switch_window}    ${current_time}
+    ...    ${type_name}
+    [Return]    ${report}
+
+compareDownloadSizeScales
+    [Arguments]    ${prod_browser}    ${stage_browser}
+    Switch browser    ${prod_browser}
+    click link    ${sizescales_link_checkAll}
+    click element    ${sizescales_button_downloadSelected}
+    ${current_time}    get time    epoch
+    @{prod_window_list}    list windows
+    select window    @{prod_window_list}[1]
+    ${prod_sizescales}    saveExcelWindow    ${prod_download_dir}    @{prod_window_list}[0]    ${current_time}
+    Switch browser    ${stage_browser}
+    click link    ${sizescales_link_checkAll}
+    click element    ${sizescales_button_downloadSelected}
+    ${current_time}    get time    epoch
+    @{stage_window_list}    list windows
+    select window    @{stage_window_list}[1]
+    ${stage_sizescales}    saveExcelWindow    ${stage_download_dir}    @{stage_window_list}[0]    ${current_time}
+    Run Keyword And Continue On Failure    compare excel    ${stage_sizescales}    ${prod_sizescales}
+
+comparePageAndItems
+    [Arguments]    ${prod_browser}    ${stage_browser}    ${item_path}    ${target_page}    ${page_path}    ${item_count_path}
+    ...    ${checkbox_jquery}    ${diff_sort}
+    compareTextFlagAndBack    ${prod_browser}    ${stage_browser}    ${page_path}    ${target_page}    0    ${checkbox_jquery}
+    ...    ${diff_sort}
+    switch browser    ${prod_browser}
+    ${prod_item_count}    get matching xpath count    ${item_count_path}
+    switch browser    ${stage_browser}
+    ${stage_item_count}    get matching xpath count    ${item_count_path}
+    run keyword if    ${prod_item_count} == 0 or ${stage_item_count} == 0 or ${prod_item_count} !=${stage_item_count}    Return From Keyword
+    : FOR    ${index}    IN RANGE    1    ${stage_item_count}+1
+    \    ${row}    convert to string    ${index}
+    \    ${current_item_path}    replace string    ${item_path}    row    ${row}
+    \    compareTextFlagAndBack    ${prod_browser}    ${stage_browser}    ${current_item_path}    ${target_page}    1
+    \    ...    ${checkbox_jquery}    ${diff_sort}
+
+goBackCompareEnvs
+    [Arguments]    ${prod_browser}    ${stage_browser}
+    Switch browser    ${prod_browser}
+    go back
+    Switch browser    ${stage_browser}
+    go back
+
+compareDropdownItems
+    [Arguments]    ${prod_browser}    ${stage_browser}    ${dropdown_path}    ${submit_path}    ${diff_sort}
+    @{items}    get list items    ${dropdown_path}
+    : FOR    ${current_item}    IN    @{items}
+    \    Switch browser    ${prod_browser}
+    \    ${prod_list_items}    get list items    ${dropdown_path}
+    \    ${item_existing}    get count    ${prod_list_items}    ${current_item}
+    \    Run Keyword And Continue On Failure    run keyword if    ${item_existing}<1    fail    ${current_item} don't exist in prod
+    \    continue for loop if    ${item_existing}<1
+    \    select from list by label    ${dropdown_path}    ${current_item}
+    \    click button    ${submit_path}
+    \    #    wait until page contains    ${current_item}    continue
+    \    sleep    10S
+    \    ${prod_page}    execute javascript    ${page_html_jquery}
+    \    go back
+    \    Switch browser    ${stage_browser}
+    \    select from list by label    ${dropdown_path}    ${current_item}
+    \    click button    ${submit_path}
+    \    #    wait until page contains    ${current_item}    100
+    \    sleep    10S
+    \    ${stage_page}    execute javascript    ${page_html_jquery}
+    \    go back
+    \    ${page_diff}    diff text    ${stage_page}    ${prod_page}
+    \    Run Keyword And Continue On Failure    run keyword if    ${page_diff}    fail    ${userName}_${user_num} ${current_item} Diff
+    \    run keyword if    ${page_diff}    write html file with inner html    ${stage_page}    ${prod_page}    ${diff_dir}\\${userName}_${User_num}_${current_item}_diff.html
+    \    ...    ${diff_sort}
+
+compareRetailers
+    [Arguments]    ${prod_browser}    ${stage_browser}    ${retailer_count}    ${checkbox_jquery}
+    : FOR    ${index}    IN RANGE    1    ${retailer_count}+1
+    \    ${row}    convert to string    ${index}
+    \    ${current_retailer_info_path}    replace string    ${customerDirectory_retailer_info_rowPlaceHold}    row    ${row}
+    \    ${current_retailer_profile_path}    replace string    ${customerDirectory_retailer_profile_rowPlaceHold}    row    ${row}
+    \    ${current_retailer_shipping_path}    replace string    ${customerDirectory_retailer_shipping_rowPlaceHold}    row    ${row}
+    \    ${current_retailer_account_path}    replace string    ${customerDirectory_retailer_account_rowPlaceHold}    row    ${row}
+    \    ${current_retailer_contact_count_path}    replace string    ${customerDirectory_retailer_contact_count}    row    ${row}
+    \    compareTextFlagAndBack    ${prod_browser}    ${stage_browser}    ${current_retailer_info_path}    RetailerInfo    1
+    \    ...    ${checkbox_jquery}    V
+    \    compareTextFlagAndBack    ${prod_browser}    ${stage_browser}    ${current_retailer_profile_path}    RetailerProfile    1
+    \    ...    ${checkbox_jquery}    V
+    \    compareTextFlagAndBack    ${prod_browser}    ${stage_browser}    ${current_retailer_shipping_path}    CustomerAddress    1
+    \    ...    ${checkbox_jquery}    V
+    \    compareTextFlagAndBack    ${prod_browser}    ${stage_browser}    ${current_retailer_account_path}    CustomerInfo    1
+    \    ...    ${checkbox_jquery}    V
+    \    Switch browser    ${prod_browser}
+    \    ${prod_retailer_contact_count}    get matching xpath count    ${current_retailer_contact_count_path}
+    \    Switch browser    ${stage_browser}
+    \    ${stage_retailer_contact_count}    get matching xpath count    ${current_retailer_contact_count_path}
+    \    continue for loop if    ${stage_retailer_contact_count} == 0 or ${prod_retailer_contact_count} == 0 or ${stage_retailer_contact_count} != ${prod_retailer_contact_count}
+    \    ${current_retailer_contact_path}    replace string    ${customerDirectory_retailer_contact_rowAndnumPlaceHold}    row    ${row}
+    \    compareList    ${prod_browser}    ${stage_browser}    ${current_retailer_contact_path}    ${stage_retailer_contact_count}    num
+    \    ...    2    ContactInfo
+
+compareList
+    [Arguments]    ${prod_browser}    ${stage_browser}    ${list_element_path}    ${list_count}    ${placeHold_flag}    ${start_num}
+    ...    ${target_page_flag}
+    : FOR    ${index}    IN RANGE    ${start_num}    ${list_count}+1
+    \    ${row}    convert to string    ${index}
+    \    ${current_element}    replace string    ${list_element_path}    ${placeHold_flag}    ${row}
+    \    Switch browser    ${prod_browser}
+    \    sleep    5S
+    \    click element    ${current_element}
+    \    wait until page contains    ${target_page_flag}    100
+    \    ${prod_page}    execute javascript    ${page_html_jquery}
+    \    go back
+    \    Switch browser    ${stage_browser}
+    \    sleep    5S
+    \    click element    ${current_element}
+    \    wait until page contains    ${target_page_flag}    100
+    \    ${stage_page}    execute javascript    ${page_html_jquery}
+    \    go back
+    \    ${page_diff}    diff text    ${stage_page}    ${prod_page}
+    \    Run Keyword And Continue On Failure    run keyword if    ${page_diff}    fail    ${userName}_${user_num} ${target_page_flag} Diff
+    \    ${current_time}    get time    epoch
+    \    run keyword if    ${page_diff}    write html file with inner html    ${stage_page}    ${prod_page}    ${diff_dir}\\${userName}_${User_num}_${target_page_flag}_diff_${current_time}.html
+    \    ...    V
+
+getCheckedText
+    [Arguments]    ${checked_path}    ${checked_type}    ${checked_attri}
+    ${checked_count}    get matching xpath count    ${checked_path}
+    ${done_count}    set variable    0
+    ${checked_text}    set variable
+    : FOR    ${index}    IN RANGE    1    ${checked_count}+1
+    \    ${current_checked_count}    get matching xpath count    ${checked_path}[${index}]
+    \    ${current_checked_text}    getCheckedTextWithSamePath    ${checked_path}[${index}]    ${checked_attri}    ${checked_type}    ${current_checked_count}
+    \    ${checked_text_length}    get length    ${checked_text}
+    \    ${checked_text}    run keyword if    ${checked_text_length} == 0    set variable    ${current_checked_text}
+    \    ...    ELSE    set variable    ${checked_text},${current_checked_text}
+    \    ${done_count}    evaluate    ${done_count}+${current_checked_count}
+    \    exit for loop if    ${done_count} >= ${checked_count}
+    [Return]    ${checked_text}
+
+getCheckedTextWithSamePath
+    [Arguments]    ${checked_path}    ${checked_attri}    ${checked_type}    ${count}
+    ${checked_text}    set variable
+    ${current_path}    set variable
+    : FOR    ${index}    IN RANGE    1    ${count}+1
+    \    ${current_path}    run keyword if    ${index} == 1    set variable    ${checked_path}
+    \    ...    ELSE    replace string    ${current_path}/following::${checked_path}    :://    ::
+    \    ${current_checked_text}    run keyword if    '${checked_type}' != 'select'    get element attribute    ${current_path}@${checked_attri}
+    \    ...    ELSE    get selected list labels    ${current_path}
+    \    ${checked_text_length}    get length    ${checked_text}
+    \    ${checked_text}    run keyword if    ${checked_text_length} == 0    set variable    ${current_checked_text}
+    \    ...    ELSE    set variable    ${checked_text},${current_checked_text}
+    [Return]    ${checked_text}
+
+compareTextFlagAndBack
+    [Arguments]    ${prod_browser}    ${stage_browser}    ${element_path}    ${target_page}    ${back_flag}    ${checkbox_jquery}
+    ...    ${diff_sort}
+    switch browser    ${prod_browser}
+    click element    ${element_path}
+    wait until page contains    ${target_page}    30
+    sleep    5S
+    ${prod_page}    execute javascript    ${page_html_jquery}
+    reload page
+    run keyword if    ${back_flag} == 1    go back
+    switch browser    ${stage_browser}
+    click element    ${element_path}
+    wait until page contains    ${target_page}    30
+    sleep    5S
+    ${stage_page}    execute javascript    ${page_html_jquery}
+    reload page
+    run keyword if    ${back_flag} == 1    go back
+    ${page_diff}    diff text    ${stage_page}    ${prod_page}
+    Run Keyword And Continue On Failure    run keyword if    ${page_diff}    fail    ${userName}_${user_num} ${target_page} Diff
+    ${current_time}    get time    epoch
+    run keyword if    ${page_diff}    write html file with inner html    ${stage_page}    ${prod_page}    ${diff_dir}\\${userName}_${User_num}_${target_page}_diff_${current_time}.html    ${diff_sort}
+
+compareCustomerDirectoryPage
+    [Arguments]    ${prod_browser}    ${stage_browser}
+    switch browser    ${prod_browser}
+    click element    ${customerDirectory_link_next}
+    wait until page contains    Customer Directory    20
+    ${prod_page}    execute javascript    ${page_html_nochange_jquery}    #${page_html_jquery}
+    ${prod_retailer_count}    get matching xpath count    ${customerDirectory_retailer_count}
+    ${prod_next_page}    get matching xpath count    ${customerDirectory_link_next_count}
+    switch browser    ${stage_browser}
+    click element    ${customerDirectory_link_next}
+    wait until page contains    Customer Directory    20
+    ${stage_page}    execute javascript    ${page_html_nochange_jquery}    #${page_html_jquery}
+    ${stage_retailer_count}    get matching xpath count    ${customerDirectory_retailer_count}
+    ${stage_next_page}    get matching xpath count    ${customerDirectory_link_next_count}
+    ${page_diff}    diff text    ${stage_page}    ${prod_page}
+    Run Keyword And Continue On Failure    run keyword if    ${page_diff}    fail    ${userName}_${user_num} Customer Directory Diff
+    ${current_time}    get time    epoch
+    run keyword if    ${page_diff}    write html file with inner html    ${stage_page}    ${prod_page}    ${diff_dir}\\${userName}_${User_num}_Customer Directory_diff_${current_time}.html    V
+    run keyword if    ${prod_retailer_count} == ${stage_retailer_count} and ${stage_retailer_count} >0    compareRetailers    ${prod_browser}    ${stage_browser}    ${stage_retailer_count}    name
+    return from keyword if    ${prod_next_page} == 0 or ${stage_next_page} == 0
+    run keyword if    ${prod_next_page} == ${stage_next_page} and ${stage_next_page} > 0    compareCustomerDirectoryPage    ${prod_browser}    ${stage_browser}
+
+saveZipToExcelWindow
+    [Arguments]    ${downloadfile_dir}    ${main_window}    ${userName}    ${user_num}
+    #    run keyword if    '${browser_type}'=='chrome'    control click    ${download_save_title_chrome}    ${download_save_save}
+    #    run keyword if    '${browser_type}'=='chrome'    sleep    40S
+    win wait    ${download_save_title_firefox}    \    4000
+    win active    ${download_save_title_firefox}
+    win set on top    ${download_save_title_firefox}    \    1
+    sleep    5S
+    control set text    ${download_save_title_firefox}    \    ${download_save_filename}    ${downloadfile_dir}\\${userName}_${user_num}.zip
+    control click    ${download_save_title_firefox}    \    ${download_save_save}
+    sleep    40S
+    ${downloadfile_name}    extractZIP    ${downloadfile_dir}\\${userName}_${user_num}.zip    ${downloadfile_dir}\\    ${userName}_${user_num}_
+    select window    ${main_window}
+    [Return]    ${downloadfile_name}
+
+compareExcelList
+    [Arguments]    ${excel_name}    ${prod_download_dir}    ${stage_download_dir}
+    @{excel_name_list}    split string    ${excel_name}    ,
+    : FOR    ${excel}    IN    @{excel_name_list}
+    \    run keyword and continue on failure    run keyword if    '${excel}'    compare excel    ${prod_download_dir}${excel}    ${stage_download_dir}${excel}
+    \    ...    ${diff_dir}${excel}
+
+compareWSViewByOptions
+    [Arguments]    ${prod_browser}    ${stage_browser}    ${dropdown_selectedOption}    ${dropdown}    ${js}    ${user_num}
+    ...    ${userName}    ${WSID}    @{dropdown_options}
+    : FOR    ${WS_by}    IN    @{dropdown_options}
+    \    continue for loop if    '${WS_by}' == '${dropdown_selectedOption}'
+    \    switch browser    ${prod_browser}
+    \    select from list by label    ${dropdown}    ${WS_by}
+    \    click element    ${wstotalview_button_view}
+    \    wait until page does not contain element    ${wstotalview_button_wait}    100
+    \    sleep    5S
+    \    ${prod_page}    execute javascript    ${page_html_jquery}
+    \    ${prod_dropdown_selectedoption}    execute javascript    ${dropdown_selected_jquery}
+    \    switch browser    ${stage_browser}
+    \    select from list by label    ${dropdown}    ${WS_by}
+    \    click element    ${wstotalview_button_view}
+    \    wait until page does not contain element    ${wstotalview_button_wait}    100
+    \    sleep    5S
+    \    ${stage_page}    execute javascript    ${page_html_jquery}
+    \    ${stage_dropdown_selectedoption}    execute javascript    ${dropdown_selected_jquery}
+    \    Run Keyword And Continue On Failure    Should Be Equal    ${stage_page}    ${prod_page}    ${userName}_${user_num} WS_${WSID}_${WS_by}_Diff    false
+    \    Run Keyword And Continue On Failure    Should Be Equal    ${stage_dropdown_selectedoption}    ${prod_dropdown_selectedoption}
+    \    ${diff_flag}    Diff text    ${stage_page}    ${prod_page}
+    \    continue for loop if    not ${diff_flag}
+    \    ${stage_html}    run keyword if    ${diff_flag}    execute javascript    ${js}
+    \    run keyword if    ${diff_flag}    Switch browser    ${prod_browser}
+    \    ${prod_html}    run keyword if    ${diff_flag}    execute javascript    ${js}
+    \    run keyword if    ${diff_flag}    write html ws with inner html    ${stage_html}    ${prod_html}    ${diff_dir}\\${userName}_${user_num}_${WSID}_${WS_by}_diff.html
+    switch browser    ${prod_browser}
+    select from list by label    ${dropdown}    ${dropdown_selectedOption}
+    click element    ${wstotalview_button_view}
+    wait until page does not contain element    ${wstotalview_button_wait}    100
+    switch browser    ${stage_browser}
+    select from list by label    ${dropdown}    ${dropdown_selectedOption}
+    click element    ${wstotalview_button_view}
+    wait until page does not contain element    ${wstotalview_button_wait}    100
+
+compareWSExcel
+    [Arguments]    ${prod_browser}    ${stage_browser}    ${download_type}    ${download_option}    ${userName}    ${user_num}
+    switch browser    ${stage_browser}
+    click link    ${ca_link_check_all}
+    select from list    ${ca_dropdown_action}    ${download_type}
+    @{main_window}    list windows
+    ${current_time}    get time    epoch
+    click element    ${ca_submit}
+    sleep    3s
+    @{current_window}    list windows
+    selectDownloadOption    @{current_window}[1]    ${download_option}
+    ${stage_excel}    saveZipToExcelWindow    ${stage_download_dir}    @{current_window}[0]    ${userName}    ${user_num}
+    ${stage_excel_name}    replace string    ${stage_excel}    ${stage_download_dir}\\    \\
+    switch browser    ${prod_browser}
+    click link    ${ca_link_check_all}
+    select from list    ${ca_dropdown_action}    ${download_type}
+    @{main_window}    list windows
+    ${current_time}    get time    epoch
+    click element    ${ca_submit}
+    sleep    3s
+    @{current_window}    list windows
+    selectDownloadOption    @{current_window}[1]    ${download_option}
+    ${prod_excel}    run keyword if    '${download_option}' == 'Edit monthly flow%' or '${download_option}' == 'Edit monthly units'    saveExcelWindow    ${prod_download_dir}    @{current_window}[0]    ${userName}
+    ...    ${user_num}
+    ...    ELSE    saveZipToExcelWindow    ${prod_download_dir}    @{current_window}[0]    ${userName}    ${user_num}
+    ${prod_excel_name}    replace string    ${prod_excel}    ${prod_download_dir}\\    \\
+    Run Keyword And Continue On Failure    Should Be Equal    ${stage_excel_name}    ${prod_excel_name}
+    return from keyword if    '${prod_excel_name}' != '${stage_excel_name}'
+    compareExcelList    ${stage_excel_name}    ${prod_download_dir}\\    ${stage_download_dir}\\
+
+saveStyleBankReportWindowInIE
+    [Arguments]    ${downloadfile_dir}    ${main_window}    ${current_time}    ${monthly_id}
+    win wait    ${download_IE_title}    \    4000
+    win activate    ${download_IE_title}
+    win set on top    ${download_IE_title}    \    1
+    #    control focus    ${download_IE_title}    ${download_IE_saveButton}
+    control click    ${download_IE_title}    \    ${download_IE_saveButton}
+    win wait    ${download_save_title}    \    40
+    win activate    ${download_save_title}
+    win set on top    ${download_save_title}    \    1
+    sleep    5S
+    control set text    ${download_save_title}    \    ${download_save_filename}    ${downloadfile_dir}\\${userName}_${user_num}_${monthly_id}_${current_time}.xls
+    control click    ${download_save_title}    \    ${download_save_save}
+    ${downloadfile_name}    set variable    ${downloadfile_dir}\\${userName}_${user_num}_${monthly_id}_${current_time}.xls
+    #    execute javascript    window.open('','_self','');window.close();
+    win wait    ${closeWindow_IE_title}    \    40
+    win activate    ${closeWindow_IE_title}
+    win set on top    ${closeWindow_IE_title}    \    1
+    control click    ${closeWindow_IE_title}    \    ${closeWindow_IE_yesButton}
+    select window    ${main_window}
+    [Return]    ${downloadfile_name}

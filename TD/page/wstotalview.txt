@@ -1,0 +1,14 @@
+*** Variables ***
+${wstotalview_back}    Xpath=//input[@type='button' and contains(@class,'sb')]
+${wstotalview_mainWS}    Xpath=//div[@id='maincontent']/div/div/form/div[3]
+${wstotalview_criteria}    Xpath=//div[@id="maincontent"]/div/div/form/div[3]/div[1]
+${wstotalview_table_sections}    Xpath=//table[@class="table3"]/tbody
+${wstotalview_table_title1}    //table[@class="table3"]/tbody[3]/tr[1]/
+${wstotalview_table_title2}    //table[@class="table3"]/tbody[3]/tr[2]/
+${wstotalview_button_view}    Xpath=//input[@name='view' and @value='view']
+${wstotalview_button_wait}    Xpath=//input[@name='view' and @value='wait']
+${wstotalview_dropdown_groupby}    name=groupby
+${wstotalview_dropdown_displaybyview}    name=displaybyview
+${wstotalview_dropdown_worksheetid}    name=worksheetid
+${wstotalview_js}    return document.getElementsByClassName("worksheet")[0].innerHTML
+${wstotalview_monthly_js}    return document.getElementsByName("switchview")[0].innerHTML

@@ -1,0 +1,13 @@
+*** Variables ***
+${sizescales_link_downloadTemplate}    Download Template
+${sizescales_button_downloadSelected}    name=download
+${sizescales_link_checkAll}    Check All
+${sizescales_link_clearAll}    Clear All
+${sizescales_count}    //table[@id='table']/tbody/tr
+${sizescales_checkbox_rowPlaceHold}    Xpath=//table[@id='table']/tbody/tr[row]/td[1]/input
+${sizescales_infoLink_rowPlaceHold}    Xpath=//table[@id='table']/tbody/tr[row]/td[2]/a
+${sizescales_defaultLink_rowPlaceHold}    Xpath=//table[@id='table']/tbody/tr[row]/td[5]/a
+${sizescales_criteria_typeDropdown}    name=sizescaletype
+${sizescales_criteria_numberRows}    name=repeatrownumber
+${sizescales_criteria_allvalues_titlePlaceHold}    Xpath=//th/label[text()='title']/parent::*/preceding-sibling::th/input
+${sizescales_criteria_certainvalue_titlePlaceHold}    Xpath=//th/label[text()='title']/parent::*/preceding-sibling::th/input

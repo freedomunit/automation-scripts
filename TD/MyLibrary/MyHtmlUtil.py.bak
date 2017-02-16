@@ -1,0 +1,106 @@
+from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.common.keys import Keys
+import time,math,string,sys
+
+def saveTableAsList(browser,sections_path): 
+	sections_count = len(browser.find_elements_by_xpath(sections_path))		
+	tab=[]
+	for n in range (1,sections_count+1):
+		rows_path = sections_path+"["+n+"]/tr"
+		rows_count = len(browser.find_elements_by_xpath(rows_path))		
+		for i in range (1,rows_count+1):
+			cols_path = rows_path +"["+i+"]/td"
+			cols_count =  len(browser.find_elements_by_xpath(cols_path))	
+			row = []
+			for j in range (1,cols_count+1):
+				cell = browser.find_element_by_xpath(cols_path+"["+j+"]").get_attribute("colspan")
+				cell = cell+","+ browser.find_element_by_xpath(cols_path+"["+j+"]").get_attribute("rowspan")
+				cell = cell+","+ browser.find_element_by_xpath(cols_path+"["+j+"]").text+";"
+				row.append(cell)
+			tab.append(col)
+	return tab
+	
+def writeHtmlFile(stage_text, prod_text,file_dir):
+	reload(sys)
+	sys.setdefaultencoding( "utf-8" )
+	html_head= "<!DOCTYPE html>\n <html>\n<head>\n<meta charset=\'utf-8\' />\n <title>WS Compare Result</title>\n<style>\n@import url(\'./css/worksheet.css\');\n</style>\n<script  src = \'./js/CompareTables.js\'>\n	</script>\n</head>\n	<body>\n"
+	stage_rows = stage_text.replace("\n", "").replace("\r", "").replace("\"", "\\\"").replace("\\n", "\\\\n").split("-/-")
+	prod_rows = prod_text.replace("\n", "").replace("\r", "").replace("\"", "\\\"").replace("\\n", "\\\\n").split("-/-")
+	html_file = open(file_dir,"w")
+	html_file.write(html_head)	
+	if(stage_rows):
+		html_file.write("<big>Stage:</big>\n<table id='actual'>\n")
+		for r in stage_rows:
+			if r:
+				cells = r.split(";")
+				html_file.write("<tr>\n")
+				for c in cells:
+					if c:
+						cell = c.split(",")
+						html_file.write("<td colspan='%s' rowspan='%s'>%s</td>\n" %(cell[0],cell[1],cell[2]))
+				html_file.write("</tr>\n")	
+		html_file.write("</table>\n")			
+	if(prod_rows):
+		html_file.write("<big>Prod:</big>\n<table id='expected'>\n")
+		for pr in prod_rows:
+			if pr:
+				pcells = pr.split(";")
+				html_file.write("<tr>\n")
+				for pc in pcells:
+					if pc:
+						pcell = pc.split(",")
+						html_file.write("<td colspan='%s'  rowspan='%s'>%s</td>\n" %(pcell[0],pcell[1],pcell[2]))
+				html_file.write("</tr>\n")	
+		html_file.write("</table>\n")			
+	html_file.write("</body>\n</html>")	
+	html_file.close()
+	
+def writeHtmlFileWithInnerHtml(stage_text, prod_text,file_dir,sort_by):
+	reload(sys)
+	sys.setdefaultencoding( "utf-8" )
+	dir= file_dir.replace("/", " ")
+		if(sort_by=="H"):
+		sort_css="page_horizontal.css"
+	if(sort_by=="V"):
+		sort_css="page_vertical.css"
+	html_head= "<!DOCTYPE html>\n <html>\n<head>\n<meta charset=\'utf-8\' />\n <title>WS Compare Result</title>\n<script type=\"text/javascript\" src=\"./js/jquery-1.11.3.js\"></script>\n<style>\n@import url(\'./css/"+sort_css+"\');\n</style>\n<script  src = \'./js/CompareHTML.js\'>\n</script>\n</head>\n<body onload=\'initCompare()\'>\n"
+	html_file = open(dir,"w")
+	html_file.write(html_head)		
+	if(stage_text):
+		html_file.write("<div id='stage'>\n<big>Stage:</big>\n")
+		html_file.write(stage_text)
+		html_file.write("</div>\n")			
+	if(prod_text):
+		html_file.write("<div id='prod'>\n<big>Prod:</big>\n")
+		html_file.write(prod_text)
+		html_file.write("</div>\n")			
+	html_file.write("</body>\n</html>")	
+	html_file.close()
+	
+def writeHtmlWSWithInnerHtml(stage_text, prod_text,file_dir):
+	reload(sys)
+	sys.setdefaultencoding( "utf-8" )
+	html_head= "<!DOCTYPE html>\n <html>\n<head>\n<meta charset=\'utf-8\' />\n <title>WS Compare Result</title>\n<script type=\"text/javascript\" src=\"./js/jquery-1.11.3.js\"></script>\n<style>\n@import url(\'./css/worksheet.css\');\n</style>\n<script  src = \'./js/CompareTables.js\'>\n</script>\n</head>\n<body onload=\'compareTables()\'>\n"
+	html_file = open(file_dir,"w")
+	html_file.write(html_head)	
+	if(stage_text):
+		html_file.write("<big>Stage:</big>\n<div id='stage'>\n")
+		html_file.write(stage_text)
+		html_file.write("</div>\n")			
+	if(prod_text):
+		html_file.write("<big>Prod:</big>\n<div id='prod'>\n")
+		html_file.write(prod_text)
+		html_file.write("</div>\n")			
+	html_file.write("</body>\n</html>")	
+	html_file.close()	
+	
+if __name__ == "__main__":		
+	saveTableAsList()	
+	writeHtmlFile()
+	writeHtmlFileWithInnerHtml()
+	writeHtmlWSWithInnerHtml()
+	 
+		
+	
+

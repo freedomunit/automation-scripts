@@ -1,0 +1,107 @@
+1478762604323	geckodriver	INFO	Listening on 127.0.0.1:28441
+1478762607288	mozprofile::profile	INFO	Using profile path C:\Users\pc\AppData\Local\Temp\rust_mozprofile.tFEBRACOeOZT
+1478762607791	geckodriver::marionette	INFO	Starting browser C:\Program Files\Mozilla Firefox\firefox.exe
+1478762607798	geckodriver::marionette	INFO	Connecting to Marionette on localhost:28447
+1478762607920	addons.manager	DEBUG	Loaded provider scope for resource://gre/modules/addons/XPIProvider.jsm: ["XPIProvider"]
+1478762607921	addons.manager	DEBUG	Loaded provider scope for resource://gre/modules/LightweightThemeManager.jsm: ["LightweightThemeManager"]
+1478762607922	addons.manager	DEBUG	Loaded provider scope for resource://gre/modules/addons/GMPProvider.jsm
+1478762607923	addons.manager	DEBUG	Loaded provider scope for resource://gre/modules/addons/PluginProvider.jsm
+1478762607924	addons.manager	DEBUG	Starting provider: XPIProvider
+1478762607924	addons.xpi	DEBUG	startup
+1478762607925	addons.xpi	INFO	Mapping firebug@software.joehewitt.com to C:\Users\pc\AppData\Local\Temp\rust_mozprofile.tFEBRACOeOZT\extensions\firebug@software.joehewitt.com.xpi
+1478762607925	addons.xpi	INFO	SystemAddonInstallLocation directory is missing
+1478762607925	addons.xpi	INFO	Mapping loop@mozilla.org to C:\Program Files\Mozilla Firefox\browser\features\loop@mozilla.org.xpi
+1478762607925	addons.xpi	INFO	Mapping {972ce4c6-7e08-4474-a285-3208198ce6fd} to C:\Program Files\Mozilla Firefox\browser\extensions\{972ce4c6-7e08-4474-a285-3208198ce6fd}.xpi
+1478762607926	addons.xpi	DEBUG	checkForChanges
+1478762607926	addons.xpi	DEBUG	Loaded add-on state from prefs: {"app-profile":{"firebug@software.joehewitt.com":{"d":"C:\\Users\\pc\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\8hl9l980.default\\extensions\\firebug@software.joehewitt.com.xpi","e":true,"v":"2.0.18","st":1478498831910}},"app-system-defaults":{"loop@mozilla.org":{"d":"C:\\Program Files\\Mozilla Firefox\\browser\\features\\loop@mozilla.org.xpi","e":true,"v":"0.1","st":1457051706000}},"winreg-app-user":{"dict@www.youdao.com":{"d":"C:\\Program Files (x86)\\Dict\\stable\\extensions\\firefox","e":false,"v":"1.81","st":1457852981941,"mt":1457852976347}},"app-global":{"{972ce4c6-7e08-4474-a285-3208198ce6fd}":{"d":"C:\\Program Files\\Mozilla Firefox\\browser\\extensions\\{972ce4c6-7e08-4474-a285-3208198ce6fd}.xpi","e":true,"v":"45.0","st":1457051706000}}}
+1478762607927	addons.xpi	DEBUG	getModTime: Recursive scan of firebug@software.joehewitt.com
+1478762607927	addons.xpi	DEBUG	Changed add-on firebug@software.joehewitt.com in app-profile
+1478762607927	addons.xpi	DEBUG	getModTime: Recursive scan of loop@mozilla.org
+1478762607927	addons.xpi	DEBUG	Changed add-on loop@mozilla.org in app-system-defaults
+1478762607928	addons.xpi	DEBUG	getModTime: Recursive scan of {972ce4c6-7e08-4474-a285-3208198ce6fd}
+1478762607928	addons.xpi	DEBUG	Changed add-on {972ce4c6-7e08-4474-a285-3208198ce6fd} in app-global
+1478762607928	addons.xpi	DEBUG	getInstallState changed: true, state: {"app-profile":{"firebug@software.joehewitt.com":{"d":"C:\\Users\\pc\\AppData\\Local\\Temp\\rust_mozprofile.tFEBRACOeOZT\\extensions\\firebug@software.joehewitt.com.xpi","e":true,"v":"2.0.18","st":1478762607563}},"app-system-defaults":{"loop@mozilla.org":{"d":"C:\\Program Files\\Mozilla Firefox\\browser\\features\\loop@mozilla.org.xpi","e":true,"v":"0.1","st":1457051706000}},"app-global":{"{972ce4c6-7e08-4474-a285-3208198ce6fd}":{"d":"C:\\Program Files\\Mozilla Firefox\\browser\\extensions\\{972ce4c6-7e08-4474-a285-3208198ce6fd}.xpi","e":true,"v":"45.0","st":1457051706000}}}
+1478762607933	addons.xpi-utils	DEBUG	Opening XPI database C:\Users\pc\AppData\Local\Temp\rust_mozprofile.tFEBRACOeOZT\extensions.json
+1478762607934	addons.xpi-utils	DEBUG	Successfully read XPI database
+1478762607935	addons.xpi-utils	DEBUG	Add-on firebug@software.joehewitt.com modified in app-profile
+*** Blocklist::_loadBlocklistFromFile: blocklist is disabled
+1478762608024	DeferredSave.extensions.json	DEBUG	Save changes
+1478762608025	DeferredSave.extensions.json	DEBUG	Save changes
+1478762608026	addons.xpi-utils	DEBUG	Add-on dict@www.youdao.com removed from winreg-app-user
+1478762608026	DeferredSave.extensions.json	DEBUG	Save changes
+1478762608026	addons.xpi-utils	INFO	Hiding the updated system add-ons.
+1478762608026	addons.manager	DEBUG	Registering startup change 'changed' for firebug@software.joehewitt.com
+1478762608030	addons.xpi	DEBUG	Loading bootstrap scope from C:\Users\pc\AppData\Roaming\Mozilla\Firefox\Profiles\8hl9l980.default\extensions\firebug@software.joehewitt.com.xpi
+1478762608033	addons.xpi	DEBUG	Calling bootstrap method uninstall on firebug@software.joehewitt.com version 2.0.18
+1478762608033	addons.xpi	DEBUG	Loading bootstrap scope from C:\Users\pc\AppData\Local\Temp\rust_mozprofile.tFEBRACOeOZT\extensions\firebug@software.joehewitt.com.xpi
+1478762608035	addons.xpi	DEBUG	Calling bootstrap method install on firebug@software.joehewitt.com version 2.0.18
+1478762608036	addons.xpi-utils	DEBUG	Make addon app-profile:firebug@software.joehewitt.com visible
+1478762608036	DeferredSave.extensions.json	DEBUG	Save changes
+1478762608036	addons.xpi-utils	DEBUG	Make addon app-system-defaults:loop@mozilla.org visible
+1478762608036	DeferredSave.extensions.json	DEBUG	Save changes
+1478762608036	addons.xpi-utils	DEBUG	Make addon app-global:{972ce4c6-7e08-4474-a285-3208198ce6fd} visible
+1478762608036	DeferredSave.extensions.json	DEBUG	Save changes
+1478762608036	addons.manager	DEBUG	Registering startup change 'uninstalled' for dict@www.youdao.com
+1478762608037	addons.xpi	DEBUG	Updating XPIState for {"id":"firebug@software.joehewitt.com","syncGUID":"8l2C_9TwHYQF","location":"app-profile","version":"2.0.18","type":"extension","internalName":null,"updateURL":null,"updateKey":null,"optionsURL":null,"optionsType":null,"aboutURL":null,"icons":{},"iconURL":"chrome://firebug/skin/firebugBig.png","icon64URL":null,"defaultLocale":{"name":"Firebug","description":"Web Development Evolved. Firebug is free and open source software distributed under the BSD License.","creator":"Joe Hewitt","homepageURL":"http://www.getfirebug.com/","translators":["Leszek(teo)Zyczkowski (pl-PL)","markh (nl)","peter3 (sv-SE)","AlleyKat (da-DK)","Hector Zhao, lovelywcm (zh-CN)","Lukas Kucharczyk, Michal Kec (cs-CZ)","Team erweiterungen.de, ReinekeFux, Benedikt Langens, Sebastian Zartner (de-DE)","l0stintranslation, gonzalopirobutirro, Luigi Grilli (it-IT)","alexxed (ro-RO)","Nicolas Martin, Franck Marcia (fr-FR)","gLes (hu-HU)","Xavi Ivars - Softcatala (ca)","gezmen (tr-TR)","eternoendless (es-AR)","Dark Preacher (ru)","Tiago Oliveira, Diego de Carvalho Zimmermann, Alexandre Rapaki (pt-BR)","Juan Botias, Alvaro G. Vicario (es-ES)","Andriy Zhouck (uk-UA)","Hisateru Tanaka, k2jp (ja-JP)","Mohsen Shadroo (fa-IR)","Eduard Babayan (hy-AM)","Helder Magalhaes (pt-PT)","Tomaz Macus (sl-SI)","Stoyan Stefanov, Alexander Shopov (bg)","Kristjan Bjarni Guomundsson (is-IS)","NGUYEN Manh Hung (vi-VN)","Bwah (hr-HR)","Sonickydon (el)","David Gonzales (es)","DakSrbija (sr)","bootleq (zh-TW)","Asier Iturralde Sarasola, Julen Irazoki Oteiza (eu)"],"contributors":["John J. Barton (IBM Almaden)","Jan Odvarko (Mozilla Corp.)","Max Stepanov (Aptana Inc.)","Rob Campbell (Mozilla Corp.)","Hans Hillen (Paciello Group, Mozilla)","Curtis Bartley (Mozilla Corp.)","Mike Collins (IBM Almaden)","Kevin Decker","Mike Ratcliffe (Mozilla Corp.)","Hernan Rodriguez Colmeiro","Austin Andrews","Christoph Dorn","Steven Roussey (Illuminations for Developers)","Sebastian Zartner","Harutyun Amirjanyan","Simon Lindholm","Stampolidis Anastasios","Joe Walker (Mozilla Corp.)","Vladimir Zhuravlev","Farshid Beheshti","Leon Sorokin","Florent Fayolle","Hector Zhao","Bharath Thiruveedula","Nathan Mische","Belakhdar Abdeldjalil","Jakob Kaltenbrunner"]},"visible":true,"active":true,"userDisabled":false,"appDisabled":false,"descriptor":"C:\\Users\\pc\\AppData\\Local\\Temp\\rust_mozprofile.tFEBRACOeOZT\\extensions\\firebug@software.joehewitt.com.xpi","installDate":1478498831910,"updateDate":1478762607563,"applyBackgroundUpdates":1,"bootstrap":true,"skinnable":false,"size":9681886,"sourceURI":null,"releaseNotesURI":null,"softDisabled":false,"foreignInstall":false,"hasBinaryComponents":false,"strictCompatibility":false,"locales":[],"targetApplications":[{"id":"toolkit@mozilla.org","minVersion":"30.0a1","maxVersion":"52.0"},{"id":"{ec8030f7-c20a-464f-9b0e-13a3a9e97384}","minVersion":"30.0a1","maxVersion":"52.0"}],"targetPlatforms":[],"multiprocessCompatible":true,"signedState":2,"seen":true}
+1478762608037	addons.xpi	DEBUG	Updating XPIState for {"id":"loop@mozilla.org","syncGUID":"bw9iyyDdebj3","location":"app-system-defaults","version":"0.1","type":"extension","internalName":null,"updateURL":null,"updateKey":null,"optionsURL":null,"optionsType":null,"aboutURL":null,"icons":{},"iconURL":null,"icon64URL":null,"defaultLocale":{"name":"Firefox Hello Beta","description":"Web sharing for Firefox","creator":"Mozilla","homepageURL":null},"visible":true,"active":true,"userDisabled":false,"appDisabled":false,"descriptor":"C:\\Program Files\\Mozilla Firefox\\browser\\features\\loop@mozilla.org.xpi","installDate":1457051706000,"updateDate":1457051706000,"applyBackgroundUpdates":1,"bootstrap":true,"skinnable":false,"size":3086125,"sourceURI":null,"releaseNotesURI":null,"softDisabled":false,"foreignInstall":false,"hasBinaryComponents":false,"strictCompatibility":false,"locales":[],"targetApplications":[{"id":"{ec8030f7-c20a-464f-9b0e-13a3a9e97384}","minVersion":"45.0a1","maxVersion":"45.0"},{"id":"xpcshell@tests.mozilla.org","minVersion":"0","maxVersion":"10"}],"targetPlatforms":[],"multiprocessCompatible":false,"seen":true}
+1478762608037	addons.xpi	DEBUG	Updating XPIState for {"id":"{972ce4c6-7e08-4474-a285-3208198ce6fd}","syncGUID":"z2Xx0HM7dEyO","location":"app-global","version":"45.0","type":"theme","internalName":"classic/1.0","updateURL":null,"updateKey":null,"optionsURL":null,"optionsType":null,"aboutURL":null,"icons":{"32":"icon.png","48":"icon.png"},"iconURL":null,"icon64URL":null,"defaultLocale":{"name":"Default","description":"The default theme.","creator":"Mozilla","homepageURL":null,"contributors":["Mozilla Contributors"]},"visible":true,"active":true,"userDisabled":false,"appDisabled":false,"descriptor":"C:\\Program Files\\Mozilla Firefox\\browser\\extensions\\{972ce4c6-7e08-4474-a285-3208198ce6fd}.xpi","installDate":1457853217066,"updateDate":1457051706000,"applyBackgroundUpdates":1,"skinnable":true,"size":22006,"sourceURI":null,"releaseNotesURI":null,"softDisabled":false,"foreignInstall":false,"hasBinaryComponents":false,"strictCompatibility":true,"locales":[],"targetApplications":[{"id":"{ec8030f7-c20a-464f-9b0e-13a3a9e97384}","minVersion":"45.0","maxVersion":"45.0"}],"targetPlatforms":[],"seen":true}
+1478762608037	DeferredSave.extensions.json	DEBUG	Save changes
+1478762608037	addons.xpi	DEBUG	Updating database with changes to installed add-ons
+1478762608037	addons.xpi-utils	DEBUG	Updating add-on states
+1478762608039	addons.xpi-utils	DEBUG	Writing add-ons list
+1478762608041	addons.xpi	DEBUG	Registering manifest for C:\Users\pc\AppData\Local\Temp\rust_mozprofile.tFEBRACOeOZT\extensions\firebug@software.joehewitt.com.xpi
+1478762608041	addons.xpi	DEBUG	Calling bootstrap method startup on firebug@software.joehewitt.com version 2.0.18
+1478762608048	addons.xpi	DEBUG	Registering manifest for C:\Program Files\Mozilla Firefox\browser\features\loop@mozilla.org.xpi
+1478762608049	addons.xpi	DEBUG	Loading bootstrap scope from C:\Program Files\Mozilla Firefox\browser\features\loop@mozilla.org.xpi
+1478762608056	addons.xpi	DEBUG	Calling bootstrap method startup on loop@mozilla.org version 0.1
+1478762608064	addons.manager	DEBUG	Starting provider: <unnamed-provider>
+1478762608064	addons.manager	DEBUG	Registering shutdown blocker for <unnamed-provider>
+1478762608065	addons.manager	DEBUG	Provider finished startup: <unnamed-provider>
+1478762608073	addons.manager	DEBUG	Registering shutdown blocker for XPIProvider
+1478762608073	addons.manager	DEBUG	Provider finished startup: XPIProvider
+1478762608073	addons.manager	DEBUG	Starting provider: LightweightThemeManager
+1478762608073	addons.manager	DEBUG	Registering shutdown blocker for LightweightThemeManager
+1478762608073	addons.manager	DEBUG	Provider finished startup: LightweightThemeManager
+1478762608074	addons.manager	DEBUG	Starting provider: GMPProvider
+1478762608078	addons.manager	DEBUG	Registering shutdown blocker for GMPProvider
+1478762608078	addons.manager	DEBUG	Provider finished startup: GMPProvider
+1478762608078	addons.manager	DEBUG	Starting provider: PluginProvider
+1478762608078	addons.manager	DEBUG	Registering shutdown blocker for PluginProvider
+1478762608078	addons.manager	DEBUG	Provider finished startup: PluginProvider
+1478762608079	addons.manager	DEBUG	Completed startup sequence
+1478762608244	DeferredSave.extensions.json	DEBUG	Starting timer
+1478762608258	addons.manager	DEBUG	Starting provider: PreviousExperimentProvider
+1478762608258	addons.manager	DEBUG	Registering shutdown blocker for PreviousExperimentProvider
+1478762608258	addons.manager	DEBUG	Provider finished startup: PreviousExperimentProvider
+1478762608277	DeferredSave.extensions.json	DEBUG	Starting write
+1478762608332	DeferredSave.extensions.json	DEBUG	Write succeeded
+1478762608332	addons.xpi-utils	DEBUG	XPI Database saved, setting schema version preference to 17
+1478762609310 Marionette: Element is missing an accesible name -> id: login1, tagName: INPUT, className: 
+1478762609355 Marionette: Element does not have a correct accessibility role and may not be manipulated via the accessibility API -> id: password, tagName: INPUT, className: 
+JavaScript error: http://10.125.2.182/javascript/jquery4.js, line 232: TypeError: $(...).val(...).prop(...).removeclass is not a function
+1478762622882 Marionette: Element is missing an accesible name -> id: , tagName: INPUT, className: 
+1478762623106 Marionette: Element is missing an accesible name -> id: , tagName: OPTION, className: 
+1478762623250 Marionette: Element does not support any accessible actions -> id: , tagName: DIV, className: multiCwrap
+1478762628183	addons.xpi	DEBUG	Calling bootstrap method shutdown on firebug@software.joehewitt.com version 2.0.18
+1478762628183	addons.xpi	DEBUG	Calling bootstrap method shutdown on loop@mozilla.org version 0.1
+cker for XPIProvider
+1478761673981	addons.xpi	DEBUG	shutdown
+1478761673981	addons.xpi-utils	DEBUG	shutdown
+1478761673981	addons.manager	DEBUG	Calling shutdown blocker for LightweightThemeManager
+1478761673982	addons.manager	DEBUG	Calling shutdown blocker for GMPProvider
+1478761673983	addons.manager	DEBUG	Calling shutdown blocker for PluginProvider
+1478761673983	addons.manager	DEBUG	Calling shutdown blocker for PreviousExperimentProvider
+1478761673985	addons.xpi	DEBUG	Notifying XPI shutdown observers
+1478761673987	addons.manager	DEBUG	Async provider shutdown done
+dons	WARN	File download failed: 0x80040111
+1478759368439	addons.manager	DEBUG	shutdown
+1478759368439	addons.manager	DEBUG	Calling shutdown blocker for <unnamed-provider>
+1478759368439	addons.manager	DEBUG	Calling shutdown blocker for XPIProvider
+1478759368439	addons.xpi	DEBUG	shutdown
+1478759368439	addons.xpi-utils	DEBUG	shutdown
+1478759368440	addons.manager	DEBUG	Calling shutdown blocker for LightweightThemeManager
+1478759368440	addons.manager	DEBUG	Calling shutdown blocker for GMPProvider
+1478759368441	addons.manager	DEBUG	Calling shutdown blocker for PluginProvider
+1478759368442	addons.manager	DEBUG	Calling shutdown blocker for PreviousExperimentProvider
+1478759368443	addons.xpi	DEBUG	Notifying XPI shutdown observers
+1478759368445	addons.manager	DEBUG	Async provider shutdown done

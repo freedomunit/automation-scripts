@@ -1,0 +1,4 @@
+*** Variables ***
+${login_map_uncheck_action}    https://www.7thonline.com/bin-java/efsnPackage.do_userAuth
+${login_editable_form}    id=loginform
+${login_map}      id=mapcheck

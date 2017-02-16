@@ -1,0 +1,28 @@
+*** Variables ***
+${Security_Button_donloadTemplate}    Xpath=//li[@title='Download Security Template']
+${Security_Button_donloadAccess}    Xpath=//li[@title='Download Security Access']
+${Security_Button_editCount}    //tr//button[text()='Edit']
+${Security_Button_Edit_rowPH}    Xpath=//tr[row]//button[text()='Edit']
+${Security_SecurityForTab_Dropdown_colPH}    Xpath=//div[@class='z-tabpanels']/div[not(contains(@style,'none;'))]//div[col]/div/div/select
+${Security_SecurityForTab_Dropdown_count}    //div[@class='z-tabpanels']/div[not(contains(@style,'none;'))]//div/div/div/select
+${Security_SecurityForTab_Button_Filter}    Xpath=//div/button[text()='Filter']
+${Security_SecurityForTab_Sheet_content}    Xpath=//div[@class='z-tabpanels']/div[not(contains(@style,'none'))]//div[@class='z-listbox-body z-word-nowrap']
+${Security_Button_createSecurity}    Xpath=//li[@title='Create Security Rule Exception']    # Create Security Rule Exception
+${Security_create/editRuleException_input}    Xpath=//span[text()='*Rule Exception Name:']/parent::*/following-sibling::div[2]/input[@type='text']
+${Security_create/editRuleException_filterItems_jquery}    var items='';$(".z-listbox-body table:visible tbody:eq(0)").children("tr").each(function(){if(!items){items+=$(this).text();} else{items+=','+$(this).text();}});return(items)
+${Security_create/editRuleException_dropdown_filterHierarachy_last}    Xpath=//tbody[@class='z-rows']/tr[last()]//select
+${Security_create/editRuleException_Button_addFilter_last}    Xpath=//tbody[@class='z-rows']/tr[last()]//button[text()='+']
+${Security_create/editRuleException_Button_removeFilter_last}    Xpath=//tbody[@class='z-rows']/tr[last()]//button[text()='-']
+${Security_create/editRuleException_filterHierarachy_options_last}    Xpath=//tbody[@class='z-rows']/tr[last()]//div[not (contains(@style,'none'))]/span[@class='ZKmultispans z-span']
+${Security_create/editRuleException_filterHierarachy_optionsCount_last}    //div[@class='pop z-popup z-popup-open']//span[contains(@class,'checkable')]    # //div[@class='z-popup-content']//span[contains(@class,'checkable')]
+${Security_create/editRuleException_filterHierarachy_popOptions_header}    Xpath=//div[@class='pop z-popup z-popup-open']/div[@class='z-popup-content']/div/div[1]//div[not(contains(@style,'none'))]/span[contains(@class,'checkable')]    # Xpath=//div[@class='z-popup-content']/div/div[1]//div[not(contains(@style,'none'))]/span[contains(@class,'checkable')]
+${Security_create/editRuleException_filterHierarachy_popOptions_rowPH}    Xpath=//div[@class='pop z-popup z-popup-open']/div[@class='z-popup-content']/div/div[3]//tr[row]//span[contains(@class,'checkable')]    # Xpath=//div[@class='z-popup-content']/div/div[3]//tr[row]//span[contains(@class,'checkable')]
+${Security_create/editRuleException_filterHierarachy_popOptions_header_checked}    Xpath=//div[@class='pop z-popup z-popup-open']/div[@class='z-popup-content']/div/div[1]//div[not(contains(@style,'none'))]/span[contains(@class,'checked')]    # Xpath=//div[@class='z-popup-content']/div/div[1]//div[not(contains(@style,'none'))]/span[contains(@class,'checked')]
+${Security_Sort_status}    Xpath=//th[@class='z-listheader z-listheader-sort'][4]//i
+${Security_invalidUsers_count}    //td[@class='e-status z-listcell'and contains(@title,'Has Exceptions')]
+${Security_Sort_status_up}    Xpath=//th[@class='z-listheader z-listheader-sort'][4]//div/i[@class='z-icon-caret-up']
+${Security_Sort_status_up@class_jquery}    return $(".z-listheader-sort:eq(3) div div i").attr("class")
+${Security_ruleException_checkboxCol_count}    //div[@class='z-tabpanel' and not (contains(@style,'display: none'))]//tr[@class='z-listhead']//span[contains(@class,'check')]
+${Security_ruleException_ruleCount}    //div[@class='z-tabpanel' and not (contains(@style,'display: none'))]//div[@class='z-listbox-body']//tbody[1]/tr
+${Security_ruleException_checkbox_header_colPH}    Xpath=//div[@class='z-tabpanel' and not (contains(@style,'display: none'))]//tr[@class='z-listhead']/th[col]//span[contains(@class,'check')]
+${Security_ruleException_checkbox_rule_rowPHcolPH}    Xpath=//div[@class='z-tabpanel' and not (contains(@style,'display: none'))]//div[@class='z-listbox-body']//tbody[1]/tr[row]/td[col]//span[contains(@class,'check')]

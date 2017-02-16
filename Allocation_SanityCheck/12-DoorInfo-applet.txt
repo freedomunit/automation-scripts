@@ -1,0 +1,6 @@
+*** Settings ***
+Resource          Setting/environment.txt
+Resource          Setting/performancekeyword.txt
+Resource          page/ZK.txt
+
+*** Test Cases ***

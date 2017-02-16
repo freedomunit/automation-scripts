@@ -1,0 +1,5 @@
+*** Variables ***
+${wshistory_save}    Xpath=//input[@value='Save Current Version']
+${wshistory_seasonal_first_compareToCurrentVersion}    Xpath=//div[@id='maincontent']//table[@class='table1']/tbody[1]/tr[2]/td[5]/a
+${wshistory_monthly_first_compareToCurrentVersion}    Xpath=//div[@id='maincontent']//table[@class='table1']/tbody[1]/tr[2]/td[6]/a
+${wshistory_monthly_first_PDFComparison}    Xpath=//div[@id='maincontent']//table[@class='table1']/tbody[1]/tr[2]/td[5]/a

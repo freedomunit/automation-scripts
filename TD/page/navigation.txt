@@ -1,0 +1,9 @@
+*** Variables ***
+${corporate_dropdown}    id=corporate-select
+${corporate_select}    name=access
+${navigation_menu}    id=menuTrigger
+${parent_company_dropdown}    id=parent-select
+${parent_company_select}    name=parent
+${corporate_dropdown_area}    id=corporate-text
+${parent_dropdown_area}    id=parent-text
+${navigation_menu_open}    Xpath=//div[@id='tog']
